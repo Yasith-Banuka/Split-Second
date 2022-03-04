@@ -24,7 +24,9 @@ server.on('connection', function (socket) {
     //socket.write('Hello, client.');
 
     // The server can also receive data from the client by reading from its socket.
-    socket.on('message', function (json) {
+    socket.on('data', function (bufObj) {
+        let json = JSON.parse(bufObj.toString('utf8'));
+
         console.log(`Data received from client: ` + JSON.stringify(json));
         clientServer(socket, json);
     });
@@ -70,6 +72,11 @@ function clientServer(socket, json) {
 
 function newidentity(socket, identity) {
     let regEx = new RegExp('^[a-z][a-z0-9]{2,16}$', 'i');
+
+    let obj = { "type": "newidentity", "approved": "true" };
+    let buf = Buffer.from(JSON.stringify(obj));
+    console.log(JSON.stringify(buf.toJSON()));
+
     if (regEx.test(identity)) {
         socket.sendMessage({ "type": "newidentity", "approved": "true" });
     } else {
