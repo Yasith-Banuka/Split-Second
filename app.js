@@ -1,6 +1,7 @@
 const Net = require('net'),
     JsonSocket = require('json-socket');
 const { clientServer } = require('./clientServer/clientServerMain');
+const util = require('./util/util');
 // The port on which the server is listening.
 const port = 8080;
 
@@ -23,9 +24,10 @@ server.on('connection', function (socket) {
 
     // The server can also receive data from the client by reading from its socket.
     socket.on('data', function (bufObj) {
-        let json = JSON.parse(bufObj.toString('utf8'));
+        let json = util.jsonDecode(bufObj);
 
-        console.log(`Data received from client: ` + JSON.stringify(json));
+        //console.log(`Data received from client: ` + JSON.stringify(json));
+        console.log(`Data received from client: ` + JSON.stringify(json) + `\n`);
         clientServer(socket, json);
     });
 
