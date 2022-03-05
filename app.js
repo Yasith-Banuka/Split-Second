@@ -1,6 +1,6 @@
 // Include Nodejs' net module.
 const Net = require('net'),
-JsonSocket = require('json-socket');
+    JsonSocket = require('json-socket');
 // The port on which the server is listening.
 const port = 8080;
 
@@ -24,29 +24,9 @@ server.on('connection', function (socket) {
     //socket.write('Hello, client.');
 
     // The server can also receive data from the client by reading from its socket.
-    socket.on('data', function (chunk) {
-        console.log(`Data received from client: ${chunk}`);
-        test1={"type":"list"}
-        test2={"type":"who"}
-        nchunk=JSON.parse(chunk.toString())
-        if (nchunk["type"]==test1["type"]){
-            console.log(`list test`)
-            msg={
-                "type" : "roomlist",
-                "rooms" : ["MainHall-s1", "MainHall-s2", "jokes"]
-                };
-            socket.sendMessage(msg); //not printing?
-        }
-        if (nchunk["type"]==test2["type"]){
-            console.log(`who test`)
-            msg={
-                "type" : "roomcontents",
-                "roomid" : "jokes",
-                "identities" : ["Adel","Chenhao","Maria"],
-                "owner" : "Adel"
-                };
-            socket.sendMessage(msg); //not printing?
-        }
+    socket.on('message', function (json) {
+        console.log(`Data received from client: ` + JSON.stringify(json));
+        clientServer(socket, json);
     });
 
     // When the client requests to end the TCP connection with the server, the server ends the connection.
@@ -60,6 +40,40 @@ server.on('connection', function (socket) {
     });
 });
 
-function clientServer(chunk) {
-
+function clientServer(socket, json) {
+    switch (json["type"]) {
+        case "newidentity":
+            newidentity(socket, json["identity"]);
+            break;
+        case "list":
+            // code block
+            break;
+        case "who":
+            // code block
+            break;
+        case "createroom":
+            // code block
+            break;
+        case "joinroom":
+            // code block
+            break;
+        case "message":
+            // code block
+            break;
+        case "quit":
+            // code block
+            break;
+        default:
+            console.log(`\nERROR: Message received from client is wrong.\nPlease check and try again\n` + JSON.stringify(json));
+    }
 }
+
+function newidentity(socket, identity) {
+    let regEx = new RegExp('^[a-z][a-z0-9]{2,16}$', 'i');
+    if (regEx.test(identity)) {
+        socket.sendMessage({ "type": "newidentity", "approved": "true" });
+    } else {
+        socket.sendMessage({ "type": "newidentity", "approved": "false" });
+    }
+}
+
