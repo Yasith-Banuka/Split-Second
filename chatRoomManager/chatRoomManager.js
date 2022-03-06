@@ -5,6 +5,7 @@ inculdes client details.
     {   
         clientIdentity : // clientIdentity
         socket : // associate socket object of the client
+        chatRoom: // chat room of the client
     },
     ....
 ]
@@ -71,4 +72,19 @@ function getClientsChatRoom(chatRoomIdentity) {
     return false;
 }
 
-module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom }
+/*
+
+    return the client details for the given socket
+
+*/
+function getClientForSocket(socket) {
+    let arrayLength = serverClients.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (serverClients[i].socket == socket) {
+            return serverClients[i];
+        }
+    }
+    return false;
+}
+
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom, getClientForSocket }

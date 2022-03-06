@@ -11,7 +11,8 @@ module.exports = {
 
             let clientObject = {
                 clientIdentity: identity,
-                socket: socket
+                socket: socket,
+                chatRoom: serverChatRooms[0].chatRoomIdentity
             };
 
             // adding the client to the server client list
