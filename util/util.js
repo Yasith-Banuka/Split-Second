@@ -16,6 +16,13 @@ module.exports = {
     jsonDecode: function (bufObj) {
         let json = JSON.parse(bufObj);
         return json;
+    },
 
+    // broadcast the given json to the given sockets
+    broadcast: function (clientList, json) {
+        let arrayLength = clientList.length;
+        for (var i = 0; i < arrayLength; i++) {
+            clientList[i].socket.write(this.jsonEncode(json));
+        }
     }
 }
