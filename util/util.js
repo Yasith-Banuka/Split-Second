@@ -6,16 +6,14 @@ module.exports = {
     // todo: this var should change according to the console i/p
     SERVERS_CONF: "",
 
-    // Encode json to utf8
+    // Encode json to utf8 string
     jsonEncode: function (json) {
-        let buf = Buffer.from(JSON.stringify(json));
-        return buf.toJSON();
+        let encodedJsonString = JSON.stringify(json) + "\n";
+        return encodedJsonString;
     },
 
     // Decode json from utf8
     jsonDecode: function (bufObj) {
-        /*  let json = JSON.parse(bufObj.toString('utf8'));
-         return json; */
         let json = JSON.parse(bufObj);
         return json;
 

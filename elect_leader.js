@@ -1,4 +1,4 @@
-import Heap from 'heap-js';
+/* import Heap from 'heap-js';
 
 var constants = require('./constants');
 
@@ -76,3 +76,4 @@ var send_view = () => {
 var receive_view = () => {
     //compare with current and update
 }
+ */
