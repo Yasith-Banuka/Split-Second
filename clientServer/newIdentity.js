@@ -5,8 +5,6 @@ module.exports = {
     newidentity: function (socket, identity) {
         let newIdentityAck;
         let mainHallMoveAck;
-        let buf = util.jsonEncode(obj);
-        console.log(socket.remotePort);
 
         if (checkAvailability(identity)) {
             // adding the client to the clients in the server list
@@ -21,12 +19,11 @@ module.exports = {
             newIdentityAck = { "type": "newidentity", "approved": "true" };
             mainHallMoveAck = { "type": "roomchange", "identity": identity, "former": "", "roomid": serverChatRooms[0].chatRoomIdentity };
 
-            socket.write(JSON.stringify(obj) + "\n", () => console.log("Completed"));
-            socket.write(JSON.stringify(obj1) + "\n");
+            socket.write(util.jsonEncode(newIdentityAck), () => console.log("Client Added Successfully "));
+            socket.write(util.jsonEncode(mainHallMoveAck));
         } else {
-            obj = { "type": "newidentity", "approved": "false" };
-            buf = util.jsonEncode(obj);
-            socket.sendMessage(buf);
+            newIdentityAck = { "type": "newidentity", "approved": "false" };
+            socket.write(util.jsonEncode(newIdentityAck));
         }
     }
 
