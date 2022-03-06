@@ -4,7 +4,7 @@ var constants = require('./constants');
 
 
 const answers = new Heap();
-const begin_election_timeout;
+const begin_election_timeout = null;
 var begin_election = () => {
     //send election msgs to all servers with higher priority
     begin_election_timeout = setTimeout(() => {
@@ -46,7 +46,7 @@ var send_coordinator = () => {
 var receive_coordinator = () => {
     // if sender has higher priority, set sender as new coordinator
 }
-const send_nomination_timeout;
+const send_nomination_timeout =null;
 var send_nomination = () => {
     if(answers.length()>0) { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
         const coordinator = answers.pop();
