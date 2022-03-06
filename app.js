@@ -1,5 +1,6 @@
 const Net = require('net'),
     JsonSocket = require('json-socket');
+const { serverClients, serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
 const util = require('./util/util');
 // The port on which the server is listening.
@@ -10,12 +11,20 @@ const server = new Net.Server();
 // Called when server is connected
 server.listen(port, function () {
     console.log(`Server listening for connection requests on socket localhost:${port}`);
+
+    // creation of the main hall of the server
+    serverChatRooms.push({
+        chatRoomIdentity: "MainHall-" + util.SERVERID,
+        owner: null,
+        identities: []
+    })
 });
 
 // When a client requests a connection with the server, the server creates a new
 // socket dedicated to that client.
+
 server.on('connection', function (socket) {
-    socket = new JsonSocket(socket);
+    //socket = new JsonSocket(socket);
     console.log('A new connection has been established.');
 
 
@@ -25,6 +34,7 @@ server.on('connection', function (socket) {
     //socket.write('Hello, client.');
 
     // The server can also receive data from the client by reading from its socket.
+
     socket.on('data', function (bufObj) {
         let json = util.jsonDecode(bufObj);
 
