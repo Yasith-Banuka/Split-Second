@@ -56,7 +56,7 @@ function checkClientIdentityExist(identity) {
 
     get identities of the chatRoom 
         if chatRoom exists
-            returns the array of identities
+            returns the array of clients
         else
             returns false
 
