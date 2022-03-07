@@ -86,6 +86,7 @@ function getClientForSocket(socket) {
     }
     return false;
 }
+
 /*
 
     remove given client from the chatRoom
