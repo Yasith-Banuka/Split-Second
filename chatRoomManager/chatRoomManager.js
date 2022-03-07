@@ -86,7 +86,6 @@ function getClientForSocket(socket) {
     }
     return false;
 }
-
 /*
 
     remove given client from the chatRoom
@@ -105,3 +104,17 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
 }
 
 module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom }
+
+/*
+
+    return all server chat rooms 
+
+*/
+function getChatRooms() {
+    let arrayLength = serverChatRooms.length;
+    let chatRooms = [];
+    for (var i = 0; i < arrayLength; i++) {
+        chatRooms.push(serverChatRooms.chatRoomIdentity);
+    }
+    return chatRooms;
+}
