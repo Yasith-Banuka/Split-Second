@@ -1,3 +1,4 @@
+const { createRoom } = require("./createRoom");
 const { message } = require("./message");
 const { newidentity } = require("./newIdentity");
 
@@ -14,7 +15,7 @@ module.exports = {
                 // code block
                 break;
             case "createroom":
-                // code block
+                createRoom(socket, json["roomid"])
                 break;
             case "joinroom":
                 // code block

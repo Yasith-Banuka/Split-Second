@@ -7,8 +7,6 @@ module.exports = {
         let mainHallMoveAck;
 
         if (checkAvailability(identity)) {
-            // adding the client to the clients in the server list
-
             let clientObject = {
                 clientIdentity: identity,
                 socket: socket,
@@ -45,10 +43,8 @@ module.exports = {
         return true
 */
 function checkAvailability(identity) {
-    let regEx = new RegExp('^[a-z][a-z0-9]{2,16}$', 'i');
-
     // because in js (0==false)-> true
-    if ((regEx.test(identity)) && (typeof checkClientIdentityExist(identity) == "boolean")) {
+    if (util.checkAlphaNumeric(identity) && (typeof checkClientIdentityExist(identity) == "boolean")) {
         return true;
     }
     return false;
