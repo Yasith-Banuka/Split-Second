@@ -9,7 +9,6 @@ module.exports = {
 
         let approveMessage;
 
-
         if (checkRoomIsAuthentic(client, roomId)) {
             let roomChange = {
                 "type": "roomchange",
