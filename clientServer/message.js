@@ -1,4 +1,4 @@
-const { getClientForSocket, getClientsChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { getClientForSocket, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
@@ -11,6 +11,6 @@ module.exports = {
             "content": content
         };
 
-        util.broadcast(getClientsChatRoom(client.chatRoom), message);
+        util.broadcast(getChatRoom(client.chatRoom).clients, message);
     }
 }

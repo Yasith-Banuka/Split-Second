@@ -1,4 +1,4 @@
-const { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
@@ -23,7 +23,7 @@ module.exports = {
             mainHallMoveAck = { "type": "roomchange", "identity": identity, "former": "", "roomid": serverChatRooms[0].chatRoomIdentity };
 
             socket.write(util.jsonEncode(newIdentityAck));
-            util.broadcast(getClientsChatRoom(serverChatRooms[0].chatRoomIdentity), mainHallMoveAck);
+            util.broadcast(getChatRoom(serverChatRooms[0].chatRoomIdentity).clients, mainHallMoveAck);
 
             console.log('new client added to the server');
         } else {
