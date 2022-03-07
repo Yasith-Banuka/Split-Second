@@ -116,7 +116,21 @@ function getChatRoomOwner(chatRoomIdentity) {
     return false;
 }
 
+/*
+
+    delete client from a chat room 
+
+*/
+function deleteClient(chatRoomIdentity) {
+    let arrayLength = serverChatRooms.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (serverChatRooms[i].chatRoomIdentity == chatRoomIdentity) {
+            serverChatRooms.splice(i);
+        }
+    }
+    return false;
+}
 
 
 
-module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom, getClientForSocket, getChatRooms, getChatRoomOwner }
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom, getClientForSocket, getChatRooms, getChatRoomOwner, deleteClient }
