@@ -1,4 +1,4 @@
-const { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
@@ -7,8 +7,6 @@ module.exports = {
         let mainHallMoveAck;
 
         if (checkAvailability(identity)) {
-            // adding the client to the clients in the server list
-
             let clientObject = {
                 clientIdentity: identity,
                 socket: socket,
@@ -25,7 +23,7 @@ module.exports = {
             mainHallMoveAck = { "type": "roomchange", "identity": identity, "former": "", "roomid": serverChatRooms[0].chatRoomIdentity };
 
             socket.write(util.jsonEncode(newIdentityAck));
-            util.broadcast(getClientsChatRoom(serverChatRooms[0].chatRoomIdentity), mainHallMoveAck);
+            util.broadcast(getChatRoom(serverChatRooms[0].chatRoomIdentity).clients, mainHallMoveAck);
 
             console.log('new client added to the server');
         } else {
@@ -45,10 +43,8 @@ module.exports = {
         return true
 */
 function checkAvailability(identity) {
-    let regEx = new RegExp('^[a-z][a-z0-9]{2,16}$', 'i');
-
     // because in js (0==false)-> true
-    if ((regEx.test(identity)) && (typeof checkClientIdentityExist(identity) == "boolean")) {
+    if (util.checkAlphaNumeric(identity) && (typeof checkClientIdentityExist(identity) == "boolean")) {
         return true;
     }
     return false;

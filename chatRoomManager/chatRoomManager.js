@@ -19,7 +19,7 @@ inculdes chat rooms details inculded in the server
 [
     {   
         chatRoomIdentity: // chatRoomIdentity
-        owner : // owner object
+        owner : // owner(client) object
         clients : [objects of clients - same as the object in the serverClients]     
     },
     ....
@@ -57,16 +57,16 @@ function checkClientIdentityExist(identity) {
 
     get identities of the chatRoom 
         if chatRoom exists
-            returns the array of clients
+            returns the chatRoomObject
         else
             returns false
 
 */
-function getClientsChatRoom(chatRoomIdentity) {
+function getChatRoom(chatRoomIdentity) {
     let arrayLength = serverChatRooms.length;
     for (var i = 0; i < arrayLength; i++) {
         if (serverChatRooms[i].chatRoomIdentity == chatRoomIdentity) {
-            return serverChatRooms[i].clients;
+            return serverChatRooms[i];
         }
     }
     return false;
@@ -87,6 +87,8 @@ function getClientForSocket(socket) {
     return false;
 }
 
+
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket }
 /*
 
     return all server chat rooms 
@@ -103,21 +105,6 @@ function getChatRooms() {
 
 /*
 
-    return owner of the chat room 
-
-*/
-function getChatRoomOwner(chatRoomIdentity) {
-    let arrayLength = serverChatRooms.length;
-    for (var i = 0; i < arrayLength; i++) {
-        if (serverChatRooms[i].chatRoomIdentity == chatRoomIdentity) {
-            return serverChatRooms[i].owner;
-        }
-    }
-    return false;
-}
-
-/*
-
     delete client from a chat room 
 
 */
@@ -130,7 +117,5 @@ function deleteClient(chatRoomIdentity) {
     }
     return false;
 }
-
-
 
 module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom, getClientForSocket, getChatRooms, getChatRoomOwner, deleteClient }
