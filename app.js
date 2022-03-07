@@ -1,8 +1,8 @@
-const Net = require('net'),
-    JsonSocket = require('json-socket');
-const { serverClients, serverChatRooms } = require('./chatRoomManager/chatRoomManager');
+const Net = require('net');
+const { serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
 const util = require('./util/util');
+
 // The port on which the server is listening.
 const port = 8080;
 
@@ -16,7 +16,7 @@ server.listen(port, function () {
     serverChatRooms.push({
         chatRoomIdentity: "MainHall-" + util.SERVERID,
         owner: null,
-        identities: []
+        clients: []
     })
 });
 

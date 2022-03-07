@@ -1,3 +1,4 @@
+const { message } = require("./message");
 const { newidentity } = require("./newIdentity");
 
 module.exports = {
@@ -19,7 +20,7 @@ module.exports = {
                 // code block
                 break;
             case "message":
-                // code block
+                message(socket, json["content"])
                 break;
             case "quit":
                 // code block

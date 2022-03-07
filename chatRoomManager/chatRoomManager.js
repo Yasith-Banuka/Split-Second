@@ -5,6 +5,7 @@ inculdes client details.
     {   
         clientIdentity : // clientIdentity
         socket : // associate socket object of the client
+        chatRoom: // chat room of the client
     },
     ....
 ]
@@ -18,8 +19,8 @@ inculdes chat rooms details inculded in the server
 [
     {   
         chatRoomIdentity: // chatRoomIdentity
-        owner : // owner's client ID
-        identities : [clients in the chat room]     
+        owner : // owner object
+        clients : [objects of clients - same as the object in the serverClients]     
     },
     ....
 ]
@@ -33,4 +34,57 @@ inculdes chat rooms details inculded in the server
 */
 var serverChatRooms = [];
 
-module.exports = { serverClients, serverChatRooms }
+/*
+
+    check if the client identity already exists and 
+        if do
+            returns the array index of the client
+        else
+            returns false
+
+*/
+function checkClientIdentityExist(identity) {
+    let arrayLength = serverClients.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (serverClients[i].clientIdentity == identity) {
+            return i;
+        }
+    }
+    return false;
+}
+
+/*
+
+    get identities of the chatRoom 
+        if chatRoom exists
+            returns the array of clients
+        else
+            returns false
+
+*/
+function getClientsChatRoom(chatRoomIdentity) {
+    let arrayLength = serverChatRooms.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (serverChatRooms[i].chatRoomIdentity == chatRoomIdentity) {
+            return serverChatRooms[i].clients;
+        }
+    }
+    return false;
+}
+
+/*
+
+    return the client details for the given socket
+
+*/
+function getClientForSocket(socket) {
+    let arrayLength = serverClients.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (serverClients[i].socket == socket) {
+            return serverClients[i];
+        }
+    }
+    return false;
+}
+
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom, getClientForSocket }

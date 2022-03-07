@@ -1,4 +1,4 @@
-const { serverClients, serverChatRooms } = require("../chatRoomManager/chatRoomManager");
+const { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
@@ -8,32 +8,48 @@ module.exports = {
 
         if (checkAvailability(identity)) {
             // adding the client to the clients in the server list
-            serverClients.push({
+
+            let clientObject = {
                 clientIdentity: identity,
-                socket: socket
-            });
+                socket: socket,
+                chatRoom: serverChatRooms[0].chatRoomIdentity
+            };
+
+            // adding the client to the server client list
+            serverClients.push(clientObject);
 
             // adding the client into MainHall
-            serverChatRooms[0].identities.push(identity);
+            serverChatRooms[0].clients.push(clientObject);
 
             newIdentityAck = { "type": "newidentity", "approved": "true" };
             mainHallMoveAck = { "type": "roomchange", "identity": identity, "former": "", "roomid": serverChatRooms[0].chatRoomIdentity };
 
-            socket.write(util.jsonEncode(newIdentityAck), () => console.log("Client Added Successfully "));
-            socket.write(util.jsonEncode(mainHallMoveAck));
+            socket.write(util.jsonEncode(newIdentityAck));
+            util.broadcast(getClientsChatRoom(serverChatRooms[0].chatRoomIdentity), mainHallMoveAck);
+
+            console.log('new client added to the server');
         } else {
             newIdentityAck = { "type": "newidentity", "approved": "false" };
             socket.write(util.jsonEncode(newIdentityAck));
+
+            console.log('new client addition failed')
         }
     }
 
 }
 
+/*
+    if identity is already exists
+        return false
+    else 
+        return true
+*/
 function checkAvailability(identity) {
     let regEx = new RegExp('^[a-z][a-z0-9]{2,16}$', 'i');
-    if (regEx.test(identity)) {
+
+    // because in js (0==false)-> true
+    if ((regEx.test(identity)) && (typeof checkClientIdentityExist(identity) == "boolean")) {
         return true;
     }
-
     return false;
 }
