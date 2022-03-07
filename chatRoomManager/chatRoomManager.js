@@ -38,7 +38,7 @@ var serverChatRooms = [];
 
     check if the client identity already exists and 
         if do
-            returns the array index of the client
+            returns the client
         else
             returns false
 
@@ -47,7 +47,7 @@ function checkClientIdentityExist(identity) {
     let arrayLength = serverClients.length;
     for (var i = 0; i < arrayLength; i++) {
         if (serverClients[i].clientIdentity == identity) {
-            return i;
+            return serverClients[i];
         }
     }
     return false;
@@ -87,8 +87,21 @@ function getClientForSocket(socket) {
     return false;
 }
 
-function checkClientIsOwner(client) {
+/*
 
+    remove given client from the chatRoom
+
+*/
+function removeClientFromChatRoom(chatRoomIdentity, client) {
+    let chatRoom = getChatRoom(chatRoomIdentity);
+    let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
+
+    let clientList = chatRoom.clients;
+    let clientArrayIndex = clientList.findIndex((x) => x == client);
+    clientList.splice(clientArrayIndex, 1);
+
+    chatRoom.clients = clientList;
+    serverChatRooms[chatRoomArrayIndex] = chatRoom;
 }
 
-module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket }
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom }
