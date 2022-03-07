@@ -11,7 +11,7 @@ module.exports = {
             "identity": client.clientIdentity,
             "former": client.chatRoom,
             "roomid": roomId
-        }
+        };
         let previousChatRoom = client.chatRoom;
 
         if (checkAvailability(roomId) && (!checkClientIsOwner(client))) {
@@ -66,7 +66,6 @@ function checkAvailability(roomId) {
         reutrn false
 
 */
-
 function checkClientIsOwner(client) {
     let clientChatRoomId = checkClientIdentityExist(client.clientIdentity).chatRoom;
     let clientChatRoom = getChatRoom(clientChatRoomId);
