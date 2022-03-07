@@ -87,4 +87,36 @@ function getClientForSocket(socket) {
     return false;
 }
 
-module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom, getClientForSocket }
+/*
+
+    return all server chat rooms 
+
+*/
+function getChatRooms() {
+    let arrayLength = serverChatRooms.length;
+    let chatRooms=[];
+    for (var i = 0; i < arrayLength; i++) {
+        chatRooms.push(serverChatRooms.chatRoomIdentity);
+    }
+    return chatRooms;
+}
+
+/*
+
+    return owner of the chat room 
+
+*/
+function getChatRoomOwner(chatRoomIdentity) {
+    let arrayLength = serverChatRooms.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (serverChatRooms[i].chatRoomIdentity == chatRoomIdentity) {
+            return serverChatRooms[i].owner;
+        }
+    }
+    return false;
+}
+
+
+
+
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getClientsChatRoom, getClientForSocket, getChatRooms, getChatRoomOwner }
