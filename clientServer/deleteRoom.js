@@ -51,6 +51,8 @@ module.exports = {
             };
             socket.write(util.jsonEncode(approveMessage));
 
+            console.log("room deleted");
+
         } else {
             approveMessage = {
                 "type": "deleteroom",
@@ -58,6 +60,8 @@ module.exports = {
                 "approved": "false"
             };
             socket.write(util.jsonEncode(approveMessage));
+
+            console.log("room deleted failed");
         }
     }
 }

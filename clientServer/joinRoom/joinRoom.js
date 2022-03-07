@@ -39,6 +39,7 @@ module.exports = {
             };
             socket.write(util.jsonEncode(approveMessage));
 
+            console.log("room changed failed");
         }
     }
 }

@@ -37,9 +37,12 @@ module.exports = {
             socket.write(util.jsonEncode(roomChange));
             util.broadcast(getChatRoom(previousChatRoom).clients, roomChange);
 
+            console.log("room created");
         } else {
             approveMessage = { "type": "createroom", "roomid": roomId, "approved": "false" };
             socket.write(util.jsonEncode(approveMessage));
+
+            console.log("room created failed");
         }
     }
 }
