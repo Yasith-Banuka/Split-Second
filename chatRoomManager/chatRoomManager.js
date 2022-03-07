@@ -103,8 +103,6 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
     serverChatRooms[chatRoomArrayIndex] = chatRoom;
 }
 
-module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom }
-
 /*
 
     return all server chat rooms 
@@ -118,3 +116,6 @@ function getChatRooms() {
     }
     return chatRooms;
 }
+
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom, getChatRooms }
+
