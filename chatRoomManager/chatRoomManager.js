@@ -106,6 +106,21 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
 
 /*
 
+    remove given client from the server
+
+*/
+function removeClientFromServer(client) {
+    let arrayLength = serverClients.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (serverClients[i].clientIdentity == client) {
+            serverClients.splice(i, 1);
+        }
+    }
+
+}
+
+/*
+
     join a client to the chatroom
 
 */
