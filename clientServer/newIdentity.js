@@ -1,20 +1,51 @@
+const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
     newidentity: function (socket, identity) {
-        let regEx = new RegExp('^[a-z][a-z0-9]{2,16}$', 'i');
+        let newIdentityAck;
+        let mainHallMoveAck;
 
-        let obj = { "type": "newidentity", "approved": "true" };
-        let buf = util.jsonEncode(obj);
-        console.log(JSON.stringify(buf));
+        if (checkAvailability(identity)) {
+            let clientObject = {
+                clientIdentity: identity,
+                socket: socket,
+                chatRoom: serverChatRooms[0].chatRoomIdentity
+            };
 
-        if (regEx.test(identity)) {
-            socket.sendMessage(buf);
+            // adding the client to the server client list
+            serverClients.push(clientObject);
+
+            // adding the client into MainHall
+            serverChatRooms[0].clients.push(clientObject);
+
+            newIdentityAck = { "type": "newidentity", "approved": "true" };
+            mainHallMoveAck = { "type": "roomchange", "identity": identity, "former": "", "roomid": serverChatRooms[0].chatRoomIdentity };
+
+            socket.write(util.jsonEncode(newIdentityAck));
+            util.broadcast(getChatRoom(serverChatRooms[0].chatRoomIdentity).clients, mainHallMoveAck);
+
+            console.log('new client added to the server');
         } else {
-            obj = { "type": "newidentity", "approved": "false" };
-            buf = util.jsonEncode(obj);
-            socket.sendMessage(buf);
+            newIdentityAck = { "type": "newidentity", "approved": "false" };
+            socket.write(util.jsonEncode(newIdentityAck));
+
+            console.log('new client addition failed')
         }
     }
 
+}
+
+/*
+    if identity is already exists
+        return false
+    else 
+        return true
+*/
+function checkAvailability(identity) {
+    // because in js (0==false)-> true
+    if (util.checkAlphaNumeric(identity) && (typeof checkClientIdentityExist(identity) == "boolean")) {
+        return true;
+    }
+    return false;
 }
