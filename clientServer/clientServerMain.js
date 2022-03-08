@@ -1,6 +1,7 @@
 const { createRoom } = require("./createRoom");
 const { deleteRoom } = require("./deleteRoom");
 const { joinRoom } = require("./joinRoom/joinRoom");
+const { sendlist } = require("./list");
 const { message } = require("./message");
 const { newidentity } = require("./newIdentity");
 
@@ -11,7 +12,7 @@ module.exports = {
                 newidentity(socket, json["identity"]);
                 break;
             case "list":
-                // code block
+                sendlist(socket);
                 break;
             case "who":
                 // code block
