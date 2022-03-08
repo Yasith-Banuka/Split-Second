@@ -1,24 +1,33 @@
-const { getClientsChatRoom, getChatRoomOwner, deleteClient } = require("../chatRoomManager/chatRoomManager");
+const { getClientForSocket, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
-    quit: function (socket, identity) {
-        //get chat room and pass it to getChatRoomOwner function and set to former
-        sendQuitReply = {
+    quit: function (socket) {
+
+        let client = getClientForSocket(socket);
+        let room = client.chatRoom;
+        let roomDetails = getChatRoom(room);
+        let roomOwner = roomDetails.owner;
+
+        //send room change msg with null string as new room
+        quitReply = {
             "type" : "roomchange", 
-            "identity" : identity, 
-            "former" : "jokes", 
-            "roomid" : ""};
-        socket.write(util.jsonEncode(sendQuitReply));
-        
+            "identity" : client.clientIdentity, 
+            "former" : room, 
+            "roomid" : ""
+        };
+
+        socket.write(util.jsonEncode(quitReply));
+
+        removeClientFromChatRoom(room, client.clientIdentity);
+
         // check if client is the chat room owner
         roomOwner = getChatRoomOwner();
-        if (identity == roomOwner){
+
+        if (client.clientIdentity == roomOwner){
             //delete room
         }
-        else{
-            deleteClient(identity);
-        }
+        
     }
     
 

@@ -3,17 +3,21 @@ const util = require("../util/util");
 
 module.exports = {
     sendlist: function (socket) {
-        let sendListReply;
+        
+        let listReply;
         let rooms=[];
         let arrayLength = serverChatRooms.length;
+
         for (var i = 0; i < arrayLength; i++) {
             rooms.push(serverChatRooms.chatRoomIdentity);
         }
-        sendListReply = {
+
+        listReply = {
             "type" : "roomlist",
             "rooms" : rooms
             };
-        socket.write(util.jsonEncode(sendListReply));
+
+        socket.write(util.jsonEncode(listReply));
     }
 }
 
