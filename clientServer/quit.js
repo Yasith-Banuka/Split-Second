@@ -1,4 +1,4 @@
-const { getClientForSocket, getChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { getClientForSocket, getChatRoom, removeClientFromServer } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 const { deleteRoom } = require("./deleteRoom");
 
@@ -22,6 +22,8 @@ module.exports = {
         socket.write(util.jsonEncode(quitReply));
 
         removeClientFromChatRoom(room, client.clientIdentity);
+        removeClientFromServer(client.clientIdentity);
+        
         util.broadcast(clientList, quitReply);
         
 
