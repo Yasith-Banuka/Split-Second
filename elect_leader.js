@@ -1,9 +1,9 @@
-import Heap from 'heap-js';
+const heap = require('heap-js');
 
-var constants = require('./constants');
+var constants = require('./util/constants');
 
 
-const answers = new Heap();
+const answers = new heap.Heap();
 const begin_election_timeout = null;
 var begin_election = () => {
     //send election msgs to all servers with higher priority
