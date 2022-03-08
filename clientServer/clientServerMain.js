@@ -1,4 +1,6 @@
 const { createRoom } = require("./createRoom");
+const { deleteRoom } = require("./deleteRoom");
+const { joinRoom } = require("./joinRoom/joinRoom");
 const { message } = require("./message");
 const { newidentity } = require("./newIdentity");
 
@@ -15,13 +17,16 @@ module.exports = {
                 // code block
                 break;
             case "createroom":
-                createRoom(socket, json["roomid"])
+                createRoom(socket, json["roomid"]);
                 break;
             case "joinroom":
-                // code block
+                joinRoom(socket, json["roomid"]);
+                break;
+            case "deleteroom":
+                deleteRoom(socket, json["roomid"]);
                 break;
             case "message":
-                message(socket, json["content"])
+                message(socket, json["content"]);
                 break;
             case "quit":
                 // code block

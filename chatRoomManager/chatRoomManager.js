@@ -38,7 +38,7 @@ var serverChatRooms = [];
 
     check if the client identity already exists and 
         if do
-            returns the array index of the client
+            returns the client
         else
             returns false
 
@@ -47,7 +47,7 @@ function checkClientIdentityExist(identity) {
     let arrayLength = serverClients.length;
     for (var i = 0; i < arrayLength; i++) {
         if (serverClients[i].clientIdentity == identity) {
-            return i;
+            return serverClients[i];
         }
     }
     return false;
@@ -89,17 +89,46 @@ function getClientForSocket(socket) {
 
 /*
 
-    delete client from a chat room 
+    remove given client from the chatRoom
 
 */
-function deleteClient(chatRoomIdentity) {
-    let arrayLength = serverChatRooms.length;
-    for (var i = 0; i < arrayLength; i++) {
-        if (serverChatRooms[i].chatRoomIdentity == chatRoomIdentity) {
-            serverChatRooms.splice(i);
-        }
-    }
-    return false;
+function removeClientFromChatRoom(chatRoomIdentity, client) {
+    let chatRoom = getChatRoom(chatRoomIdentity);
+    let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
+
+    let clientList = chatRoom.clients;
+    let clientArrayIndex = clientList.findIndex((x) => x == client);
+    clientList.splice(clientArrayIndex, 1);
+
+    chatRoom.clients = clientList;
+    serverChatRooms[chatRoomArrayIndex] = chatRoom;
 }
 
-module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, deleteClient }
+/*
+
+    join a client to the chatroom
+
+*/
+function joinClientNewChatRoom(chatRoomIdentity, client) {
+    let chatRoom = getChatRoom(chatRoomIdentity);
+    let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
+    chatRoom.clients.push(client);
+
+    serverChatRooms[chatRoomArrayIndex] = chatRoom;
+}
+
+/*
+
+    return all server chat rooms 
+
+*/
+function getChatRooms() {
+    let arrayLength = serverChatRooms.length;
+    let chatRooms = [];
+    for (var i = 0; i < arrayLength; i++) {
+        chatRooms.push(serverChatRooms.chatRoomIdentity);
+    }
+    return chatRooms;
+}
+
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom, getChatRooms, joinClientNewChatRoom }
