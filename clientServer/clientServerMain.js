@@ -4,6 +4,7 @@ const { joinRoom } = require("./joinRoom/joinRoom");
 const { sendlist } = require("./list");
 const { message } = require("./message");
 const { newidentity } = require("./newIdentity");
+const { sendwho } = require("./who");
 
 module.exports = {
     clientServer: function (socket, json) {
@@ -15,7 +16,7 @@ module.exports = {
                 sendlist(socket);
                 break;
             case "who":
-                // code block
+                sendwho(socket);
                 break;
             case "createroom":
                 createRoom(socket, json["roomid"]);
