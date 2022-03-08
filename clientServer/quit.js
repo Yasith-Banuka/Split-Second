@@ -1,5 +1,6 @@
 const { getClientForSocket, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
+const { deleteRoom } = require("./deleteRoom");
 
 module.exports = {
     quit: function (socket) {
@@ -7,7 +8,8 @@ module.exports = {
         let client = getClientForSocket(socket);
         let room = client.chatRoom;
         let roomDetails = getChatRoom(room);
-        let roomOwner = roomDetails.owner;
+        let owner = (roomDetails.owner == null) ? "" : roomDetails.owner.clientIdentity;
+        let clientList = roomDetails.clients
 
         //send room change msg with null string as new room
         quitReply = {
@@ -20,12 +22,12 @@ module.exports = {
         socket.write(util.jsonEncode(quitReply));
 
         removeClientFromChatRoom(room, client.clientIdentity);
+        util.broadcast(clientList, quitReply);
+        
 
-        // check if client is the chat room owner
-        roomOwner = getChatRoomOwner();
-
-        if (client.clientIdentity == roomOwner){
+        if (client.clientIdentity == owner){
             //delete room
+            deleteRoom(socket, room);
         }
         
     }

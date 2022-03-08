@@ -5,6 +5,7 @@ const { sendlist } = require("./list");
 const { message } = require("./message");
 const { newidentity } = require("./newIdentity");
 const { sendwho } = require("./who");
+const {quit} = require("./quit")
 
 module.exports = {
     clientServer: function (socket, json) {
@@ -31,7 +32,7 @@ module.exports = {
                 message(socket, json["content"]);
                 break;
             case "quit":
-                // code block
+                quit(socket);
                 break;
             default:
                 console.log(`\nERROR: Message received from client is wrong.\nPlease check and try again\n` + JSON.stringify(json));
