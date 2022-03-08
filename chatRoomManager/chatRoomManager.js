@@ -132,4 +132,3 @@ function getChatRooms() {
 }
 
 module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom, getChatRooms, joinClientNewChatRoom }
-

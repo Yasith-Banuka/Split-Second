@@ -1,11 +1,12 @@
-const { getClientsChatRoom, getChatRoomOwner } = require("../chatRoomManager/chatRoomManager");
+const { getClientForSocket, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
     sendwho: function (socket) {
-        let room = getChatRoom(); //how to get room
-        let identities = getClientsChatRoom(room);
-        let owner = getChatRoomOwner(room);
+        let room = getClientForSocket(socket).chatRoom; 
+        let roomDetails = getChatRoom(room);
+        let identities = roomDetails.clients;
+        let owner = roomDetails.owner;
         let sendWhoReply;
         sendWhoReply = {
             "type" : "roomcontents",
