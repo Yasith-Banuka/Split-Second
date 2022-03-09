@@ -1,4 +1,4 @@
-const { getClientForSocket, getChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { getClientForSocket, getChatRoom, checkClientIdentityExist } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
@@ -9,14 +9,13 @@ module.exports = {
         let clients = roomDetails.clients;
         let owner = (roomDetails.owner == null) ? "" : roomDetails.owner.clientIdentity;
         let whoReply;
-
         whoReply = {
             "type": "roomcontents",
             "roomid": room,
             "identities": getClientIdentities(clients),
             "owner": owner
         };
-
+        
         socket.write(util.jsonEncode(whoReply));
     }
 }
@@ -28,12 +27,9 @@ module.exports = {
 */
 function getClientIdentities(clients) {
     let arrayLength = clients.length;
-    console.log(arrayLength);
-    console.log(clients);
     let clientIdentites = [];
     for (var i = 0; i < arrayLength; i++) {
         clientIdentites.push(clients[i].clientIdentity);
-        return clientIdentites;
     }
-    return false;
+    return clientIdentites;
 }

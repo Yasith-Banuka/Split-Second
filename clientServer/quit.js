@@ -1,4 +1,4 @@
-const { getClientForSocket, getChatRoom, removeClientFromServer } = require("../chatRoomManager/chatRoomManager");
+const { serverChatRooms, serverClients, getClientForSocket, getChatRoom, removeClientFromChatRoom, removeClientFromServer,  joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 const { deleteRoom } = require("./deleteRoom");
 
@@ -21,9 +21,9 @@ module.exports = {
 
         socket.write(util.jsonEncode(quitReply));
 
-        removeClientFromChatRoom(room, client.clientIdentity);
-        removeClientFromServer(client.clientIdentity);
-        
+        removeClientFromChatRoom(room, client);
+        removeClientFromServer(client);
+
         util.broadcast(clientList, quitReply);
         
 
@@ -41,7 +41,7 @@ module.exports = {
             let clientListForChatRoom = chatRoom.clients;
             let clientListForMainHall = serverChatRooms[0].clients;
             let arrayLength = clientListForChatRoom.length;
-
+            
             // send "roomchange" command to the clients in the room to change them to the MainHall
             for (var i = 0; i < arrayLength; i++) {
                 let clientArrayIndex = serverClients.findIndex((x) => x == clientListForChatRoom[i]);
@@ -73,17 +73,7 @@ module.exports = {
  
              console.log("room deleted");
  
-         } else {
-             approveMessage = {
-                 "type": "deleteroom",
-                 "roomid": room,
-                 "approved": "false"
-             };
-             socket.write(util.jsonEncode(approveMessage));
- 
-             console.log("room deleted failed");
-         }
-        
+         } 
     }
     
 

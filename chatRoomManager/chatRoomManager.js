@@ -110,12 +110,10 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
 
 */
 function removeClientFromServer(client) {
-    let arrayLength = serverClients.length;
-    for (var i = 0; i < arrayLength; i++) {
-        if (serverClients[i].clientIdentity == client) {
-            serverClients.splice(i, 1);
-        }
-    }
+    
+    let clientArrayIndex = serverClients.findIndex((x) => x == client);
+    
+    serverClients.splice(clientArrayIndex, 1);
 
 }
 
@@ -146,4 +144,4 @@ function getChatRooms() {
     return chatRooms;
 }
 
-module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom, getChatRooms, joinClientNewChatRoom }
+module.exports = { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, getClientForSocket, removeClientFromChatRoom, getChatRooms, joinClientNewChatRoom, removeClientFromServer }
