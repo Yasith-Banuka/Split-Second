@@ -1,41 +1,52 @@
-/* import Heap from 'heap-js';
+const heap = require('heap-js');
 
-var constants = require('./constants');
+const constants = require('./util/constants');
 
 
-const answers = new Heap();
-const begin_election_timeout = null;
-var begin_election = () => {
+const answers = new heap.Heap();
+var inProcess = False;
+var acceptingAnswers = false;
+var acceptingNominations = false;
+var acceptingCoordinators = false;
+var acceptingViews = false;
+
+var beginElection = () => {
     //send election msgs to all servers with higher priority
-    begin_election_timeout = setTimeout(() => {
-         
+    acceptingAnswers = true;
+    inProcess = true;
+    setTimeout(() => {
+        acceptingAnswers = false;
         if(answers.length()>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
-            send_nomination();
-        } else {  //else, send coordinator msgs to all procersses wih lower priority
-            send_coordinator();
+            sendNomination();
+            acceptingNominations = true;
+        } else {  //else, send coordinator msgs to all processes wih lower priority
+            sendCoordinator();
         }
 
     }, constants.T2);
 }
 
-var send_election = () => {
+var sendElection = () => {
     
 }
 
-var receive_election = () => {
+var receiveElection = () => {
     //if the priority of server that sent the msg is lower, send answer msg
     
 }
 
-var send_answer = () => {
+var sendAnswer = () => {
 
 }
 
-var receive_answer = () => {
-    //add to answer array
+var receiveAnswer = () => {
+    if(acceptingAnswers) {
+        //add to answer array
+    }
+    
 }
 
-var send_coordinator = () => {
+var sendCoordinator = () => {
     //to all servers with lower priority
 
     
@@ -43,37 +54,48 @@ var send_coordinator = () => {
 
 }
 
-var receive_coordinator = () => {
+var receiveCoordinator = () => {
     // if sender has higher priority, set sender as new coordinator
 }
-const send_nomination_timeout =null;
-var send_nomination = () => {
-    if(answers.length()>0) { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+const sendNominationTimeout = null;
+var sendNomination = () => {
+    if(answers.length()>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
         const coordinator = answers.pop();
-        send_nomination_timeout = setTimeout(send_nomination, constants.T3)  //repeat every T3 until coordinator msg received
+        sendNominationTimeout = setTimeout(sendNomination, constants.T3)  //repeat every T3 until coordinator msg received
     } else { //else restart election
-        begin_election();
+        beginElection();
     }
     
 }
 
-var receive_nomination = () => {
+var receiveNomination = (serverID) => {
+    if(receiveNomination) {
+        //check if serverID less than own
+        sendCoordinator();
+        inProcess = false;
+    }
     //send_coordinator
 }
 
-var send_iamup = () => {
+var sendIamup = () => {
+    //send messages to all
+    acceptingViews = true;
+    setTimeout(()=> {
+        acceptingViews = false;
+    },constants.T2);
+}
+
+var receiveIamup = () => {
+    sendView();
+}
+
+var sendView = () => {
 
 }
 
-var receive_iamup = () => {
-    //send_view
-}
-
-var send_view = () => {
-
-}
-
-var receive_view = () => {
+var receiveView = () => {
     //compare with current and update
 }
- */
+
+//block clients until all servers up
+//values for t1, t2
