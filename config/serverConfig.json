@@ -1,0 +1,17 @@
+{
+    "s1":{
+        "address":"localhost",
+        "clientsPort" : 8080,
+        "coordinationPort" : 5000
+    },
+    "s2":{
+        "address":"localhost",
+        "clientsPort" : 8081,
+        "coordinationPort" : 5001
+    },
+    "s3":{
+        "address":"localhost",
+        "clientsPort" : 8082,
+        "coordinationPort" : 5002
+    }
+}
