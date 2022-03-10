@@ -7,17 +7,21 @@ inculdes server details.
         port: 
         coordinationPort :
         socket : // associate socket object of the server
+        priority
     },
     ....
 ]
 
 */
-var coordinatingServers = [];
+var otherServerDetails = [];
 
+var serverDetails = {
+    "id": "s3",
+    "priority": 3
+}
 
 function getServerForSocket(socket) {
-    let arrayLength = coordinatingServers.length;
-    for (var i = 0; i < arrayLength; i++) {
+    for (var i = 0; i < coordinatingServers.length; i++) {
         if (coordinatingServers[i].socket == socket) {
             return coordinatingServers[i];
         }
@@ -25,8 +29,23 @@ function getServerForSocket(socket) {
     return false;
 }
 
-function getSocketForServer( serverId){
-    return coordinatingServers["socket"];
+function getSocketsForServers(serverIds){
+    if (typeof serverIds === "string"){
+        serverIds = [serverIds];
+    }
+    let results = []
+    for (var i = 0; i < coordinatingServers.length; i++) {
+        if (serverIds.includes(coordinatingServers[i].serverId)) {
+            results.push(coordinatingServers[i].socket);
+        }
+    }
+    return results;
+    
 }
 
-module.exports = { getServerForSocket, getSocketForServer}
+function getAllSockets() {
+    return coordinatingServers.map(server => server.socket);
+}
+
+
+module.exports = { getServerForSocket, getSocketsForServers, getAllSockets , otherServerDetails, serverDetails}
