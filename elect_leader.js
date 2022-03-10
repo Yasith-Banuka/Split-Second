@@ -2,18 +2,23 @@ const heap = require('heap-js');
 
 const constants = require('./util/constants');
 
+const {message, broadcast, multicast} = require("./serverServer/message")
+
+const {getLowerPriorityServers, getHigherPriorityServers, serverDetails} = require("./serverManager/serverManager")
 
 const answers = new heap.Heap();
-var inProcess = False;
+var inProcess = false;
 var acceptingAnswers = false;
 var acceptingNominations = false;
 var acceptingCoordinators = false;
 var acceptingViews = false;
 
 var beginElection = () => {
-    //send election msgs to all servers with higher priority
+    //send election msgs to all processes with higher priority
+    sendElection();
     acceptingAnswers = true;
     inProcess = true;
+
     setTimeout(() => {
         acceptingAnswers = false;
         if(answers.length()>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
@@ -27,40 +32,49 @@ var beginElection = () => {
 }
 
 var sendElection = () => {
-    
+    let electionMsg = {“type” : “bully”, “subtype” : “election”, “serverid” : serverDetails.id}
+    multicast(getHigherPriorityServers(),electionMsg)
 }
 
-var receiveElection = () => {
+var receiveElection = (serverPriority) => {
     //if the priority of server that sent the msg is lower, send answer msg
+    if(serverPriority < serverDetails.priority) {
+        sendAnswer("s" + serverPriority);
+    }
     
 }
 
-var sendAnswer = () => {
-
+var sendAnswer = (serverId) => {
+    let answerMsg = {“type” : “bully”, “subtype” : “answer”, “serverid” : serverDetails.id}
+    message(serverId, answerMsg);
 }
 
-var receiveAnswer = () => {
+var receiveAnswer = (serverPriority) => {
     if(acceptingAnswers) {
-        //add to answer array
+        answers.push(serverPriority);
     }
     
 }
 
 var sendCoordinator = () => {
     //to all servers with lower priority
-
-    
-    
-
+    let coordinatorMsg = {“type” : “bully”, “subtype” : “coordinator”, “serverid” : serverDetails.id}
+    multicast(getLowerPriorityServers, coordinatorMsg);
 }
 
-var receiveCoordinator = () => {
+var receiveCoordinator = (serverPriority) => {
     // if sender has higher priority, set sender as new coordinator
+    if(serverPriority > serverDetails.priority) {
+
+    }
 }
+
 const sendNominationTimeout = null;
 var sendNomination = () => {
     if(answers.length()>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
-        const coordinator = answers.pop();
+        const nominationId = "s"+answers.pop();
+        //nominationMsg = {“type” : “bully”, “subtype” : “nomination”, “serverid” : “s3”}
+        message(nominationId,nominationMsg);
         sendNominationTimeout = setTimeout(sendNomination, constants.T3)  //repeat every T3 until coordinator msg received
     } else { //else restart election
         beginElection();
@@ -68,13 +82,13 @@ var sendNomination = () => {
     
 }
 
-var receiveNomination = (serverID) => {
-    if(receiveNomination) {
-        //check if serverID less than own
+var receiveNomination = (serverPriority) => {
+    //check if serverID less than own and send coordinator
+    if(serverPriority < serverDetails.priority) {
+        
         sendCoordinator();
         inProcess = false;
     }
-    //send_coordinator
 }
 
 var sendIamup = () => {

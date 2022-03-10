@@ -7,13 +7,18 @@ inculdes server details.
         port: 
         coordinationPort :
         socket : // associate socket object of the server
+        priority
     },
     ....
 ]
 
 */
-var coordinatingServers = [];
+var otherServerDetails = [];
 
+var serverDetails = {
+    "id": "s3",
+    "priority": 3
+}
 
 function getServerForSocket(socket) {
     for (var i = 0; i < coordinatingServers.length; i++) {
@@ -43,4 +48,4 @@ function getAllSockets() {
 }
 
 
-module.exports = { getServerForSocket, getSocketsForServers, getAllSockets }
+module.exports = { getServerForSocket, getSocketsForServers, getAllSockets , otherServerDetails, serverDetails}

@@ -14,10 +14,10 @@ module.exports = {
         }
      },
 
-     multicast: function(serverIds, message) {
+    multicast: function(serverIds, message) {
         let sockets = getSocketsForServers(serverIds);
         for (let i=0;i<sockets.length;i++) {
             sockets[i].write(util.jsonEncode(message));
         }
-     }   
+    }   
 }
