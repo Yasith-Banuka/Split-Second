@@ -42,10 +42,14 @@ module.exports = {
     else 
         return true
 */
-function checkAvailability(identity) {
+async function checkAvailability(identity) {
     // because in js (0==false)-> true
     if (util.checkAlphaNumeric(identity) && (typeof checkClientIdentityExist(identity) == "boolean")) {
-        return true;
+        //if not coordinator
+        let coordinatorApproved = await getCoordinatorIdentityApproval(identity);
+        if (coordinatorApproved) {
+            return true;
+        }        
     }
     return false;
 }
