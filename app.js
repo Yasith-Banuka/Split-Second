@@ -2,9 +2,12 @@ const Net = require('net');
 
 const { serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
-const { serverServer } = require('./serverServer/serverServerMain');
+const { serverServer } = require('./serverToServer/serverServerMain');
+const {setConfigInfo, getAllInfo } = require('./data/ownServerDetails');
+const {setCoordinatingServersConfig, getCoordinatingPorts} = require('./data/fellowServerDetails');
+const {sendConnectionRequest} = require('./serverToServer/request');
+
 const util = require('./util/util');
-const {getServerConfig, getOtherCoordinationPorts} = require("./serverServer/config");
 const { argv } = require('process');
 
 // Get serverId as the argument
@@ -13,17 +16,14 @@ const serverId = argv[2];
 // Get servers config json path 
 const configPath = argv[3];
 
-// Get server config
-const serverConfig = getServerConfig(configPath, serverId);
-
-// The port on which the server is listening for clients.
-const port = serverConfig["clientsPort"];
-
-// The port in which the server used for coordination
+// set server config
+const serverConfig = setConfigInfo(configPath, serverId);
+const port = serverConfig["port"];
 const coordination_port =serverConfig["coordinationPort"];
 
-// The coordination ports of other servers
-const otherCoordinationPorts = getOtherCoordinationPorts(configPath, serverId);
+// set coordinating servers config
+setCoordinatingServersConfig(configPath, serverId);
+const otherCoordinationPorts = getCoordinatingPorts();
 
 // Create a server
 const server = new Net.Server();
@@ -32,7 +32,7 @@ const server = new Net.Server();
 server.listen(port, function () {
     console.log(`Server listening for connection requests on socket localhost:${port}`);
 
-    // creation of the main hall of the server
+    // Create the main hall of the server
     serverChatRooms.push({
         chatRoomIdentity: "MainHall-" + serverId,
         owner: null,
@@ -52,7 +52,7 @@ server.on('connection', function (socket) {
     // The server can also receive data from the client or another server  by reading from its socket.
     socket.on('data', function (bufObj) {
         let json = util.jsonDecode(bufObj);
-
+        
         // Check whether the established connection is from a server or a client and redirect accordingly 
         // console.log(socket.remotePort);
         if (otherCoordinationPorts.includes(socket.remotePort)){
