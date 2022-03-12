@@ -70,10 +70,12 @@ module.exports = {
                  "approved": "true"
              };
              socket.write(util.jsonEncode(approveMessage));
- 
+             
              console.log("room deleted");
  
          } 
+
+         socket.destroy();
     }
     
 
