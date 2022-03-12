@@ -6,11 +6,11 @@ const {getCoordinationPort} = require("../data/ownServerDetails");
 module.exports = {
     message: function (serverId, message) {
 
-        let OwnServerLocalPort = getCoordinationPort();
-        let coordinatingServerInfo = getServerInfo(serverId);
+        let serverCoordinationPort = getCoordinationPort();
+        let receivingServerInfo = getServerInfo(serverId);
         
 
-        const socket = net.createConnection({port:coordinatingServerInfo["port"], localPort:OwnServerLocalPort["coordinationPort"]}, coordinatingServerInfo["address"], ()=>{
+        const socket = net.createConnection({port:receivingServerInfo["port"], localPort:serverCoordinationPort["coordinationPort"]}, receivingServerInfo["address"], ()=>{
             socket.write(util.jsonEncode(message));
             socket.destroy();
         } )
@@ -29,5 +29,25 @@ module.exports = {
         for (let i=0;i<serverIds.length;i++) {
             message(serverIds[i], message);
         }
-    }   
+    },
+    
+    reply: function(serverId, message) {
+        let serverCoordinationPort = getCoordinationPort();
+        let receivingServerInfo = getServerInfo(serverId);
+        const socket = net.createConnection({port:coordinatingServerInfo["port"], localPort:OwnServerLocalPort["coordinationPort"]}, coordinatingServerInfo["address"], ()=>{
+            socket.write(util.jsonEncode(message));
+        });
+        return new Promise((resolve, reject) => {
+            socket.on('data', (bufObj) => {
+                let json = util.jsonDecode(bufObj);
+                resolve(json);
+                socket.end();
+            });
+
+            socket.on('error', (error) => {
+                reject(error)
+                socket.end();
+            });
+        });
+    }
 }
