@@ -113,3 +113,4 @@ var receiveView = () => {
 
 //block clients until all servers up
 //values for t1, t2
+//at start, set leader

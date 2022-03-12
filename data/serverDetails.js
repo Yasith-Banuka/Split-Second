@@ -36,9 +36,9 @@ function setConfigInfo(path, serverId) {
 
         if (serverConf[0] == serverId){
 
-            serverInfo["id"] = serverConf[0];
+            serverInfo["serverId"] = serverConf[0];
             serverInfo["address"] = serverConf[1];
-            serverInfo["port"] = parseInt(serverConf[2]);
+            serverInfo["ClientPort"] = parseInt(serverConf[2]);
             serverInfo["coordinationPort"] = parseInt(serverConf[3]);
             break;
         }
@@ -47,12 +47,12 @@ function setConfigInfo(path, serverId) {
 }
 
 
-function getId() {
-    return serverInfo["id"];
+function getServerId() {
+    return serverInfo["serverId"];
 }
 
-function getPort() {
-    return serverInfo["port"];
+function getClientPort() {
+    return serverInfo["ClientPort"];
 }
 
 function getCoordinationPort() {
@@ -67,7 +67,11 @@ function setCoordinator (serverId) {// Set the leader
     coordinatorId = serverId;
 } 
 
-module.exports= {setConfigInfo, getId, getPort, getCoordinationPort, getAllInfo, setCoordinator, setCoordinator}
+function getCoordinator () {
+    return coordinatorId;
+} 
+
+module.exports= {setConfigInfo, getServerId, getClientPort, getCoordinationPort, getAllInfo, setCoordinator, setCoordinator, getCoordinator}
 
 
 // console.log(setConfigInfo('config/serverConfig.txt','s1'));
