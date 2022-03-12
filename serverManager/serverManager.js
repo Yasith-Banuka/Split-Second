@@ -21,9 +21,9 @@ var serverDetails = {
 }
 
 function getServerForSocket(socket) {
-    for (var i = 0; i < coordinatingServers.length; i++) {
-        if (coordinatingServers[i].socket == socket) {
-            return coordinatingServers[i];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (otherServerDetails[i].socket == socket) {
+            return otherServerDetails[i];
         }
     }
     return false;
@@ -33,10 +33,10 @@ function getSocketsForServers(serverIds){
     if (typeof serverIds === "string"){
         serverIds = [serverIds];
     }
-    let results = []
-    for (var i = 0; i < coordinatingServers.length; i++) {
-        if (serverIds.includes(coordinatingServers[i].serverId)) {
-            results.push(coordinatingServers[i].socket);
+    let results = [];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (serverIds.includes(otherServerDetails[i].serverId)) {
+            results.push(otherServerDetails[i].socket);
         }
     }
     return results;
@@ -44,8 +44,27 @@ function getSocketsForServers(serverIds){
 }
 
 function getAllSockets() {
-    return coordinatingServers.map(server => server.socket);
+    return otherServerDetails.map(server => server.socket);
 }
 
+function getHigherPriorityServers() {
+    let results = [];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (serverDetails.priority < otherServerDetails[i].priority) {
+            results.push(otherServerDetails[i].serverId);
+        }
+    } 
+    return results;
+}
 
-module.exports = { getServerForSocket, getSocketsForServers, getAllSockets , otherServerDetails, serverDetails}
+function getLowerPriorityServers() {
+    let results = [];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (serverDetails.priority > otherServerDetails[i].priority) {
+            results.push(otherServerDetails[i].serverId);
+        }
+    } 
+    return results;
+}
+
+module.exports = { getServerForSocket, getSocketsForServers, getAllSockets , getLowerPriorityServers, getHigherPriorityServers, serverDetails}
