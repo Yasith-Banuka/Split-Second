@@ -5,7 +5,6 @@ const { clientServer } = require('./clientServer/clientServerMain');
 const { serverServer } = require('./serverToServer/serverServerMain');
 const {setConfigInfo, getAllInfo } = require('./data/ownServerDetails');
 const {setCoordinatingServersConfig, getCoordinatingPorts} = require('./data/fellowServerDetails');
-const {sendConnectionRequest} = require('./serverToServer/request');
 
 const util = require('./util/util');
 const { argv } = require('process');

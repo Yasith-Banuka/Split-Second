@@ -80,13 +80,22 @@ function removeChatroom(roomId){
 
 
 function getServerInfo(serverId) {
-    let arrayLength = coordinatingServersInfo.length;
+    let arrayLength = coordinatingServers.length;
     for (var i = 0; i < arrayLength; i++) {
-        if (coordinatingServersInfo[i]["id"] == serverId) {
-            return coordinatingServersInfo[i];
+        if (coordinatingServers[i]["id"] == serverId) {
+            return coordinatingServers[i];
         }
     }
 }
 
+function getCoordinatingServerIds () {
+    let serverIds = [];
+    let arrayLength = coordinatingServers.length;
+    for (var i = 0; i < arrayLength; i++) {
+        serverIds.push(coordinatingServers["id"]);
+    }
+    return serverIds;
+}
 
-module.exports = {setCoordinatingServersConfig, getCoordinatingPorts, isClientIdUnique, addClients, removeClient, isChatroomIdUnique, addChatroom, removeChatroom,  getServerInfo }
+
+module.exports = {setCoordinatingServersConfig, getCoordinatingPorts, isClientIdUnique, addClients, removeClient, isChatroomIdUnique, addChatroom, removeChatroom,  getServerInfo, getCoordinatingServerIds }
