@@ -1,5 +1,9 @@
 const { getChatRoom, serverClients, removeClientFromChatRoom, serverChatRooms, getClientForSocket, checkClientIdentityExist } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
+const {isChatroomIdUnique} = require("../data/globalChatRooms");
+const {getServerId, getCoordinator}= require("../data/serverDetails");
+const {reply} = require("../serverToServer/message");
+const {beginElection} = require("../leaderElection");
 
 module.exports = {
     createRoom: function (socket, roomId) {
@@ -14,7 +18,7 @@ module.exports = {
         };
         let previousChatRoom = client.chatRoom;
 
-        if (checkAvailability(roomId) && (!checkClientIsOwner(client))) {
+        if ((!checkClientIsOwner(client)) && checkAvailability(roomId)) {
 
             // remove client from previous chatRoom
             removeClientFromChatRoom(previousChatRoom, client);
@@ -55,11 +59,27 @@ module.exports = {
 */
 function checkAvailability(roomId) {
     // because in js (0==false)-> true
-    if (util.checkAlphaNumeric(roomId) && (typeof getChatRoom(roomId) == "boolean")) {
-        return true;
+    if (util.checkAlphaNumeric(roomId)) {        
+        return getCoordinatorRoomIdApproval(roomId);  
     }
     return false;
-}
+};
+
+function getCoordinatorRoomIdApproval(roomId) {
+    if(getServerId===getCoordinator) {
+
+        return (!isChatroomIdUnique(roomId));
+    }
+    roomRequestMsg = {"type" : "roomrequest", "roomid" : roomId, "serverid" : getServerId}
+    reply(getCoordinator, roomRequestMsg)
+        .then(json => {
+            if(json.type === "roomconfirm" && json.roomid === roomId) {
+                return json.roomApproved;
+            }
+            return false;
+        })
+        .catch(error => beginElection())
+};
 
 /*
 

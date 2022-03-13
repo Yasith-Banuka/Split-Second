@@ -1,19 +1,35 @@
-const { getClientForSocket, getChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { getClientForSocket, getChatRoom, checkClientIdentityExist } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 
 module.exports = {
     sendwho: function (socket) {
-        let room = getClientForSocket(socket).chatRoom; 
+
+        let room = getClientForSocket(socket).chatRoom;
         let roomDetails = getChatRoom(room);
-        let identities = roomDetails.clients;
-        let owner = roomDetails.owner;
-        let sendWhoReply;
-        sendWhoReply = {
-            "type" : "roomcontents",
-            "roomid" : room,
-            "identities" : identities,
-            "owner" : owner
-            };
-        socket.write(util.jsonEncode(sendWhoReply));
+        let clients = roomDetails.clients;
+        let owner = (roomDetails.owner == null) ? "" : roomDetails.owner.clientIdentity;
+        let whoReply;
+        whoReply = {
+            "type": "roomcontents",
+            "roomid": room,
+            "identities": getClientIdentities(clients),
+            "owner": owner
+        };
+        
+        socket.write(util.jsonEncode(whoReply));
     }
+}
+
+/*
+
+    return the list of client identites of given client list
+
+*/
+function getClientIdentities(clients) {
+    let arrayLength = clients.length;
+    let clientIdentites = [];
+    for (var i = 0; i < arrayLength; i++) {
+        clientIdentites.push(clients[i].clientIdentity);
+    }
+    return clientIdentites;
 }
