@@ -111,6 +111,7 @@ var receiveView = () => {
     //compare with current and update
 }
 
+module.exports = {beginElection}
 //block clients until all servers up
 //values for t1, t2
 //at start, set leader
