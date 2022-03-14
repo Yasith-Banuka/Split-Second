@@ -26,7 +26,7 @@ var heartbeatCounterList = [];
 
 //increase counter after receiving 
 
-function receiveAnswer() {
+function receiveHeartbeat() {
     
 }
 
@@ -38,7 +38,7 @@ function receiveAnswer() {
 }
 */
 
-function sendAnswer() {
+function sendHeartbeat() {
     
 }
 
