@@ -1,9 +1,10 @@
 var fs = require('fs')
+const {getPriority} = require("./serverDetails");
 /*
 Include information only about the other servers 
 */
 
-var globalServerDetails = [];
+var globalServersInfo = [];
 
 
 
@@ -24,32 +25,43 @@ function setGlobalServersConfig(path, serverId){
             server= {}
             server["serverId"] = serverConf[0];
             server["address"] = serverConf[1];
-            server["ClientPort"] = parseInt(serverConf[2]);
+            server["clientPort"] = parseInt(serverConf[2]);
             server["coordinationPort"] = parseInt(serverConf[3]);
-
-            globalServerDetails.push(server);
+            server["priority"] = parseInt(serverConf[0].slice(1));
+            globalServersInfo.push(server);
         }
     }
 }
 
 function getCoordinatingPorts () {
     coordinatingPorts = [];
-    let arrayLength = globalServerDetails.length;
+    let arrayLength = globalServersInfo.length;
     for (var i = 0; i < arrayLength; i++) {
-        coordinatingPorts.push(globalServerDetails[i]["coordinationPort"]) 
+        coordinatingPorts.push(globalServersInfo[i]["coordinationPort"]) 
     }
     return coordinatingPorts;
 
 }
 
 function getServerInfo(serverId) {
-    let arrayLength = coordinatingServersInfo.length;
+    let arrayLength = globalServersInfo.length;
     for (var i = 0; i < arrayLength; i++) {
-        if (coordinatingServersInfo[i]["serverId"] == serverId) {
-            return coordinatingServersInfo[i];
+        if (globalServersInfo[i]["serverId"] == serverId) {
+            return globalServersInfo[i];
         }
     }
 }
 
+function getAllServerInfo() {
+    return globalServersInfo;
+}
 
-module.exports = {setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo }
+function getHighestPriorityServer() {
+    let highestPriority = getPriority();
+    for (var i = 0; i < globalServersInfo.length; i++) {
+        highestPriority = Math.min(highestPriority , globalServersInfo[i].priority);
+    }   
+    return "s" + highestPriority; 
+}
+
+module.exports = {setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo, getHighestPriorityServer, getAllServerInfo}
