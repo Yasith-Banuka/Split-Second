@@ -1,52 +1,28 @@
-/* 
-
-inculdes server details.
-[
-    {   
-        serverId : 
-        port: 
-        coordinationPort :
-        socket : // associate socket object of the server
-        priority
-    },
-    ....
-]
-
-*/
-var otherServerDetails = [];
-
-var serverDetails = {
-    "id": "s3",
-    "priority": 3
-}
-
-function getServerForSocket(socket) {
-    for (var i = 0; i < otherServerDetails.length; i++) {
-        if (otherServerDetails[i].socket == socket) {
-            return otherServerDetails[i];
+module.exports = {
+    serverManager: function (socket, json) {
+        switch (json["type"]) {
+            case "newidentity": 
+                // Check the uniqueness of the identity with coordinator
+                // newidentity(socket, json["identity"]);
+                break;
+            case "newchatroom":
+                // Check the uniqueness of the room id with coordinator
+                // code block
+                break;
+            case "joinroom":
+                // code block
+                break;
+            case "bully":
+               // code block
+                break;
+            case "heartbeat":
+                // code block
+                break;
+            case "suspectfailed":
+                // code block
+                break;
+            default:
+                console.log(`\nERROR: Message received from server is wrong.\nPlease check and try again\n` + JSON.stringify(json));
         }
     }
-    return false;
 }
-
-function getSocketsForServers(serverIds){
-    if (typeof serverIds === "string"){
-        serverIds = [serverIds];
-    }
-    let results = [];
-    for (var i = 0; i < otherServerDetails.length; i++) {
-        if (serverIds.includes(otherServerDetails[i].serverId)) {
-            results.push(otherServerDetails[i].socket);
-        }
-    }
-    return results;
-    
-}
-
-function getAllSockets() {
-    return otherServerDetails.map(server => server.socket);
-}
-
-
-
-module.exports = { getServerForSocket, getSocketsForServers, getAllSockets , getLowerPriorityServers, getHigherPriorityServers, serverDetails}

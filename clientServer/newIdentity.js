@@ -2,7 +2,7 @@ const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom } 
 const util = require("../util/util");
 const {isClientIdUsed} = require("../data/globalClients");
 const {getServerId, getCoordinator}= require("../data/serverDetails");
-const {reply} = require("../serverToServer/message");
+const {reply} = require("../serverManager/serverMessage");
 const {beginElection} = require("../leaderElection");
 const {getCoordinatorIdentityApproval} = require("../serverManager/coordinatorCommunication");
 module.exports = {

@@ -3,7 +3,7 @@ var fs = require('fs')
 Include information only about the other servers 
 */
 
-var globalServerDetails = [];
+var globalServersInfo = [];
 
 
 
@@ -24,7 +24,7 @@ function setGlobalServersConfig(path, serverId){
             server= {}
             server["serverId"] = serverConf[0];
             server["address"] = serverConf[1];
-            server["ClientPort"] = parseInt(serverConf[2]);
+            server["clientPort"] = parseInt(serverConf[2]);
             server["coordinationPort"] = parseInt(serverConf[3]);
             server["priority"] = parseInt(serverConf[0].slice(1));
             globalServerDetails.push(server);
@@ -34,19 +34,19 @@ function setGlobalServersConfig(path, serverId){
 
 function getCoordinatingPorts () {
     coordinatingPorts = [];
-    let arrayLength = globalServerDetails.length;
+    let arrayLength = globalServersInfo.length;
     for (var i = 0; i < arrayLength; i++) {
-        coordinatingPorts.push(globalServerDetails[i]["coordinationPort"]) 
+        coordinatingPorts.push(globalServersInfo[i]["coordinationPort"]) 
     }
     return coordinatingPorts;
 
 }
 
 function getServerInfo(serverId) {
-    let arrayLength = globalServerDetails.length;
+    let arrayLength = globalServersInfo.length;
     for (var i = 0; i < arrayLength; i++) {
-        if (globalServerDetails[i]["serverId"] == serverId) {
-            return globalServerDetails[i];
+        if (globalServersInfo[i]["serverId"] == serverId) {
+            return globalServersInfo[i];
         }
     }
 }
