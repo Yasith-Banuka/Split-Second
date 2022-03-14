@@ -1,4 +1,6 @@
 const util = require("../util/util");
+const {message, broadcast, multicast} = require("./serverMessage")
+const {beginElection} = require("./leaderElection")
 /* 
 
 includes heartbeat counter details.
@@ -29,7 +31,7 @@ function receiveHeartbeat(identity) {
     let arrayLength = heartbeatCounterList.length;
     for (var i = 0; i < arrayLength; i++) {
         if (heartbeatCounterList[i].serverid == identity) {
-            heartbeatCounterList[i].counter = heartbeatCounterList[i].counter+1
+            heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
         }
     }
 
@@ -59,6 +61,14 @@ function sendHeartbeat() {
 */
 
 function informFailure(serverid) {
+
+	if (serverid==leaderid){
+		beginElection();
+	}
+	else{
+		let failureMsg = {type : "heartbeat_fail", fail_serverid : serverid};
+		message(leaderid, failureMsg);
+	}
     
 }
 
