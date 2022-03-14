@@ -4,7 +4,7 @@ const constants = require('./util/constants');
 
 const {message, broadcast, multicast} = require("./serverServer/message")
 
-const {getLowerPriorityServers, getHigherPriorityServers, serverDetails} = require("./serverManager/serverManager")
+const {serverDetails} = require("./serverManager/serverManager")
 
 const answers = new heap.Heap();
 var inProcess = false;
@@ -109,6 +109,26 @@ var sendView = () => {
 
 var receiveView = () => {
     //compare with current and update
+}
+
+function getHigherPriorityServers() {
+    let results = [];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (serverDetails.priority < otherServerDetails[i].priority) {
+            results.push(otherServerDetails[i].serverId);
+        }
+    } 
+    return results;
+}
+
+function getLowerPriorityServers() {
+    let results = [];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (serverDetails.priority > otherServerDetails[i].priority) {
+            results.push(otherServerDetails[i].serverId);
+        }
+    } 
+    return results;
 }
 
 module.exports = {beginElection}

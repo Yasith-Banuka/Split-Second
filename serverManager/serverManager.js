@@ -47,24 +47,6 @@ function getAllSockets() {
     return otherServerDetails.map(server => server.socket);
 }
 
-function getHigherPriorityServers() {
-    let results = [];
-    for (var i = 0; i < otherServerDetails.length; i++) {
-        if (serverDetails.priority < otherServerDetails[i].priority) {
-            results.push(otherServerDetails[i].serverId);
-        }
-    } 
-    return results;
-}
 
-function getLowerPriorityServers() {
-    let results = [];
-    for (var i = 0; i < otherServerDetails.length; i++) {
-        if (serverDetails.priority > otherServerDetails[i].priority) {
-            results.push(otherServerDetails[i].serverId);
-        }
-    } 
-    return results;
-}
 
 module.exports = { getServerForSocket, getSocketsForServers, getAllSockets , getLowerPriorityServers, getHigherPriorityServers, serverDetails}

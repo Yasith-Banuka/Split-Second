@@ -26,7 +26,7 @@ function setGlobalServersConfig(path, serverId){
             server["address"] = serverConf[1];
             server["ClientPort"] = parseInt(serverConf[2]);
             server["coordinationPort"] = parseInt(serverConf[3]);
-
+            server["priority"] = parseInt(serverConf[0].slice(1));
             globalServerDetails.push(server);
         }
     }
@@ -43,13 +43,20 @@ function getCoordinatingPorts () {
 }
 
 function getServerInfo(serverId) {
-    let arrayLength = coordinatingServersInfo.length;
+    let arrayLength = globalServerDetails.length;
     for (var i = 0; i < arrayLength; i++) {
-        if (coordinatingServersInfo[i]["serverId"] == serverId) {
-            return coordinatingServersInfo[i];
+        if (globalServerDetails[i]["serverId"] == serverId) {
+            return globalServerDetails[i];
         }
     }
 }
 
+function getHighestPriorityServer() {
+    let highestPriority = globalServerDetails[0].priority;
+    for (var i = 1; i < globalServerDetails.length; i++) {
+        highestPriority = Math.min(highestPriority,globalServerDetails[i].priority);
+    }   
+    return "s"+highestPriority; 
+}
 
-module.exports = {setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo }
+module.exports = {setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo, getHighestPriorityServer }
