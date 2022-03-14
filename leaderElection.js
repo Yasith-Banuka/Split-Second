@@ -32,7 +32,7 @@ var beginElection = () => {
 }
 
 var sendElection = () => {
-    let electionMsg = {type : "bull", subtype : "election", serverid : serverDetails.id};
+    let electionMsg = {type : "bully", subtype : "election", serverid : serverDetails.id};
     multicast(getHigherPriorityServers(),electionMsg);
 }
 
@@ -73,7 +73,7 @@ const sendNominationTimeout = null;
 var sendNomination = () => {
     if(answers.length()>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
         const nominationId = "s"+answers.pop();
-        //nominationMsg = {“type” : “bully”, “subtype” : “nomination”, “serverid” : “s3”}
+        nominationMsg = {type : "bully", subtype : "nomination", serverid : "s3"}
         message(nominationId,nominationMsg);
         sendNominationTimeout = setTimeout(sendNomination, constants.T3)  //repeat every T3 until coordinator msg received
     } else { //else restart election
