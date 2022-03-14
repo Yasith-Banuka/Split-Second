@@ -2,9 +2,9 @@ const Net = require('net');
 
 const { serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
-const { serverServer } = require('./serverToServer/serverServerMain');
-const {setConfigInfo, getAllInfo } = require('./data/ownServerDetails');
-const {setCoordinatingServersConfig, getCoordinatingPorts} = require('./data/fellowServerDetails');
+const { serverManager } = require('./serverManager/serverManager');
+const {setConfigInfo, getAllInfo } = require('./data/serverDetails');
+const {setCoordinatingServersConfig, getCoordinatingPorts} = require('./data/globalServerDetails');
 
 const util = require('./util/util');
 const { argv } = require('process');
@@ -17,7 +17,7 @@ const configPath = argv[3];
 
 // set server config
 const serverConfig = setConfigInfo(configPath, serverId);
-const port = serverConfig["port"];
+const port = serverConfig["clientPort"];
 const coordination_port =serverConfig["coordinationPort"];
 
 // set coordinating servers config
@@ -56,7 +56,7 @@ server.on('connection', function (socket) {
         // console.log(socket.remotePort);
         if (otherCoordinationPorts.includes(socket.remotePort)){
             console.log(`Data received from server: ` + JSON.stringify(json) + `\n`);
-            serverServer(socket, json);
+            serverManager(socket, json);
         }else{
             console.log(`Data received from client: ` + JSON.stringify(json) + `\n`);
             clientServer(socket, json);

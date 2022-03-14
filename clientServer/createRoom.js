@@ -2,7 +2,7 @@ const { getChatRoom, serverClients, removeClientFromChatRoom, serverChatRooms, g
 const util = require("../util/util");
 const {isChatroomIdUnique} = require("../data/globalChatRooms");
 const {getServerId, getCoordinator}= require("../data/serverDetails");
-const {reply} = require("../serverToServer/message");
+const {reply} = require("../serverManager/serverMessage");
 const {beginElection} = require("../leaderElection");
 
 module.exports = {
