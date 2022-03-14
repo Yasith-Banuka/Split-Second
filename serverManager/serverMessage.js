@@ -32,6 +32,7 @@ module.exports = {
     },
     
     reply: function(serverId, message) {
+        console.log(serverId);
         let serverCoordinationPort = getCoordinationPort();
         let receivingServerInfo = getServerInfo(serverId);
         console.log(serverId, message);

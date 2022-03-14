@@ -25,7 +25,7 @@ setCoordinatingServersConfig(configPath, serverId);
 const otherCoordinationPorts = getCoordinatingPorts();
 
 //set coordinator
-setCoordinator(getHighestPriorityServer);
+setCoordinator(getHighestPriorityServer());
 
 // Create a server
 const server = new Net.Server();

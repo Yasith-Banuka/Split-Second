@@ -1,11 +1,11 @@
 const heap = require('heap-js');
 
-const constants = require('./util/constants');
+const constants = require('../util/constants');
 
-const {message, broadcast, multicast} = require("./serverManager/serverMessage")
+const {message, broadcast, multicast} = require("./serverMessage")
 
-const {getAllServerInfo} = require("./data/globalServerDetails")
-const {getPriority} = require("./data/serverDetails")
+const {getAllServerInfo} = require("../data/globalServerDetails")
+const {getPriority} = require("../data/serverDetails")
 
 const answers = new heap.Heap();
 var inProcess = false;
