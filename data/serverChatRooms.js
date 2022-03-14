@@ -21,8 +21,6 @@ inculdes chat rooms details inculded in the server
 */
 var serverChatRooms = [];
 
-var MAINHALL_ID = "MainHall-" + getServerId();
-
 function getMainHallID() {
     return "MainHall-" + getServerId();
 }
@@ -44,7 +42,7 @@ function addLocalChatRoom(chatRoomObject) {
 */
 function getLocalChatRoom(chatRoomIdentity) {
 
-    if (chatRoomIdentity == MAINHALL_ID) {
+    if (chatRoomIdentity == getMainHallID()) {
         return serverChatRooms[0];
     } else {
         let arrayLength = serverChatRooms.length;
@@ -71,4 +69,4 @@ function getLocalChatRooms() {
     return chatRooms;
 }
 
-module.exports = { serverChatRooms, MAINHALL_ID, getMainHallID, addLocalChatRoom, getLocalChatRoom, getLocalChatRooms }
+module.exports = { serverChatRooms, getMainHallID, addLocalChatRoom, getLocalChatRoom, getLocalChatRooms }
