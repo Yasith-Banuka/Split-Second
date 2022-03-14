@@ -1,10 +1,12 @@
-const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
-const {isClientIdUsed} = require("../data/globalClients");
-const {getServerId, getCoordinator}= require("../data/serverDetails");
-const {reply} = require("../serverManager/serverMessage");
-const {beginElection} = require("../serverManager/leaderElection");
-const {getCoordinatorIdentityApproval} = require("../serverManager/coordinatorCommunication");
+const { isClientIdUsed } = require("../data/globalClients");
+const { getServerId, getCoordinator } = require("../data/serverDetails");
+const { reply } = require("../serverManager/serverMessage");
+const { beginElection } = require("../serverManager/leaderElection");
+const { getCoordinatorIdentityApproval } = require("../serverManager/coordinatorCommunication");
+const { addLocalClient } = require("../data/serverClients");
+const { getLocalChatRoom, getMainHallID } = require("../data/serverChatRooms");
 
 module.exports = {
     newidentity: function (socket, identity) {
@@ -15,20 +17,20 @@ module.exports = {
             let clientObject = {
                 clientIdentity: identity,
                 socket: socket,
-                chatRoom: serverChatRooms[0].chatRoomIdentity
+                chatRoom: getMainHallID()
             };
 
             // adding the client to the server client list
-            serverClients.push(clientObject);
+            addLocalClient(clientObject);
 
             // adding the client into MainHall
-            serverChatRooms[0].clients.push(clientObject);
+            joinClientNewChatRoom(getMainHallID(), clientObject);
 
             newIdentityAck = { "type": "newidentity", "approved": "true" };
-            mainHallMoveAck = { "type": "roomchange", "identity": identity, "former": "", "roomid": serverChatRooms[0].chatRoomIdentity };
+            mainHallMoveAck = { "type": "roomchange", "identity": identity, "former": "", "roomid": getMainHallID() };
 
             socket.write(util.jsonEncode(newIdentityAck));
-            util.broadcast(getChatRoom(serverChatRooms[0].chatRoomIdentity).clients, mainHallMoveAck);
+            util.broadcast(getLocalChatRoom(getMainHallID()).clients, mainHallMoveAck);
 
             console.log('new client added to the server');
         } else {
@@ -49,8 +51,8 @@ module.exports = {
 */
 function checkAvailability(identity) {
     // because in js (0==false)-> true
-    if (util.checkAlphaNumeric(identity)) {        
-        return getCoordinatorIdentityApproval(identity).idapproved;  
+    if (util.checkAlphaNumeric(identity)) {
+        return getCoordinatorIdentityApproval(identity).idapproved;
     }
     return false;
 };
