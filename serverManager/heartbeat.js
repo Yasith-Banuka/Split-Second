@@ -1,22 +1,20 @@
-const { getLocalChatRoom } = require("../data/serverChatRooms");
-const { getClientForSocket } = require("../data/serverClients");
 const util = require("../util/util");
 
 
 /* 
 
-includes client details.
-[
-    {   
-        clientIdentity : // clientIdentity
-        socket : // associate socket object of the client
-        chatRoom: // chat room of the client
-    },
-    ....
+includes heartbeat counter details.
+[ 
+{
+	“serverID” : “s2”,
+	“heartbeatCounter” : 1024,
+	“Timestamp” : xxxx
+},...
 ]
 
+
 */
-var variable1 = [];
+var heartbeatCounterList = [];
 
 /*
 {
