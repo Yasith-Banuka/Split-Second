@@ -1,9 +1,11 @@
 const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
-const {isClientIdUnique} = require("../data/globalClients");
+const {isClientIdUsed} = require("../data/globalClients");
 const {getServerId, getCoordinator}= require("../data/serverDetails");
-const {reply} = require("../serverToServer/message");
-const {beginElection} = require("../leaderElection");
+const {reply} = require("../serverManager/serverMessage");
+const {beginElection} = require("../serverManager/leaderElection");
+const {getCoordinatorIdentityApproval} = require("../serverManager/coordinatorCommunication");
+
 module.exports = {
     newidentity: function (socket, identity) {
         let newIdentityAck;
@@ -48,23 +50,8 @@ module.exports = {
 function checkAvailability(identity) {
     // because in js (0==false)-> true
     if (util.checkAlphaNumeric(identity)) {        
-        return getCoordinatorIdentityApproval(identity);  
+        return getCoordinatorIdentityApproval(identity).idapproved;  
     }
     return false;
 };
 
-function getCoordinatorIdentityApproval(identity) {
-    if(getServerId===getCoordinator) {
-
-        return (!isClientIdUnique(identity));
-    }
-    identityRequestMsg = {"type" : "clientrequest", "clientid" : identity, "serverid" : getServerId}
-    reply(getCoordinator, identityRequestMsg)
-        .then(json => {
-            if(json.clientid === identity) {
-                return json.idApproved;
-            }
-            return false;
-        })
-        .catch(error => beginElection())
-};

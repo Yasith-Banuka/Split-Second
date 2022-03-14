@@ -5,9 +5,9 @@ var fs = require('fs')
 inculdes server details.
 [
     {   
-        id :
+        serverId :
         address: 
-        port: 
+        clientPort: 
         coordinationPort :
     },
     ....
@@ -38,21 +38,24 @@ function setConfigInfo(path, serverId) {
 
             serverInfo["serverId"] = serverConf[0];
             serverInfo["address"] = serverConf[1];
-            serverInfo["ClientPort"] = parseInt(serverConf[2]);
+            serverInfo["clientPort"] = parseInt(serverConf[2]);
             serverInfo["coordinationPort"] = parseInt(serverConf[3]);
+            serverInfo["priority"] = parseInt(serverConf[0].slice(1));
             break;
         }
     }
     return serverInfo;
 }
 
-
+function getPriority() {
+    return serverInfo["priority"];
+}
 function getServerId() {
     return serverInfo["serverId"];
 }
 
 function getClientPort() {
-    return serverInfo["ClientPort"];
+    return serverInfo["clientPort"];
 }
 
 function getCoordinationPort() {
@@ -71,7 +74,7 @@ function getCoordinator () {
     return coordinatorId;
 } 
 
-module.exports= {setConfigInfo, getServerId, getClientPort, getCoordinationPort, getAllInfo, setCoordinator, setCoordinator, getCoordinator}
+module.exports= {setConfigInfo, getServerId, getClientPort, getCoordinationPort, getPriority, getAllInfo, setCoordinator, setCoordinator, getCoordinator}
 
 
 // console.log(setConfigInfo('config/serverConfig.txt','s1'));
