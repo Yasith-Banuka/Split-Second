@@ -1,5 +1,4 @@
 const { serverChatRooms, MAINHALL_ID, getLocalChatRoom, getMainHallID } = require("../data/serverChatRooms");
-const { getServerId, getClientPort } = require("../data/serverDetails");
 
 /*
 
@@ -7,7 +6,7 @@ const { getServerId, getClientPort } = require("../data/serverDetails");
 
 */
 function removeClientFromChatRoom(chatRoomIdentity, client) {
-    let chatRoom = getChatRoom(chatRoomIdentity);
+    let chatRoom = getLocalChatRoom(chatRoomIdentity);
     let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
 
     let clientList = chatRoom.clients;
