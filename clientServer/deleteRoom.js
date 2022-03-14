@@ -36,7 +36,6 @@ module.exports = {
 
                 // move the client to MainHall
                 joinClientNewChatRoom(serverChatRooms[0].chatRoomIdentity, clientListForChatRoom[i]);
-                clientListForMainHall.push(clientListForChatRoom[i]);
             }
 
             // remove chatRoom from serverChatRooms
