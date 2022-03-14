@@ -1,6 +1,6 @@
 var serverChatrooms = {}; // Store the chatroom id // {'s1': ['room1']}
 
-function isChatroomIdUnique(roomId){
+function isChatroomIdUsed(roomId){
     return serverChatrooms.hasOwnProperty(roomId); 
 }
 
@@ -22,4 +22,4 @@ function updateRooms(serverId, roomList) {
     }
 }
 
-module.exports = {isChatroomIdUnique, addChatroom, removeChatroom, getRoomServer, updateRooms}
+module.exports = {isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms}
