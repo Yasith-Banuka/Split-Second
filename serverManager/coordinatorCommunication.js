@@ -1,12 +1,16 @@
-const {beginElection} = require("../leaderElection");
+const {beginElection} = require("./leaderElection");
+const {getServerId, getCoordinator} = require('../data/serverDetails');
+const {isChatroomIdUsed} = require('../data/globalChatRooms');
+const {isClientIdUsed} = require('../data/globalClients');
+const {reply} = require('./serverMessage');
 
 function getCoordinatorRoomIdApproval(roomId) {
-    if(getServerId===getCoordinator) {
+    if(getServerId()===getCoordinator()) {
         let roomApprovalMsg = {"type" : "roomconfirm", "roomid" : roomId, "roomApproved" : !isChatroomIdUsed(roomId)}
         return roomApprovalMsg;
     }
-    let roomRequestMsg = {"type" : "roomrequest", "roomid" : roomId, "serverid" : getServerId}
-    reply(getCoordinator, roomRequestMsg)
+    let roomRequestMsg = {"type" : "roomrequest", "roomid" : roomId, "serverid" : getServerId()}
+    reply(getCoordinator(), roomRequestMsg)
         .then(json => {
             if(json.type === "roomconfirm" && json.roomid === roomId) {
                 return json;
@@ -17,12 +21,12 @@ function getCoordinatorRoomIdApproval(roomId) {
 };
 
 function getCoordinatorIdentityApproval(identity) {
-    if(getServerId===getCoordinator) {
+    if(getServerId() === getCoordinator() ) {
         let identityApprovalMsg = {"type" : "clientconfirm", "clientid" : identity, "idapproved" : !isClientIdUsed(identity)}
         return identityApprovalMsg;
     }
-    let identityRequestMsg = {"type" : "clientrequest", "clientid" : identity, "serverid" : getServerId}
-    reply(getCoordinator, identityRequestMsg)
+    let identityRequestMsg = {"type" : "clientrequest", "clientid" : identity, "serverid" : getServerId() }
+    reply(getCoordinator() , identityRequestMsg)
         .then(json => {
             if(json.clientid === identity) {
                 return json.idApproved;
