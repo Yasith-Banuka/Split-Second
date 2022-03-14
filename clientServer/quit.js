@@ -59,22 +59,25 @@ module.exports = {
                 joinClientNewChatRoom(serverChatRooms[0].chatRoomIdentity, clientListForChatRoom[i]);
                 clientListForMainHall.push(clientListForChatRoom[i]);
             }
-            //delete room
-            // remove chatRoom from serverChatRooms
-            let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
-            serverChatRooms.splice(chatRoomArrayIndex, 1);
 
-            // send deleteRoom approve message to the client
-            approveMessage = {
-                "type": "deleteroom",
-                "roomid": room,
-                "approved": "true"
-            };
-            socket.write(util.jsonEncode(approveMessage));
+             //delete room
+             // remove chatRoom from serverChatRooms
+             let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
+             serverChatRooms.splice(chatRoomArrayIndex, 1);
+ 
+             // send deleteRoom approve message to the client
+             approveMessage = {
+                 "type": "deleteroom",
+                 "roomid": room,
+                 "approved": "true"
+             };
+             socket.write(util.jsonEncode(approveMessage));
+             
+             console.log("room deleted");
+ 
+         } 
 
-            console.log("room deleted");
-
-        }
+         socket.destroy();
     }
 
 
