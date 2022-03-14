@@ -17,7 +17,7 @@ inculdes server details.
 
 var configPath = null;
 
-var serverInfo = {} ;
+var serverInfo = {};
 
 var coordinatorId = null;
 
@@ -26,7 +26,7 @@ function setConfigInfo(path, serverId) {
     configPath = path;
 
     // read servers config from file 
-    const data =  fs.readFileSync(path, 'utf8');
+    const data = fs.readFileSync(path, 'utf8');
 
     serversConf = data.split('\r\n');
 
@@ -34,7 +34,7 @@ function setConfigInfo(path, serverId) {
 
         serverConf = serversConf[i].split(' ');
 
-        if (serverConf[0] == serverId){
+        if (serverConf[0] == serverId) {
 
             serverInfo["serverId"] = serverConf[0];
             serverInfo["address"] = serverConf[1];
@@ -66,15 +66,15 @@ function getAllInfo() {
     return serverInfo;
 }
 
-function setCoordinator (serverId) {// Set the leader
+function setCoordinator(serverId) {// Set the leader
     coordinatorId = serverId;
-} 
+}
 
-function getCoordinator () {
+function getCoordinator() {
     return coordinatorId;
-} 
+}
 
-module.exports= {setConfigInfo, getServerId, getClientPort, getCoordinationPort, getPriority, getAllInfo, setCoordinator, setCoordinator, getCoordinator}
+module.exports = { setConfigInfo, getServerId, getClientPort, getCoordinationPort, getPriority, getAllInfo, setCoordinator, setCoordinator, getCoordinator }
 
 
 // console.log(setConfigInfo('config/serverConfig.txt','s1'));
