@@ -4,7 +4,8 @@ const constants = require('./util/constants');
 
 const {message, broadcast, multicast} = require("./serverManager/serverMessage")
 
-const {serverDetails} = require("./serverManager/serverManager")
+const {getAllServerInfo} = require("./data/globalServerDetails")
+const {getPriority} = require("./data/serverDetails")
 
 const answers = new heap.Heap();
 var inProcess = false;
@@ -113,9 +114,11 @@ var receiveView = () => {
 
 function getHigherPriorityServers() {
     let results = [];
-    for (var i = 0; i < otherServerDetails.length; i++) {
-        if (serverDetails.priority < otherServerDetails[i].priority) {
-            results.push(otherServerDetails[i].serverId);
+    let globalServerInfo = getAllServerInfo();
+    let serverPriority = getPriority();
+    for (var i = 0; i < globalServerInfo.length; i++) {
+        if (serverPriority.priority < globalServerInfo[i].priority) {
+            results.push(globalServerInfo[i].serverId);
         }
     } 
     return results;
@@ -123,9 +126,11 @@ function getHigherPriorityServers() {
 
 function getLowerPriorityServers() {
     let results = [];
-    for (var i = 0; i < otherServerDetails.length; i++) {
-        if (serverDetails.priority > otherServerDetails[i].priority) {
-            results.push(otherServerDetails[i].serverId);
+    let globalServerInfo = getAllServerInfo();
+    let serverPriority = getPriority();
+    for (var i = 0; i < globalServerInfo.length; i++) {
+        if (serverPriority.priority > globalServerInfo[i].priority) {
+            results.push(globalServerInfo[i].serverId);
         }
     } 
     return results;

@@ -51,6 +51,10 @@ function getServerInfo(serverId) {
     }
 }
 
+function getAllServerInfo() {
+    return globalServersInfo;
+}
+
 function getHighestPriorityServer() {
     let highestPriority = globalServersInfo[0].priority;
     for (var i = 1; i < globalServersInfo.length; i++) {
@@ -59,4 +63,4 @@ function getHighestPriorityServer() {
     return "s" + highestPriority; 
 }
 
-module.exports = {setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo, getHighestPriorityServer }
+module.exports = {setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo, getHighestPriorityServer, getAllServerInfo}
