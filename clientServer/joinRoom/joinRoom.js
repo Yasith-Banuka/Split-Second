@@ -1,4 +1,6 @@
-const { removeClientFromChatRoom, joinClientNewChatRoom, getClientForSocket, getChatRoom } = require("../../chatRoomManager/chatRoomManager");
+const { removeClientFromChatRoom, joinClientNewChatRoom } = require("../../chatRoomManager/chatRoomManager");
+const { getLocalChatRoom } = require("../../data/serverChatRooms");
+const { getClientForSocket } = require("../../data/serverClients");
 const util = require("../../util/util");
 
 // todo: need to implment the multi server part
@@ -25,8 +27,8 @@ module.exports = {
             joinClientNewChatRoom(roomId, client);
 
             // send neccessary messages
-            util.broadcast(getChatRoom(clientPrevChatRoomId).clients, approveMessage);
-            util.broadcast(getChatRoom(roomId).clients, approveMessage);
+            util.broadcast(getLocalChatRoom(clientPrevChatRoomId).clients, approveMessage);
+            util.broadcast(getLocalChatRoom(roomId).clients, approveMessage);
 
             console.log("room changed");
 
@@ -53,7 +55,7 @@ module.exports = {
 
  */
 function checkClientIsOwner(client, roomId) {
-    let roomOwner = getChatRoom(roomId).owner;
+    let roomOwner = getLocalChatRoom(roomId).owner;
     return (client == roomOwner);
 }
 
@@ -66,7 +68,7 @@ function checkClientIsOwner(client, roomId) {
  
 */
 function checkRoomIsAuthentic(client, roomId) {
-    if (typeof getChatRoom(roomId) != "boolean") {
+    if (typeof getLocalChatRoom(roomId) != "boolean") {
         if (!checkClientIsOwner(client, roomId)) {
             return true;
         }

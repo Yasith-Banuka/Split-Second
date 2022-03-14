@@ -1,4 +1,6 @@
-const { getChatRoom, serverClients, serverChatRooms, joinClientNewChatRoom, getClientForSocket } = require("../chatRoomManager/chatRoomManager");
+const { joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { getLocalChatRoom, getMainHallID, serverChatRooms } = require("../data/serverChatRooms");
+const { serverClients, getClientForSocket } = require("../data/serverClients");
 const util = require("../util/util");
 
 // todo: If successfully deleted, s1 informs other servers by sending the message
@@ -14,10 +16,10 @@ module.exports = {
                 "type": "roomchange",
                 "identity": "",
                 "former": roomId,
-                "roomid": serverChatRooms[0].chatRoomIdentity
+                "roomid": getMainHallID()
             };
 
-            let chatRoom = getChatRoom(roomId);
+            let chatRoom = getLocalChatRoom(roomId);
             let clientListForChatRoom = chatRoom.clients;
             let clientListForMainHall = serverChatRooms[0].clients;
             let arrayLength = clientListForChatRoom.length;
@@ -74,7 +76,7 @@ module.exports = {
 
  */
 function checkClientIsOwner(client, roomId) {
-    let roomOwner = getChatRoom(roomId).owner;
+    let roomOwner = getLocalChatRoom(roomId).owner;
     return (client == roomOwner);
 }
 
@@ -87,7 +89,7 @@ function checkClientIsOwner(client, roomId) {
 
 */
 function checkRoomIsAuthentic(client, roomId) {
-    if (typeof getChatRoom(roomId) != "boolean") {
+    if (typeof getLocalChatRoom(roomId) != "boolean") {
         if (checkClientIsOwner(client, roomId)) {
             return true;
         }

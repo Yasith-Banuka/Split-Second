@@ -1,11 +1,13 @@
-const { getChatRoom, serverClients, removeClientFromChatRoom, serverChatRooms, getClientForSocket, checkClientIdentityExist } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
-const {isChatroomIdUsed} = require("../data/globalChatRooms");
-const {getServerId, getCoordinator}= require("../data/serverDetails");
-const {reply} = require("../serverManager/serverMessage");
-const {beginElection} = require("../serverManager/leaderElection");
+const { isChatroomIdUsed } = require("../data/globalChatRooms");
+const { getServerId, getCoordinator } = require("../data/serverDetails");
+const { reply } = require("../serverManager/serverMessage");
+const { beginElection } = require("../serverManager/leaderElection");
 
-const {getCoordinatorRoomIdApproval} = require("../serverManager/coordinatorCommunication");
+const { getCoordinatorRoomIdApproval } = require("../serverManager/coordinatorCommunication");
+const { getClientForSocket, checkClientIdentityExist, serverClients } = require("../data/serverClients");
+const { removeClientFromChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { getLocalChatRoom, addLocalChatRoom } = require("../data/serverChatRooms");
 module.exports = {
     createRoom: function (socket, roomId) {
         let client = getClientForSocket(socket);
@@ -35,12 +37,12 @@ module.exports = {
                 owner: client,
                 clients: [client]
             }
-            serverChatRooms.push(newChatRoom);
+            addLocalChatRoom(newChatRoom);
 
             approveMessage = { "type": "createroom", "roomid": roomId, "approved": "true" };
             socket.write(util.jsonEncode(approveMessage));
             socket.write(util.jsonEncode(roomChange));
-            util.broadcast(getChatRoom(previousChatRoom).clients, roomChange);
+            util.broadcast(getLocalChatRoom(previousChatRoom).clients, roomChange);
 
             console.log("room created");
         } else {
@@ -60,8 +62,8 @@ module.exports = {
 */
 function checkAvailability(roomId) {
     // because in js (0==false)-> true
-    if (util.checkAlphaNumeric(roomId)) {        
-        return getCoordinatorRoomIdApproval(roomId).roomapproved;  
+    if (util.checkAlphaNumeric(roomId)) {
+        return getCoordinatorRoomIdApproval(roomId)['roomApproved'];
     }
     return false;
 };
@@ -78,7 +80,7 @@ function checkAvailability(roomId) {
 */
 function checkClientIsOwner(client) {
     let clientChatRoomId = checkClientIdentityExist(client.clientIdentity).chatRoom;
-    let clientChatRoom = getChatRoom(clientChatRoomId);
+    let clientChatRoom = getLocalChatRoom(clientChatRoomId);
 
     return (clientChatRoom.owner == client);
 

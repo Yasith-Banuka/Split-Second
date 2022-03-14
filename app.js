@@ -3,11 +3,12 @@ const Net = require('net');
 const { serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
 const { serverManager } = require('./serverManager/serverManager');
-const {setConfigInfo, getAllInfo, setCoordinator } = require('./data/serverDetails');
-const {setCoordinatingServersConfig, getCoordinatingPorts, getHighestPriorityServer} = require('./data/globalServerDetails');
+const { setConfigInfo, getAllInfo, setCoordinator, getClientPort } = require('./data/serverDetails');
+const { setCoordinatingServersConfig, getCoordinatingPorts, getHighestPriorityServer } = require('./data/globalServerDetails');
 
 const util = require('./util/util');
 const { argv } = require('process');
+const { addLocalChatRoom } = require('./data/serverChatRooms');
 
 // Get serverId as the argument
 const serverId = argv[2];
@@ -17,8 +18,8 @@ const configPath = argv[3];
 
 // set server config
 const serverConfig = setConfigInfo(configPath, serverId);
-const port = serverConfig["clientPort"];
-const coordination_port =serverConfig["coordinationPort"];
+const port = getClientPort();
+const coordination_port = getCoordinatingPorts();
 
 // set coordinating servers config
 setCoordinatingServersConfig(configPath, serverId);
@@ -35,11 +36,11 @@ server.listen(port, function () {
     console.log(`Server listening for connection requests on socket localhost:${port}`);
 
     // Create the main hall of the server
-    serverChatRooms.push({
+    addLocalChatRoom({
         chatRoomIdentity: "MainHall-" + serverId,
         owner: null,
         clients: []
-    })
+    });
 });
 
 
@@ -54,19 +55,19 @@ server.on('connection', function (socket) {
     // The server can also receive data from the client or another server  by reading from its socket.
     socket.on('data', function (bufObj) {
         let json = util.jsonDecode(bufObj);
-        
+
         // Check whether the established connection is from a server or a client and redirect accordingly 
         // console.log(socket.remotePort);
-        if (otherCoordinationPorts.includes(socket.remotePort)){
+        if (otherCoordinationPorts.includes(socket.remotePort)) {
             console.log(`Data received from server: ` + JSON.stringify(json) + `\n`);
             serverManager(socket, json);
-        }else{
+        } else {
             console.log(`Data received from client: ` + JSON.stringify(json) + `\n`);
             clientServer(socket, json);
         }
-        
+
     });
-         
+
 
     // When the client requests to end the TCP connection with the server, the server ends the connection.
     socket.on('end', function () {
