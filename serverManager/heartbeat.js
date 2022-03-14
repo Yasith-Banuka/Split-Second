@@ -1,6 +1,4 @@
 const util = require("../util/util");
-
-
 /* 
 
 includes heartbeat counter details.
@@ -8,7 +6,7 @@ includes heartbeat counter details.
 {
 	“serverID” : “s2”,
 	“heartbeatCounter” : 1024,
-	“Timestamp” : xxxx
+	“timestamp” : xxxx
 },...
 ]
 
@@ -26,8 +24,15 @@ var heartbeatCounterList = [];
 
 //increase counter after receiving 
 
-function receiveHeartbeat() {
-    
+function receiveHeartbeat(identity) {
+
+    let arrayLength = heartbeatCounterList.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (heartbeatCounterList[i].serverid == identity) {
+            heartbeatCounterList[i].counter = heartbeatCounterList[i].counter+1
+        }
+    }
+
 }
 
 /*
@@ -48,12 +53,12 @@ function sendHeartbeat() {
 /*
 
 {
-	“Type” : “heartbeat_fail”,
-	“Fail_serverid” : s2,
+	“type” : “heartbeat_fail”,
+	“fail_serverid” : s2,
 }
 */
 
-function informFailure() {
+function informFailure(serverid) {
     
 }
 
