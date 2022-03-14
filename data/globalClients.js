@@ -1,6 +1,6 @@
 var globalClients = []; // Store the client id
 
-function isClientIdUnique(clientId){
+function isClientIdUsed(clientId){
     return globalClients.includes(clientId)
 }
 function addClient(clientId){
@@ -18,4 +18,4 @@ function updateClients(clientIdList) {
     globalClients = globalClients.concat(clientIdList);
 }
 
-module.exports = {isClientIdUnique, addClient, removeClient, updateClients}
+module.exports = {isClientIdUsed, addClient, removeClient, updateClients}

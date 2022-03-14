@@ -3,8 +3,8 @@ const Net = require('net');
 const { serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
 const { serverManager } = require('./serverManager/serverManager');
-const {setConfigInfo, getAllInfo } = require('./data/serverDetails');
-const {setCoordinatingServersConfig, getCoordinatingPorts} = require('./data/globalServerDetails');
+const {setConfigInfo, getAllInfo, setCoordinator } = require('./data/serverDetails');
+const {setCoordinatingServersConfig, getCoordinatingPorts, getHighestPriorityServer} = require('./data/globalServerDetails');
 
 const util = require('./util/util');
 const { argv } = require('process');
@@ -23,6 +23,9 @@ const coordination_port =serverConfig["coordinationPort"];
 // set coordinating servers config
 setCoordinatingServersConfig(configPath, serverId);
 const otherCoordinationPorts = getCoordinatingPorts();
+
+//set coordinator
+setCoordinator(getHighestPriorityServer);
 
 // Create a server
 const server = new Net.Server();

@@ -4,7 +4,7 @@ const constants = require('./util/constants');
 
 const {message, broadcast, multicast} = require("./serverManager/serverMessage")
 
-const {getLowerPriorityServers, getHigherPriorityServers, serverDetails} = require("./serverManager/serverManager")
+const {serverDetails} = require("./serverManager/serverManager")
 
 const answers = new heap.Heap();
 var inProcess = false;
@@ -32,7 +32,7 @@ var beginElection = () => {
 }
 
 var sendElection = () => {
-    let electionMsg = {type : "bull", subtype : "election", serverid : serverDetails.id};
+    let electionMsg = {type : "bully", subtype : "election", serverid : serverDetails.id};
     multicast(getHigherPriorityServers(),electionMsg);
 }
 
@@ -73,7 +73,7 @@ const sendNominationTimeout = null;
 var sendNomination = () => {
     if(answers.length()>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
         const nominationId = "s"+answers.pop();
-        //nominationMsg = {“type” : “bully”, “subtype” : “nomination”, “serverid” : “s3”}
+        nominationMsg = {type : "bully", subtype : "nomination", serverid : "s3"}
         message(nominationId,nominationMsg);
         sendNominationTimeout = setTimeout(sendNomination, constants.T3)  //repeat every T3 until coordinator msg received
     } else { //else restart election
@@ -109,6 +109,26 @@ var sendView = () => {
 
 var receiveView = () => {
     //compare with current and update
+}
+
+function getHigherPriorityServers() {
+    let results = [];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (serverDetails.priority < otherServerDetails[i].priority) {
+            results.push(otherServerDetails[i].serverId);
+        }
+    } 
+    return results;
+}
+
+function getLowerPriorityServers() {
+    let results = [];
+    for (var i = 0; i < otherServerDetails.length; i++) {
+        if (serverDetails.priority > otherServerDetails[i].priority) {
+            results.push(otherServerDetails[i].serverId);
+        }
+    } 
+    return results;
 }
 
 module.exports = {beginElection}
