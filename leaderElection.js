@@ -2,7 +2,7 @@ const heap = require('heap-js');
 
 const constants = require('./util/constants');
 
-const {message, broadcast, multicast} = require("./serverServer/message")
+const {message, broadcast, multicast} = require("./serverManager/serverMessage")
 
 const {getLowerPriorityServers, getHigherPriorityServers, serverDetails} = require("./serverManager/serverManager")
 
@@ -32,8 +32,8 @@ var beginElection = () => {
 }
 
 var sendElection = () => {
-    let electionMsg = {“type” : “bully”, “subtype” : “election”, “serverid” : serverDetails.id}
-    multicast(getHigherPriorityServers(),electionMsg)
+    let electionMsg = {type : "bull", subtype : "election", serverid : serverDetails.id};
+    multicast(getHigherPriorityServers(),electionMsg);
 }
 
 var receiveElection = (serverPriority) => {
@@ -45,7 +45,7 @@ var receiveElection = (serverPriority) => {
 }
 
 var sendAnswer = (serverId) => {
-    let answerMsg = {“type” : “bully”, “subtype” : “answer”, “serverid” : serverDetails.id}
+    let answerMsg = {type : "bully", subtype : "answer", serverid : serverDetails.id}
     message(serverId, answerMsg);
 }
 
@@ -58,7 +58,7 @@ var receiveAnswer = (serverPriority) => {
 
 var sendCoordinator = () => {
     //to all servers with lower priority
-    let coordinatorMsg = {“type” : “bully”, “subtype” : “coordinator”, “serverid” : serverDetails.id}
+    let coordinatorMsg = {type : "bully", subtype : "coordinator", serverid : serverDetails.id}
     multicast(getLowerPriorityServers, coordinatorMsg);
 }
 
