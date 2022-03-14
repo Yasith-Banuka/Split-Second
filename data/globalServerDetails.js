@@ -1,4 +1,5 @@
 var fs = require('fs')
+const {getPriority} = require("./serverDetails");
 /*
 Include information only about the other servers 
 */
@@ -56,8 +57,8 @@ function getAllServerInfo() {
 }
 
 function getHighestPriorityServer() {
-    let highestPriority = globalServersInfo[0].priority;
-    for (var i = 1; i < globalServersInfo.length; i++) {
+    let highestPriority = getPriority();
+    for (var i = 0; i < globalServersInfo.length; i++) {
         highestPriority = Math.min(highestPriority , globalServersInfo[i].priority);
     }   
     return "s" + highestPriority; 
