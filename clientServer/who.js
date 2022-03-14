@@ -1,11 +1,12 @@
-const { getClientForSocket, getChatRoom, checkClientIdentityExist } = require("../chatRoomManager/chatRoomManager");
+const { getLocalChatRoom } = require("../data/serverChatRooms");
+const { getClientForSocket } = require("../data/serverClients");
 const util = require("../util/util");
 
 module.exports = {
     sendwho: function (socket) {
 
         let room = getClientForSocket(socket).chatRoom;
-        let roomDetails = getChatRoom(room);
+        let roomDetails = getLocalChatRoom(room);
         let clients = roomDetails.clients;
         let owner = (roomDetails.owner == null) ? "" : roomDetails.owner.clientIdentity;
         let whoReply;
@@ -15,7 +16,7 @@ module.exports = {
             "identities": getClientIdentities(clients),
             "owner": owner
         };
-        
+
         socket.write(util.jsonEncode(whoReply));
     }
 }

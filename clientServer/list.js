@@ -1,4 +1,4 @@
-const { serverChatRooms } = require("../chatRoomManager/chatRoomManager");
+const { serverChatRooms } = require("../data/serverChatRooms");
 const util = require("../util/util");
 
 module.exports = {
