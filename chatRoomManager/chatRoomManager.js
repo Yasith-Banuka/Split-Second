@@ -1,4 +1,4 @@
-const { serverChatRooms, MAINHALL_ID, getLocalChatRoom, getMainHallID } = require("../data/serverChatRooms");
+const { serverChatRooms, getLocalChatRoom, getMainHallID } = require("../data/serverChatRooms");
 
 /*
 

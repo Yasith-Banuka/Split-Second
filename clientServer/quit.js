@@ -79,6 +79,4 @@ module.exports = {
 
          socket.destroy();
     }
-
-
 }
