@@ -1,17 +1,21 @@
 const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
 const { message } = require("./serverMessage");
-
+const {beginElection} = require("./leaderElection")
+const {getCoordinator} = require("../data/serverDetails")
 
 /* 
 
 includes heartbeat counter details.
+
 [ 
-	{
-		serverID : “s2”,
-		heartbeatCounter : 1024,
-		Timestamp : xxxx
-	},...
+
+{
+	“serverID” : “s2”,
+	“heartbeatCounter” : 1024,
+	“timestamp” : xxxx
+},...
+
 ]
 
 * Use Date.now() to calculate the current timestamp
@@ -82,8 +86,14 @@ function getHearbeatCounterObjectForServerId(serverId) {
 
 //increase counter after receiving 
 
-function receiveHeartbeat() {
+function receiveHeartbeat(identity) {
 
+    let arrayLength = heartbeatCounterList.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (heartbeatCounterList[i].serverid == identity) {
+            heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
+        }
+    }
 }
 
 /*
@@ -114,13 +124,20 @@ function sendHeartbeat(heartbeatCounterObject) {
 /*
 
 {
-	“Type” : “heartbeat_fail”,
-	“Fail_serverid” : s2,
+	“type” : “heartbeat_fail”,
+	“fail_serverid” : s2,
 }
 */
 
-function informFailure(serverID) {
-
+function informFailure(serverid) {
+	leaderid = getCoordinator();
+	if (serverid==leaderid){
+		beginElection();
+	}
+	else{
+		let failureMsg = {type : "heartbeat_fail", fail_serverid : serverid};
+		message(leaderid, failureMsg);
+	}
 }
 
 async function heartbeat() {
