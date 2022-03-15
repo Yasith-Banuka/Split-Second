@@ -1,6 +1,7 @@
 const util = require("../util/util");
 const {message, broadcast, multicast} = require("./serverMessage")
 const {beginElection} = require("./leaderElection")
+const {getCoordinator} = require("../data/serverDetails")
 /* 
 
 includes heartbeat counter details.
@@ -61,7 +62,7 @@ function sendHeartbeat() {
 */
 
 function informFailure(serverid) {
-
+	leaderid = getCoordinator();
 	if (serverid==leaderid){
 		beginElection();
 	}
