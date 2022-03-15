@@ -1,4 +1,4 @@
-const {beginElection} = require("../leaderElection");
+const {beginElection} = require("./leaderElection");
 
 function getCoordinatorRoomIdApproval(roomId) {
     if(getServerId===getCoordinator) {
