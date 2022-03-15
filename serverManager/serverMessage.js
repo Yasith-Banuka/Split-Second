@@ -31,7 +31,7 @@ module.exports = {
         }
     },
     
-    reply: function(serverId, message) {
+    reply: function(serverId, message, timeout) {
         console.log(serverId);
         let serverCoordinationPort = getCoordinationPort();
         let receivingServerInfo = getServerInfo(serverId);
@@ -50,6 +50,8 @@ module.exports = {
                 reject(error)
                 socket.end();
             });
+
+            setTimeout(() => reject(), timeout);
         });
     }
 }
