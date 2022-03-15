@@ -1,8 +1,8 @@
 const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
 const { message } = require("./serverMessage");
-const {beginElection} = require("./leaderElection")
-const {getCoordinator} = require("../data/serverDetails")
+const { beginElection } = require("./leaderElection")
+const { getCoordinator } = require("../data/serverDetails")
 
 /* 
 
@@ -88,12 +88,12 @@ function getHearbeatCounterObjectForServerId(serverId) {
 
 function receiveHeartbeat(identity) {
 
-    let arrayLength = heartbeatCounterList.length;
-    for (var i = 0; i < arrayLength; i++) {
-        if (heartbeatCounterList[i].serverid == identity) {
-            heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
-        }
-    }
+	let arrayLength = heartbeatCounterList.length;
+	for (var i = 0; i < arrayLength; i++) {
+		if (heartbeatCounterList[i].serverid == identity) {
+			heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
+		}
+	}
 }
 
 /*
@@ -131,11 +131,14 @@ function sendHeartbeat(heartbeatCounterObject) {
 
 function informFailure(serverid) {
 	leaderid = getCoordinator();
-	if (serverid==leaderid){
+	if (serverid == leaderid) {
 		beginElection();
 	}
-	else{
-		let failureMsg = {type : "heartbeat_fail", fail_serverid : serverid};
+	else {
+		let failureMsg = {
+			"type": "heartbeat_fail",
+			"fail_serverid": serverid
+		};
 		message(leaderid, failureMsg);
 	}
 }
@@ -182,4 +185,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { heartbeat }
+module.exports = { heartbeat, receiveHeartbeat }
