@@ -50,10 +50,7 @@ module.exports = {
         return true
 */
 function checkAvailability(identity) {
-    // because in js (0==false)-> true
-    if (util.checkAlphaNumeric(identity)) {
-        return getCoordinatorIdentityApproval(identity).idapproved;
-    }
-    return false;
+
+    return util.checkAlphaNumeric(identity) && (!isClientIdUsed) && getCoordinatorIdentityApproval(identity);
 };
 

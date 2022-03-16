@@ -61,11 +61,8 @@ module.exports = {
         return true
 */
 function checkAvailability(roomId) {
-    // because in js (0==false)-> true
-    if (util.checkAlphaNumeric(roomId)) {
-        return getCoordinatorRoomIdApproval(roomId)['roomApproved'];
-    }
-    return false;
+
+    return util.checkAlphaNumeric(roomId) && (!isChatroomIdUsed) && getCoordinatorRoomIdApproval(roomId, getServerId());
 };
 
 
