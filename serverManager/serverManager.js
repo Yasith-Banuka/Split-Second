@@ -8,7 +8,7 @@ module.exports = {
                 // code block
                 break; 
 
-            case "clientconfirm";
+            case "clientconfirm":
                 // code block
                 break;
 
