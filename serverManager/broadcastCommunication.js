@@ -1,12 +1,16 @@
-const {broadcast} = require('./serverMessage');
-const {addClient, removeClient} = require('../data/globalClients');
+const {multicast} = require('./serverMessage');
+const {getCoordinator} = require('../data/serverDetails');
+const {getAllServerInfo, addClient, removeClient} = require('../data/globalClients');
 const {addChatroom, removeChatroom} = require('../data/globalChatRooms');
 
 
-function broadcastNewClient (clientId){}
-    let message = {type : "newclient", clientid : clientId};
-    broadcast(message);
 
+function broadcastNewClient (clientId){
+    let message = {type : "newclient", clientid : clientId};
+
+    let multicastServerIds = getServerIdsExcludingLeader();
+    multicast(multicastServerIds, message);
+}
 
 function uponReceiveNewClient (clientId) {
     addClient(clientId);
@@ -14,7 +18,8 @@ function uponReceiveNewClient (clientId) {
 
 function broadcastClientDeletion () {
     let message = {type : "endclient", clientid : clientId};
-    broadcast(message);
+    let multicastServerIds = getServerIdsExcludingLeader();
+    multicast(multicastServerIds, message);
 }
 
 function uponReceiveClientDeletion (clientId) {
@@ -23,7 +28,8 @@ function uponReceiveClientDeletion (clientId) {
 
 function broadcastNewChatroom (serverId, roomId){
     let message = {type : "newroom", roomid : roomId, serverid: serverId};
-    broadcast(message);
+    let multicastServerIds = getServerIdsExcludingLeader();
+    multicast(multicastServerIds, message);
 }
 
 function uponReceiveNewChatroom (serverId, roomId) {
@@ -32,11 +38,26 @@ function uponReceiveNewChatroom (serverId, roomId) {
 
 function broadcastChatroomDeletion (roomId) {
     let message = {type : "endroom", roomid : roomId};
-    broadcast(message);
+    let multicastServerIds = getServerIdsExcludingLeader();
+    multicast(multicastServerIds, message);
 }
 
 function uponReceiveChatroomDeletion (roomId) {
     removeChatroom(roomId);
+}
+
+function getServerIdsExcludingLeader () {
+    let coordinatorId = getCoordinator;
+    let allServersInfo = getAllServerInfo;
+
+    let serverIdsExcludngLeader = [];
+    for (var i = 0; i < allServersInfo.length; i++) {
+        if (allServersInfo[i]["serverId"] != coordinatorId) {
+            serverIdsExcludngLeader.push(allServersInfo[i]["serverId"]);
+        }
+    }
+
+    return serverIdsExcludngLeader;
 }
 
 module.exports = {
