@@ -4,6 +4,7 @@ const { message, broadcast } = require("./serverMessage");
 const { beginElection } = require("./leaderElection")
 const { getCoordinator } = require("../data/serverDetails");
 const { getServerInfo, markFailedServer } = require("../data/globalServerDetails");
+const { getChatRoomOfServer, removeChatroom } = require("../data/globalChatRooms");
 
 /* 
 
@@ -152,8 +153,13 @@ function serverActionForFailedServer(failedServerID) {
 	// mark the server as a failed on its global server list
 	markFailedServer(failedServerID);
 
+	let chatRoomForFailedServer = getChatRoomOfServer(failedServerID);
+
+	for (var i = 0; i < chatRoomForFailedServer.length; i++) {
+		removeChatroom(chatRoomForFailedServer[i]);
+	}
+
 	//todo: remove its clients from global client list
-	// todo: remove its chatrooms from global chatroom list
 }
 
 /*
@@ -171,7 +177,7 @@ function leaderActionForFailedServer(failedServerID) {
 			"fail_serverid": failedServerID
 		};
 
-		markFailedServer(failedServerID);
+		serverActionForFailedServer(failedServerID)
 
 		// broadcast the message to remove the failedServer from there globale server list
 		broadcast(broadcastMessage);
