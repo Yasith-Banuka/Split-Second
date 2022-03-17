@@ -4,16 +4,17 @@ const {isChatroomIdUsed,addChatroom} = require('../data/globalChatRooms');
 const {isClientIdUsed, addClient} = require('../data/globalClients');
 const {reply} = require('./serverMessage');
 const constants = require('../util/constants')
+
 function getCoordinatorRoomIdApproval(roomId, serverId) {
     if(isCoordinator) {
         let isRoomApproved = !isChatroomIdUsed(roomId);
         if(isRoomApproved) {
             addChatroom(serverId, roomId);
         }
-        let roomApprovalMsg = {"type" : "roomconfirm", "roomid" : roomId, "roomapproved" : isRoomApproved}
-        return roomApprovalMsg;
+        
+        return isRoomApproved;
     }
-    let roomRequestMsg = {"type" : "roomrequest", "roomid" : roomId, "serverid" : serverId}
+    let roomRequestMsg = {type : "roomrequest", roomid : roomId, serverid : serverId}
     reply(getCoordinator(), roomRequestMsg, constants.T1)
         .then(json => {
             if(json.type === "roomconfirm" && json.roomid === roomId) {
@@ -33,10 +34,10 @@ function getCoordinatorIdentityApproval(identity, serverId) {
         if(isClientApproved) {
             addClient(identity);
         }
-        let identityApprovalMsg = {"type" : "clientconfirm", "clientid" : identity, "idapproved" : isClientApproved}
-        return identityApprovalMsg;
+        
+        return isClientApproved;
     }
-    let identityRequestMsg = {"type" : "clientrequest", "clientid" : identity, "serverid" : serverId }
+    let identityRequestMsg = {type : "clientrequest", clientid : identity, serverid : serverId }
     reply(getCoordinator() , identityRequestMsg, constants.T1)
         .then(json => {
             if(json.type === "clientconfirm" && json.clientid === identity) {
@@ -50,4 +51,18 @@ function getCoordinatorIdentityApproval(identity, serverId) {
         })
 };
 
-module.exports = {getCoordinatorIdentityApproval, getCoordinatorRoomIdApproval}
+function handleIdentityRequestMsg(socket, message) {
+    let approval = getCoordinatorIdentityApproval(message.clientid, message.serverid);
+    let identityApprovalMsg = {type : "clientconfirm", clientid : identity, idapproved : approval};
+    socket.write(util.jsonEncode(identityApprovalMsg));
+    socket.destroy();
+}
+
+function handleRoomRequestMsg(socket, message) {
+    let approval = getCoordinatorRoomIdApproval(message.roomid, message.serverid);
+    let roomApprovalMsg = {type : "roomconfirm", roomid : roomId, roomapproved : approval}
+    socket.write(util.jsonEncode(roomApprovalMsg));
+    socket.destroy();
+}
+
+module.exports = {getCoordinatorIdentityApproval, getCoordinatorRoomIdApproval, handleIdentityRequestMsg, handleRoomRequestMsg}
