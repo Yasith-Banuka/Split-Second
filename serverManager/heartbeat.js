@@ -1,8 +1,9 @@
 const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
-const { message } = require("./serverMessage");
+const { message, broadcast } = require("./serverMessage");
 const { beginElection } = require("./leaderElection")
-const { getCoordinator } = require("../data/serverDetails")
+const { getCoordinator } = require("../data/serverDetails");
+const { getServerInfo, markFailedServer } = require("../data/globalServerDetails");
 
 /* 
 
@@ -128,7 +129,6 @@ function sendHeartbeat(heartbeatCounterObject) {
 	“fail_serverid” : s2,
 }
 */
-
 function informFailure(serverid) {
 	leaderid = getCoordinator();
 	if (serverid == leaderid) {
@@ -141,6 +141,30 @@ function informFailure(serverid) {
 		};
 		message(leaderid, failureMsg);
 	}
+}
+
+/*
+
+	leader action when a failed server encountered
+
+*/
+function leaderActionForFailedServer(failedServerID) {
+	let failedServerInfo = getServerInfo(failedServerID);
+
+	if (failedServerInfo["active"] == true) {
+
+		let broadcastMessage = {
+			"type": "heartbeat_fail_broadcast",
+			"fail_serverid": failedServerID
+		};
+
+		markFailedServer(failedServerID);
+
+		// broadcast the message to remove the failedServer from there globale server list
+		broadcast(broadcastMessage);
+	}
+	// else disregrad the request, because it's already been handled by the leader.
+
 }
 
 async function heartbeat() {
