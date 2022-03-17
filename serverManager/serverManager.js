@@ -1,15 +1,17 @@
 const {uponReceiveNewClient,uponReceiveNewChatroom,uponReceiveClientDeletion,uponReceiveChatroomDeletion} = require('./broadcastCommunication');
+const { handleIdentityRequestMsg, handleRoomRequestMsg } = require('./coordinatorCommunication');
+const { bullyManager } = require('./leaderElection');
 
 module.exports = {
     serverManager: function (socket, json) {
         switch (json["type"]) {
 
             case "clientrequest":
-                // code block
+                handleIdentityRequestMsg(socket, json);
                 break; 
-
-            case "clientconfirm":
-                // code block
+                
+            case "roomrequest":
+                handleRoomRequestMsg(socket, json);
                 break;
 
             case "newclient": 
@@ -18,14 +20,6 @@ module.exports = {
 
             case "endclient":
                 uponReceiveClientDeletion(json["clientid"]);
-                break;
-
-            case "roomrequest":
-                // code block
-                break;
-
-            case "roomconfirm":
-                // code block
                 break;
 
             case "newroom":
@@ -41,7 +35,7 @@ module.exports = {
                 break;
 
             case "bully":
-               // code block
+                bullyManager(json);
                 break;
 
             case "heartbeat":

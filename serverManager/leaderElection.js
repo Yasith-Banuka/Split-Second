@@ -1,15 +1,13 @@
 const heap = require('heap-js');
-
 const constants = require('../util/constants');
-
 const {message, broadcast, multicast} = require("./serverMessage")
-
 const {getAllServerInfo} = require("../data/globalServerDetails")
 const {getPriority, getServerId, setCoordinator} = require("../data/serverDetails")
 const {getLocalClientIds} = require("../data/serverClients")
 const {getLocalChatRooms} = require("../data/serverChatRooms")
 const {updateRooms} = require("../data/globalChatRooms")
 const {updateClients} = require("../data/globalClients")
+
 const answers = new heap.Heap();
 var inProcess = false;
 var acceptingAnswers = false;
