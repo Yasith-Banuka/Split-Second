@@ -17,5 +17,8 @@ module.exports = {
         socket.write(jsonEncode(routeMessage));
 
         removeClientFromServer(client);
+
+        console.log("joinRoomChangeServer called");
+
     }
 }

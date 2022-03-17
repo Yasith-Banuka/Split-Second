@@ -19,12 +19,18 @@ module.exports = {
 
             socket.write(jsonEncode(serverChange));
 
+            console.log("move join called - client add to the " + roomId);
+
+
         } else {
 
             // move to the MainHall of the server
             localMoveJoin(socket, getMainHallID(), former, clientIdentity);
 
+            console.log("move join called - client add to the " + getMainHallID());
+
         }
+
 
 
     }

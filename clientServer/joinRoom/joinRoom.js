@@ -38,11 +38,14 @@ module.exports = {
                 joinClientNewChatRoom(roomId, client);
 
                 // send neccessary messages
-                util.broadcast(getLocalChatRoom(clientPrevChatRoomId).clients, approveMessage);
                 util.broadcast(getLocalChatRoom(roomId).clients, approveMessage);
 
-                console.log("room changed");
+
             }
+
+            // send neccessary messages - this is common for the both cases
+            util.broadcast(getLocalChatRoom(clientPrevChatRoomId).clients, approveMessage);
+            console.log("room changed");
 
         } else {
             approveMessage = {
