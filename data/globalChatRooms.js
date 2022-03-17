@@ -1,4 +1,4 @@
-var serverChatrooms = {}; // Store the chatroom id // {'s1': ['room1']}
+var serverChatrooms = {}; // Store the chatroom id // {'roomId': 's1'}
 
 function isChatroomIdUsed(roomId){
     return serverChatrooms.hasOwnProperty(roomId); 
