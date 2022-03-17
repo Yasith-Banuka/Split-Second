@@ -1,9 +1,9 @@
 const { removeClientFromChatRoom, joinClientNewChatRoom } = require("../../chatRoomManager/chatRoomManager");
+const { isClientIdUsed } = require("../../data/globalClients");
 const { getLocalChatRoom } = require("../../data/serverChatRooms");
 const { getClientForSocket } = require("../../data/serverClients");
 const util = require("../../util/util");
-
-// todo: need to implment the multi server part
+const { joinRoomChangeServer } = require("./joinRoomChangeServer");
 
 module.exports = {
     joinRoom: function (socket, roomId) {
@@ -13,24 +13,36 @@ module.exports = {
         let approveMessage;
 
         if (checkRoomIsAuthentic(client, roomId)) {
-            approveMessage = {
-                "type": "roomchange",
-                "identity": client.clientIdentity,
-                "former": clientPrevChatRoomId,
-                "roomid": roomId
-            };
 
             removeClientFromChatRoom(clientPrevChatRoomId, client);
 
-            client.chatRoom = roomId;
+            // handle seperately - when the chat room in a different server
+            if (isClientIdUsed(roomId)) {
 
-            joinClientNewChatRoom(roomId, client);
+                joinRoomChangeServer(socket, roomId, client);
 
-            // send neccessary messages
-            util.broadcast(getLocalChatRoom(clientPrevChatRoomId).clients, approveMessage);
-            util.broadcast(getLocalChatRoom(roomId).clients, approveMessage);
+            } else {
 
-            console.log("room changed");
+                // when chat room in the same server
+
+                approveMessage = {
+                    "type": "roomchange",
+                    "identity": client.clientIdentity,
+                    "former": clientPrevChatRoomId,
+                    "roomid": roomId
+                };
+
+
+                client.chatRoom = roomId;
+
+                joinClientNewChatRoom(roomId, client);
+
+                // send neccessary messages
+                util.broadcast(getLocalChatRoom(clientPrevChatRoomId).clients, approveMessage);
+                util.broadcast(getLocalChatRoom(roomId).clients, approveMessage);
+
+                console.log("room changed");
+            }
 
         } else {
             approveMessage = {
@@ -54,8 +66,8 @@ module.exports = {
         return false
 
  */
-function checkClientIsOwner(client, roomId) {
-    let roomOwner = getLocalChatRoom(roomId).owner;
+function checkClientIsOwner(client) {
+    let roomOwner = getLocalChatRoom(client.chatRoom).owner;
     return (client == roomOwner);
 }
 
@@ -68,8 +80,8 @@ function checkClientIsOwner(client, roomId) {
  
 */
 function checkRoomIsAuthentic(client, roomId) {
-    if (typeof getLocalChatRoom(roomId) != "boolean") {
-        if (!checkClientIsOwner(client, roomId)) {
+    if ((typeof getLocalChatRoom(roomId) != "boolean") || isChatroomIdUsed(roomId)) {
+        if (!checkClientIsOwner(client)) {
             return true;
         }
     } else {

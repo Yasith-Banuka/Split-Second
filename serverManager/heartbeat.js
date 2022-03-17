@@ -145,6 +145,19 @@ function informFailure(serverid) {
 
 /*
 
+	general server action for failed server
+
+*/
+function serverActionForFailedServer(failedServerID) {
+	// mark the server as a failed on its global server list
+	markFailedServer(failedServerID);
+
+	//todo: remove its clients from global client list
+	// todo: remove its chatrooms from global chatroom list
+}
+
+/*
+
 	leader action when a failed server encountered
 
 */
@@ -209,4 +222,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { heartbeat, receiveHeartbeat }
+module.exports = { heartbeat, receiveHeartbeat, leaderActionForFailedServer, serverActionForFailedServer }

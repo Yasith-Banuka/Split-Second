@@ -1,7 +1,17 @@
 var fs = require('fs')
 const { getPriority } = require("./serverDetails");
 /*
-Include information only about the other servers 
+    Include information only about the other servers 
+    [
+        {
+            "serverId" : s2,
+            "address" : localhost,
+            "clientPort" : 4447,
+            "coordinationPort" : 5557,
+            "priority" : x,
+            "active" : true
+        }
+    ]
 */
 
 var globalServersInfo = [];
