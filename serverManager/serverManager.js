@@ -1,26 +1,56 @@
+const {uponReceiveNewClient,uponReceiveNewChatroom,uponReceiveClientDeletion,uponReceiveChatroomDeletion} = require('./broadcastCommunication');
+
 module.exports = {
     serverManager: function (socket, json) {
         switch (json["type"]) {
-            case "newidentity": 
-                // Check the uniqueness of the identity with coordinator
-                // newidentity(socket, json["identity"]);
-                break;
-            case "newchatroom":
-                // Check the uniqueness of the room id with coordinator
+
+            case "clientrequest":
+                // code block
+                break; 
+
+            case "clientconfirm":
                 // code block
                 break;
+
+            case "newclient": 
+                uponReceiveNewClient(json["clientid"]);
+                break;
+
+            case "endclient":
+                uponReceiveClientDeletion(json["clientid"]);
+                break;
+
+            case "roomrequest":
+                // code block
+                break;
+
+            case "roomconfirm":
+                // code block
+                break;
+
+            case "newroom":
+                uponReceiveNewChatroom(json["serverid"], json["roomid"])
+                break;
+
+            case "endroom":
+                uponReceiveChatroomDeletion(json["roomid"]);
+                break;
+
             case "joinroom":
                 // code block
                 break;
+
             case "bully":
                // code block
                 break;
+
             case "heartbeat":
                 // code block
                 break;
             case "suspectfailed":
                 // code block
                 break;
+                
             default:
                 console.log(`\nERROR: Message received from server is wrong.\nPlease check and try again\n` + JSON.stringify(json));
         }

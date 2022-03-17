@@ -18,6 +18,9 @@ function addLocalClient(clientObject) {
     serverClients.push(clientObject);
 }
 
+function getLocalClientIds() {
+    return serverClients.map(client => client.clientIdentity);
+}
 /*
 
     check if the client identity already exists and 
@@ -65,7 +68,7 @@ function removeClientFromServer(client) {
 
 }
 
-module.exports = { serverClients, addLocalClient, checkClientIdentityExist, getClientForSocket, removeClientFromServer }
+module.exports = { serverClients, getLocalClientIds, addLocalClient, checkClientIdentityExist, getClientForSocket, removeClientFromServer }
 
 
 
