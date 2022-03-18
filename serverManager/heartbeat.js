@@ -31,6 +31,14 @@ var heartbeatCounterList = [
 	}
 ];
 
+var heartbeatReceiveCounterList = [
+	{
+		serverID: "s2",
+		heartbeatCounter: 1024,
+		Timestamp: 1647282451457
+	}
+];
+
 // add given heartbeatCounterObject to the heartbeatCounterList
 function addHearbeatCounterObject(heartbeatCounterObject) {
 	heartbeatCounterList.push(heartbeatCounterObject);
@@ -86,16 +94,54 @@ function getHearbeatCounterObjectForServerId(serverId) {
 }
 */
 
-//increase counter after receiving 
+//increase heartbeatReceive counter after receiving heartbeat and send ack message
 
-function receiveHeartbeat(identity) {
+function receiveHeartbeat(identity, receivedCounter) {
 
-	let arrayLength = heartbeatCounterList.length;
+	let arrayLength = heartbeatReceiveCounterList.length;
+
 	for (var i = 0; i < arrayLength; i++) {
-		if (heartbeatCounterList[i].serverid == identity) {
-			heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
+		if (heartbeatReceiveCounterList[i].serverid == identity) {
+			currentCounter = heartbeatReceiveCounterList[i].counter;
+			break
 		}
 	}
+
+	if (receivedCounter > currentCounter) {
+
+		let arrayLength = heartbeatCounterList.length;
+
+		for (var i = 0; i < arrayLength; i++) {
+			if (heartbeatCounterList[i].serverid == identity) {
+				heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
+				break
+			}
+		}
+
+		let heartbeatAckMessage = {
+			"type": "heartbeat_ack",
+			"from": getServerId(),
+			"counter": heartbeatCounterObject[heartbeatCounter]++
+		};
+
+		// sernd the heartbeat message to the particular server
+		message(identity, heartbeatAckMessage);
+	}
+
+}
+
+//increase heartbeat counter after receiving heartbeat ack message
+
+function receiveHeartbeatAck(identity) {
+
+	let arrayLength = heartbeatReceiveCounterList.length;
+
+	for (var i = 0; i < arrayLength; i++) {
+		if (heartbeatReceiveCounterList[i].serverid == identity) {
+			heartbeatReceiveCounterList[i].counter = heartbeatReceiveCounterList[i].counter + 1;
+		}
+	}
+
 }
 
 /*
