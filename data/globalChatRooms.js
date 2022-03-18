@@ -1,3 +1,4 @@
+
 var serverChatrooms = {}; // Store the chatroom id // {'roomId': 'serverID'} 
 
 function isChatroomIdUsed(roomId) {
