@@ -31,6 +31,20 @@ var heartbeatCounterList = [
 	}
 ];
 
+/* 
+
+includes received heartbeat counter details.
+
+*/
+
+var heartbeatReceiveCounterList = [
+	{
+		serverID: "s2",
+		heartbeatCounter: 1024,
+		Timestamp: 1647282451457
+	}
+];
+
 // add given heartbeatCounterObject to the heartbeatCounterList
 function addHearbeatCounterObject(heartbeatCounterObject) {
 	heartbeatCounterList.push(heartbeatCounterObject);
@@ -86,16 +100,50 @@ function getHearbeatCounterObjectForServerId(serverId) {
 }
 */
 
-//increase counter after receiving 
+//increase heartbeatReceive counter after receiving heartbeat and send ack message
 
-function receiveHeartbeat(identity) {
+function receiveHeartbeat(identity, receivedCounter) {
+
+	let arrayLength = heartbeatReceiveCounterList.length;
+	let currentCounter;
+	let fromServerIndex;
+	for (var i = 0; i < arrayLength; i++) {
+		if (heartbeatReceiveCounterList[i].serverid == identity) {
+			currentCounter = heartbeatReceiveCounterList[i].counter;
+			fromServerIndex = i;
+			break
+		}
+	}
+
+	if (receivedCounter > currentCounter) {
+
+		
+		heartbeatReceiveCounterList[fromServerIndex].counter = heartbeatReceiveCounterList[fromServerIndex].counter + 1;
+			
+		let heartbeatAckMessage = {
+			"type": "heartbeat_ack",
+			"from": getServerId(),
+			"counter": heartbeatCounterObject[heartbeatCounter]++
+		};
+
+		// sernd the heartbeat message to the particular server
+		message(identity, heartbeatAckMessage);
+	}
+
+}
+
+//increase heartbeat counter after receiving heartbeat ack message
+
+function receiveHeartbeatAck(identity) {
 
 	let arrayLength = heartbeatCounterList.length;
+
 	for (var i = 0; i < arrayLength; i++) {
 		if (heartbeatCounterList[i].serverid == identity) {
 			heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
 		}
 	}
+
 }
 
 /*
@@ -160,6 +208,8 @@ function serverActionForFailedServer(failedServerID) {
 	}
 
 	//todo: remove its clients from global client list
+
+	//todo: remove server from heartbeatcounterlist and heartbeatAckCounterlist
 }
 
 /*
