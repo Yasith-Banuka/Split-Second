@@ -31,6 +31,12 @@ var heartbeatCounterList = [
 	}
 ];
 
+/* 
+
+includes received heartbeat counter details.
+
+*/
+
 var heartbeatReceiveCounterList = [
 	{
 		serverID: "s2",
@@ -99,25 +105,21 @@ function getHearbeatCounterObjectForServerId(serverId) {
 function receiveHeartbeat(identity, receivedCounter) {
 
 	let arrayLength = heartbeatReceiveCounterList.length;
-
+	let currentCounter;
+	let fromServerIndex;
 	for (var i = 0; i < arrayLength; i++) {
 		if (heartbeatReceiveCounterList[i].serverid == identity) {
 			currentCounter = heartbeatReceiveCounterList[i].counter;
+			fromServerIndex = i;
 			break
 		}
 	}
 
 	if (receivedCounter > currentCounter) {
 
-		let arrayLength = heartbeatCounterList.length;
-
-		for (var i = 0; i < arrayLength; i++) {
-			if (heartbeatCounterList[i].serverid == identity) {
-				heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
-				break
-			}
-		}
-
+		
+		heartbeatReceiveCounterList[fromServerIndex].counter = heartbeatReceiveCounterList[fromServerIndex].counter + 1;
+			
 		let heartbeatAckMessage = {
 			"type": "heartbeat_ack",
 			"from": getServerId(),
@@ -134,11 +136,11 @@ function receiveHeartbeat(identity, receivedCounter) {
 
 function receiveHeartbeatAck(identity) {
 
-	let arrayLength = heartbeatReceiveCounterList.length;
+	let arrayLength = heartbeatCounterList.length;
 
 	for (var i = 0; i < arrayLength; i++) {
-		if (heartbeatReceiveCounterList[i].serverid == identity) {
-			heartbeatReceiveCounterList[i].counter = heartbeatReceiveCounterList[i].counter + 1;
+		if (heartbeatCounterList[i].serverid == identity) {
+			heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
 		}
 	}
 
@@ -206,6 +208,8 @@ function serverActionForFailedServer(failedServerID) {
 	}
 
 	//todo: remove its clients from global client list
+
+	//todo: remove server from heartbeatcounterlist and heartbeatAckCounterlist
 }
 
 /*
