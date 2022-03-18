@@ -1,8 +1,10 @@
 const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
-const { message } = require("./serverMessage");
-const {beginElection} = require("./leaderElection")
-const {getCoordinator} = require("../data/serverDetails")
+const { message, broadcast } = require("./serverMessage");
+const { beginElection } = require("./leaderElection")
+const { getCoordinator } = require("../data/serverDetails");
+const { getServerInfo, markFailedServer } = require("../data/globalServerDetails");
+const { getChatRoomOfServer, removeChatroom } = require("../data/globalChatRooms");
 
 /* 
 
@@ -88,12 +90,12 @@ function getHearbeatCounterObjectForServerId(serverId) {
 
 function receiveHeartbeat(identity) {
 
-    let arrayLength = heartbeatCounterList.length;
-    for (var i = 0; i < arrayLength; i++) {
-        if (heartbeatCounterList[i].serverid == identity) {
-            heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
-        }
-    }
+	let arrayLength = heartbeatCounterList.length;
+	for (var i = 0; i < arrayLength; i++) {
+		if (heartbeatCounterList[i].serverid == identity) {
+			heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
+		}
+	}
 }
 
 /*
@@ -128,16 +130,60 @@ function sendHeartbeat(heartbeatCounterObject) {
 	“fail_serverid” : s2,
 }
 */
-
 function informFailure(serverid) {
 	leaderid = getCoordinator();
-	if (serverid==leaderid){
+	if (serverid == leaderid) {
 		beginElection();
 	}
-	else{
-		let failureMsg = {type : "heartbeat_fail", fail_serverid : serverid};
+	else {
+		let failureMsg = {
+			"type": "heartbeat_fail",
+			"fail_serverid": serverid
+		};
 		message(leaderid, failureMsg);
 	}
+}
+
+/*
+
+	general server action for failed server
+
+*/
+function serverActionForFailedServer(failedServerID) {
+	// mark the server as a failed on its global server list
+	markFailedServer(failedServerID);
+
+	let chatRoomForFailedServer = getChatRoomOfServer(failedServerID);
+
+	for (var i = 0; i < chatRoomForFailedServer.length; i++) {
+		removeChatroom(chatRoomForFailedServer[i]);
+	}
+
+	//todo: remove its clients from global client list
+}
+
+/*
+
+	leader action when a failed server encountered
+
+*/
+function leaderActionForFailedServer(failedServerID) {
+	let failedServerInfo = getServerInfo(failedServerID);
+
+	if (failedServerInfo["active"] == true) {
+
+		let broadcastMessage = {
+			"type": "heartbeat_fail_broadcast",
+			"fail_serverid": failedServerID
+		};
+
+		serverActionForFailedServer(failedServerID)
+
+		// broadcast the message to remove the failedServer from there globale server list
+		broadcast(broadcastMessage);
+	}
+	// else disregrad the request, because it's already been handled by the leader.
+
 }
 
 async function heartbeat() {
@@ -182,4 +228,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { heartbeat }
+module.exports = { heartbeat, receiveHeartbeat, leaderActionForFailedServer, serverActionForFailedServer }
