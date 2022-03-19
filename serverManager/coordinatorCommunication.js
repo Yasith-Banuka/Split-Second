@@ -1,11 +1,14 @@
 const {beginElection} = require("./leaderElection");
-const {isCoordinator} = require('../data/serverDetails');
+const {isCoordinator, isCoordinatorAvailable} = require('../data/serverDetails');
 const {isChatroomIdUsed,addChatroom} = require('../data/globalChatRooms');
 const {isClientIdUsed, addClient} = require('../data/globalClients');
 const {reply} = require('./serverMessage');
 const constants = require('../util/constants')
 
 function getCoordinatorRoomIdApproval(roomId, serverId) {
+    if (!isCoordinatorAvailable) {
+        return false;
+    }
     if(isCoordinator) {
         let isRoomApproved = !isChatroomIdUsed(roomId);
         if(isRoomApproved) {
@@ -29,6 +32,9 @@ function getCoordinatorRoomIdApproval(roomId, serverId) {
 };
 
 function getCoordinatorIdentityApproval(identity, serverId) {
+    if (!isCoordinatorAvailable) {
+        return false;
+    }
     if(isCoordinator) {
         let isClientApproved = !isClientIdUsed(identity);
         if(isClientApproved) {
