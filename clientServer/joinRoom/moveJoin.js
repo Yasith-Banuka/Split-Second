@@ -19,6 +19,9 @@ module.exports = {
 
             socket.write(jsonEncode(serverChange));
 
+            // update client server id
+            // todo: update client's server id
+
             console.log("move join called - client add to the " + roomId);
 
 
