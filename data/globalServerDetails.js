@@ -64,4 +64,5 @@ function getHighestPriorityServer() {
     return "s" + highestPriority; 
 }
 
+
 module.exports = {setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo, getHighestPriorityServer, getAllServerInfo}
