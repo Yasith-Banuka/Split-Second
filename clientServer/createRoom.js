@@ -1,6 +1,6 @@
 const util = require("../util/util");
 const { isChatroomIdUsed } = require("../data/globalChatRooms");
-const { getServerId, getCoordinator } = require("../data/serverDetails");
+const { getServerId } = require("../data/serverDetails");
 const { reply } = require("../serverManager/serverMessage");
 const { beginElection } = require("../serverManager/leaderElection");
 
@@ -8,6 +8,7 @@ const { getCoordinatorRoomIdApproval } = require("../serverManager/coordinatorCo
 const { getClientForSocket, checkClientIdentityExist, serverClients } = require("../data/serverClients");
 const { removeClientFromChatRoom } = require("../chatRoomManager/chatRoomManager");
 const { getLocalChatRoom, addLocalChatRoom } = require("../data/serverChatRooms");
+const { broadcastNewChatroom } = require("../serverManager/broadcastCommunication");
 module.exports = {
     createRoom: function (socket, roomId) {
         let client = getClientForSocket(socket);
@@ -43,6 +44,9 @@ module.exports = {
             socket.write(util.jsonEncode(approveMessage));
             socket.write(util.jsonEncode(roomChange));
             util.broadcast(getLocalChatRoom(previousChatRoom).clients, roomChange);
+
+            // broadcast new chatroom to the other servers
+            broadcastNewChatroom(getServerId(), roomId);
 
             console.log("room created");
         } else {
