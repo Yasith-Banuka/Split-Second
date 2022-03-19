@@ -22,4 +22,21 @@ function updateRooms(serverId, roomList) {
     }
 }
 
-module.exports = {isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms}
+/*
+
+    return the list of chat rooms for a server
+
+*/
+function getChatRoomOfServer(serverId) {
+    let chatRooms = [];
+
+    for (var roomId in serverChatrooms) {
+        if (getRoomServer(roomId) == serverId) {
+            chatRooms.push(roomId);
+        }
+    }
+
+    return chatRooms;
+}
+
+module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer }

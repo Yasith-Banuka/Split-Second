@@ -1,8 +1,10 @@
 const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
-const { message } = require("./serverMessage");
-const {beginElection} = require("./leaderElection")
-const {getCoordinator} = require("../data/serverDetails")
+const { message, broadcast } = require("./serverMessage");
+const { beginElection } = require("./leaderElection")
+const { getCoordinator } = require("../data/serverDetails");
+const { getServerInfo, markFailedServer } = require("../data/globalServerDetails");
+const { getChatRoomOfServer, removeChatroom } = require("../data/globalChatRooms");
 
 /* 
 
@@ -22,6 +24,20 @@ includes heartbeat counter details.
 
 */
 var heartbeatCounterList = [
+	{
+		serverID: "s2",
+		heartbeatCounter: 1024,
+		Timestamp: 1647282451457
+	}
+];
+
+/* 
+
+includes received heartbeat counter details.
+
+*/
+
+var heartbeatReceiveCounterList = [
 	{
 		serverID: "s2",
 		heartbeatCounter: 1024,
@@ -84,16 +100,50 @@ function getHearbeatCounterObjectForServerId(serverId) {
 }
 */
 
-//increase counter after receiving 
+//increase heartbeatReceive counter after receiving heartbeat and send ack message
 
-function receiveHeartbeat(identity) {
+function receiveHeartbeat(identity, receivedCounter) {
 
-    let arrayLength = heartbeatCounterList.length;
-    for (var i = 0; i < arrayLength; i++) {
-        if (heartbeatCounterList[i].serverid == identity) {
-            heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
-        }
-    }
+	let arrayLength = heartbeatReceiveCounterList.length;
+	let currentCounter;
+	let fromServerIndex;
+	for (var i = 0; i < arrayLength; i++) {
+		if (heartbeatReceiveCounterList[i].serverid == identity) {
+			currentCounter = heartbeatReceiveCounterList[i].counter;
+			fromServerIndex = i;
+			break
+		}
+	}
+
+	if (receivedCounter > currentCounter) {
+
+		
+		heartbeatReceiveCounterList[fromServerIndex].counter = heartbeatReceiveCounterList[fromServerIndex].counter + 1;
+			
+		let heartbeatAckMessage = {
+			"type": "heartbeat_ack",
+			"from": getServerId(),
+			"counter": heartbeatCounterObject[heartbeatCounter]++
+		};
+
+		// sernd the heartbeat message to the particular server
+		message(identity, heartbeatAckMessage);
+	}
+
+}
+
+//increase heartbeat counter after receiving heartbeat ack message
+
+function receiveHeartbeatAck(identity) {
+
+	let arrayLength = heartbeatCounterList.length;
+
+	for (var i = 0; i < arrayLength; i++) {
+		if (heartbeatCounterList[i].serverid == identity) {
+			heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
+		}
+	}
+
 }
 
 /*
@@ -128,16 +178,62 @@ function sendHeartbeat(heartbeatCounterObject) {
 	“fail_serverid” : s2,
 }
 */
-
 function informFailure(serverid) {
 	leaderid = getCoordinator();
-	if (serverid==leaderid){
+	if (serverid == leaderid) {
 		beginElection();
 	}
-	else{
-		let failureMsg = {type : "heartbeat_fail", fail_serverid : serverid};
+	else {
+		let failureMsg = {
+			"type": "heartbeat_fail",
+			"fail_serverid": serverid
+		};
 		message(leaderid, failureMsg);
 	}
+}
+
+/*
+
+	general server action for failed server
+
+*/
+function serverActionForFailedServer(failedServerID) {
+	// mark the server as a failed on its global server list
+	markFailedServer(failedServerID);
+
+	let chatRoomForFailedServer = getChatRoomOfServer(failedServerID);
+
+	for (var i = 0; i < chatRoomForFailedServer.length; i++) {
+		removeChatroom(chatRoomForFailedServer[i]);
+	}
+
+	//todo: remove its clients from global client list
+
+	//todo: remove server from heartbeatcounterlist and heartbeatAckCounterlist
+}
+
+/*
+
+	leader action when a failed server encountered
+
+*/
+function leaderActionForFailedServer(failedServerID) {
+	let failedServerInfo = getServerInfo(failedServerID);
+
+	if (failedServerInfo["active"] == true) {
+
+		let broadcastMessage = {
+			"type": "heartbeat_fail_broadcast",
+			"fail_serverid": failedServerID
+		};
+
+		serverActionForFailedServer(failedServerID)
+
+		// broadcast the message to remove the failedServer from there globale server list
+		broadcast(broadcastMessage);
+	}
+	// else disregrad the request, because it's already been handled by the leader.
+
 }
 
 async function heartbeat() {
@@ -182,4 +278,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { heartbeat }
+module.exports = { heartbeat, receiveHeartbeat, leaderActionForFailedServer, serverActionForFailedServer }
