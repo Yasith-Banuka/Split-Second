@@ -1,4 +1,5 @@
 const { joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { removeChatroom } = require("../data/globalChatRooms");
 const { getLocalChatRoom, getMainHallID, serverChatRooms } = require("../data/serverChatRooms");
 const { serverClients, getClientForSocket } = require("../data/serverClients");
 const { broadcastChatroomDeletion } = require("../serverManager/broadcastCommunication");
@@ -54,6 +55,7 @@ module.exports = {
             socket.write(util.jsonEncode(approveMessage));
 
             // broadcast deletion of chatroom to the other servers
+            removeChatroom(roomId);
             broadcastChatroomDeletion(roomId);
 
             console.log("room deleted");
