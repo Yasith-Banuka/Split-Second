@@ -1,6 +1,7 @@
 const {multicast} = require('./serverMessage');
 const {getCoordinator} = require('../data/serverDetails');
-const {getAllServerInfo, addClient, removeClient} = require('../data/globalClients');
+const {getAllServerInfo} = require("../data/globalServerDetails");
+const {addClient, removeClient} = require('../data/globalClients');
 const {addChatroom, removeChatroom} = require('../data/globalChatRooms');
 
 
@@ -16,7 +17,7 @@ function uponReceiveNewClient (serverId, clientId) {
     addClient(serverId, clientId);
 }
 
-function broadcastClientDeletion () {
+function broadcastClientDeletion (clientId) {
     let message = {type : "endclient", clientid : clientId};
     let multicastServerIds = getServerIdsExcludingLeader();
     multicast(multicastServerIds, message);
@@ -48,16 +49,16 @@ function uponReceiveChatroomDeletion (roomId) {
 
 function getServerIdsExcludingLeader () {
     let coordinatorId = getCoordinator;
-    let allServersInfo = getAllServerInfo;
+    let allServersInfo = getAllServerInfo();
 
-    let serverIdsExcludngLeader = [];
+    let serverIdsExcludingLeader = [];
     for (var i = 0; i < allServersInfo.length; i++) {
         if (allServersInfo[i]["serverId"] != coordinatorId) {
-            serverIdsExcludngLeader.push(allServersInfo[i]["serverId"]);
+            serverIdsExcludingLeader.push(allServersInfo[i]["serverId"]);
         }
     }
 
-    return serverIdsExcludngLeader;
+    return serverIdsExcludingLeader;
 }
 
 module.exports = {
