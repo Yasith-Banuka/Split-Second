@@ -30,10 +30,10 @@ function getCoordinatorRoomIdApproval(roomId, serverId) {
         .catch(error => {
             beginElection();
             return false;
-        })
+    })
 };
 
-function getCoordinatorIdentityApproval(identity, serverId) {
+async function getCoordinatorIdentityApproval(identity, serverId) {
     if (!isCoordinatorAvailable) {
         return false;
     }
@@ -46,21 +46,20 @@ function getCoordinatorIdentityApproval(identity, serverId) {
         return isClientApproved;
     }
     let identityRequestMsg = {type : "clientrequest", clientid : identity, serverid : serverId }
-    reply(getCoordinator() , identityRequestMsg, constants.T1)
-        .then(json => {
-            if(json.type === "clientconfirm" && json.clientid === identity) {
-                return json.idapproved;
-            }
-            return false;
-        })
-        .catch(error => {
-            beginElection();
-            return false;
-        })
-};
+    try {
+        response = await reply(getCoordinator() , identityRequestMsg, constants.T1)
+    } catch (e) {
+        beginElection();
+        return false;
+    }
+    if(response.type === "clientconfirm" && response.clientid === identity) {
+        return response.idapproved;
+    }
+    return false;
+}
 
-function handleIdentityRequestMsg(socket, message) {
-    let approval = getCoordinatorIdentityApproval(message.clientid, message.serverid);
+async function handleIdentityRequestMsg(socket, message) {
+    let approval = await getCoordinatorIdentityApproval(message.clientid, message.serverid);
     let identityApprovalMsg = {type : "clientconfirm", clientid : message.clientid, idapproved : approval};
     socket.write(jsonEncode(identityApprovalMsg));
     socket.destroy();

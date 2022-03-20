@@ -8,11 +8,11 @@ const { getLocalChatRoom, getMainHallID } = require("../data/serverChatRooms");
 const { broadcastNewClient } = require("../serverManager/broadcastCommunication");
 
 module.exports = {
-    newidentity: function (socket, identity) {
+    newidentity: async function (socket, identity) {
         let newIdentityAck;
         let mainHallMoveAck;
-
-        if (checkAvailability(identity)) {
+        let availabile = await checkAvailability(identity);
+        if(availabile) {
             let clientObject = {
                 clientIdentity: identity,
                 socket: socket,
@@ -42,7 +42,6 @@ module.exports = {
             console.log('new client addition failed')
         }
     }
-
 };
 
 /*
@@ -51,8 +50,11 @@ module.exports = {
     else 
         return true
 */
-function checkAvailability(identity) {
-
-    return util.checkAlphaNumeric(identity) && (!isClientIdUsed(identity)) && getCoordinatorIdentityApproval(identity, getServerId());
+async function checkAvailability(identity) {
+    if (util.checkAlphaNumeric(identity) && (!isClientIdUsed(identity))) {
+        return await getCoordinatorIdentityApproval(identity, getServerId())
+    }
+    return false;
 };
+    
 

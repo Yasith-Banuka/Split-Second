@@ -41,19 +41,27 @@ module.exports = {
         const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort}, receivingServerInfo["address"], ()=>{
             socket.write(jsonEncode(message));
         });
+        let timeoutVar = null;
         return new Promise((resolve, reject) => {
+            timeoutVar = setTimeout(() => {
+                socket.end();
+                throw new Error();
+            }, timeout);
+
             socket.on('data', (bufObj) => {
                 let json = jsonDecode(bufObj);
                 resolve(json);
+                clearTimeout(timeoutVar);
                 socket.end();
             });
 
             socket.on('error', (error) => {
-                reject(error)
                 socket.end();
+                clearTimeout(timeoutVar);
+                throw new Error();   
             });
 
-            setTimeout(() => reject(), timeout);
+
         });
     }
 }
