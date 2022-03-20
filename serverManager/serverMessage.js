@@ -48,12 +48,26 @@ function reply(serverId, message, timeout) {
             resolve(json);
             socket.end();
         });
+        let timeoutVar = null;
+        return new Promise((resolve, reject) => {
+            timeoutVar = setTimeout(() => {
+                socket.end();
+                throw new Error();
+            }, timeout);
 
-        socket.on('error', (error) => {
-            reject(error)
-            socket.end();
+            socket.on('data', (bufObj) => {
+                let json = jsonDecode(bufObj);
+                resolve(json);
+                clearTimeout(timeoutVar);
+                socket.end();
+            });
+
+            socket.on('error', (error) => {
+                socket.end();
+                clearTimeout(timeoutVar);
+                throw new Error();   
+            });
         });
-
         setTimeout(() => reject(), timeout);
     });
 }
