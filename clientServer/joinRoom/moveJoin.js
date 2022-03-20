@@ -12,8 +12,6 @@ module.exports = {
 
         if (typeof getChatRoom != "boolean") {
 
-            localMoveJoin(socket, roomId, former, clientIdentity);
-
             // send serverChange message to the client
             let serverChange = {
                 "type": "serverchange",
@@ -21,9 +19,13 @@ module.exports = {
                 "serverid": getServerId()
             }
 
-            console.log(serverChange);
 
             socket.write(jsonEncode(serverChange));
+
+            localMoveJoin(socket, roomId, former, clientIdentity);
+
+
+            console.log(serverChange);
 
             // update client server id
             // todo: update client's server id
