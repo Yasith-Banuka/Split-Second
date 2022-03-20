@@ -26,7 +26,7 @@ function setGlobalServersConfig(path, serverId) {
     const data = fs.readFileSync(path, 'utf8');
 
     serversConf = data.split('\r\n');
-
+    
     for (var i = 0; i < serversConf.length; i++) {
 
         serverConf = serversConf[i].split(' ');
@@ -43,6 +43,7 @@ function setGlobalServersConfig(path, serverId) {
             globalServersInfo.push(server);
         }
     }
+
 }
 
 function getCoordinatingPorts() {
@@ -75,7 +76,7 @@ function getAllServerInfo() {
     let arrayLength = globalServersInfo.length;
     for (var i = 0; i < arrayLength; i++) {
         if (globalServersInfo[i]["active"] == true) {
-            return globalServersList.push(globalServersInfo[i]);
+            globalServersList.push(globalServersInfo[i]);
         }
     }
 
