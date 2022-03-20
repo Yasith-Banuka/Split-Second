@@ -32,7 +32,7 @@ module.exports = {
             util.broadcast(getLocalChatRoom(getMainHallID()).clients, mainHallMoveAck);
 
             // broadcast new client to the other servers
-            broadcastNewClient(identity);
+            broadcastNewClient(getServerId(), identity );
 
             console.log('new client added to the server');
         } else {
