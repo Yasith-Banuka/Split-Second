@@ -152,7 +152,6 @@ var sendIamup = () => {
             setCoordinator(getServerId());
         } else {
             if(Math.min(viewMsgPriorities)>getServerId()) {
-                setCoordinator(getServerId());
                 sendCoordinator();
             } else {
                 setCoordinator("s" + Math.min(viewMsgPriorities));
@@ -207,3 +206,4 @@ module.exports = {bullyManager, beginElection, sendIamup}
 //block clients until all servers up
 //values for t1, t2
 //at start, set leader
+//start vs recoevered
