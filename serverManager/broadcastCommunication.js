@@ -5,14 +5,14 @@ const {addChatroom, removeChatroom} = require('../data/globalChatRooms');
 
 
 
-function broadcastNewClient (clientId, serverId){
+function broadcastNewClient (serverId, clientId){
     let message = {type : "newclient", clientid : clientId, serverid:serverId };
 
     let multicastServerIds = getServerIdsExcludingLeader();
     multicast(multicastServerIds, message);
 }
 
-function uponReceiveNewClient (clientId, serverId) {
+function uponReceiveNewClient (serverId, clientId) {
     addClient(serverId, clientId);
 }
 
