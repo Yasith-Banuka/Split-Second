@@ -1,9 +1,7 @@
 const { serverClients, serverChatRooms, checkClientIdentityExist, getChatRoom, joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
 const { isClientIdUsed } = require("../data/globalClients");
-const { getServerId, getCoordinator } = require("../data/serverDetails");
-const { reply } = require("../serverManager/serverMessage");
-const { beginElection } = require("../serverManager/leaderElection");
+const { getServerId} = require("../data/serverDetails");
 const { getCoordinatorIdentityApproval } = require("../serverManager/coordinatorCommunication");
 const { addLocalClient } = require("../data/serverClients");
 const { getLocalChatRoom, getMainHallID } = require("../data/serverChatRooms");
@@ -55,6 +53,6 @@ module.exports = {
 */
 function checkAvailability(identity) {
 
-    return util.checkAlphaNumeric(identity) && (!isClientIdUsed(identity)) && getCoordinatorIdentityApproval(identity);
+    return util.checkAlphaNumeric(identity) && (!isClientIdUsed(identity)) && getCoordinatorIdentityApproval(identity, getServerId());
 };
 

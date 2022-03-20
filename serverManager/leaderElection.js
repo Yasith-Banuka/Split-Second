@@ -49,7 +49,7 @@ var beginElection = () => {
     setCoordinator(null);
     setTimeout(() => {
         acceptingAnswers = false;
-        if(answers.length()>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+        if(answers.length>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
             sendNomination();
             acceptingNominations = true;
         } else {  //else, send coordinator msgs to all processes wih lower priority
@@ -114,7 +114,7 @@ var receiveCoordinator = (serverId) => {
 var sendNominationTimeout = null;
 var currentNomination;
 var sendNomination = () => {
-    if(answers.length()>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+    if(answers.length>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
         currentNomination = "s"+answers.pop();
         let nominationMsg = {type : "bully", subtype : "nomination", serverid : getServerId()}
         message(currentNomination, nominationMsg);

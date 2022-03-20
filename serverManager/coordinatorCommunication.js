@@ -1,16 +1,17 @@
 const {beginElection} = require("./leaderElection");
-const {isCoordinator, isCoordinatorAvailable} = require('../data/serverDetails');
+const {isCoordinator, isCoordinatorAvailable, getCoordinator} = require('../data/serverDetails');
 const {isChatroomIdUsed,addChatroom} = require('../data/globalChatRooms');
 const {isClientIdUsed, addClient} = require('../data/globalClients');
 const {reply} = require('./serverMessage');
-const constants = require('../util/constants')
+const constants = require('../util/constants');
+const { jsonEncode } = require("../util/util");
 
 function getCoordinatorRoomIdApproval(roomId, serverId) {
 
     if (!isCoordinatorAvailable) {
         return false;
     }
-    if(isCoordinator) {
+    if(isCoordinator()) {
         let isRoomApproved = !isChatroomIdUsed(roomId);
         if(isRoomApproved) {
             addChatroom(serverId, roomId);
@@ -36,10 +37,10 @@ function getCoordinatorIdentityApproval(identity, serverId) {
     if (!isCoordinatorAvailable) {
         return false;
     }
-    if(isCoordinator) {
+    if(isCoordinator()) {
         let isClientApproved = !isClientIdUsed(identity);
         if(isClientApproved) {
-            addClient(identity);
+            addClient(serverId, identity);
         }
         
         return isClientApproved;
@@ -60,15 +61,15 @@ function getCoordinatorIdentityApproval(identity, serverId) {
 
 function handleIdentityRequestMsg(socket, message) {
     let approval = getCoordinatorIdentityApproval(message.clientid, message.serverid);
-    let identityApprovalMsg = {type : "clientconfirm", clientid : identity, idapproved : approval};
-    socket.write(util.jsonEncode(identityApprovalMsg));
+    let identityApprovalMsg = {type : "clientconfirm", clientid : message.clientid, idapproved : approval};
+    socket.write(jsonEncode(identityApprovalMsg));
     socket.destroy();
 }
 
 function handleRoomRequestMsg(socket, message) {
     let approval = getCoordinatorRoomIdApproval(message.roomid, message.serverid);
-    let roomApprovalMsg = {type : "roomconfirm", roomid : roomId, roomapproved : approval}
-    socket.write(util.jsonEncode(roomApprovalMsg));
+    let roomApprovalMsg = {type : "roomconfirm", roomid : message.roomid, roomapproved : approval}
+    socket.write(jsonEncode(roomApprovalMsg));
     socket.destroy();
 }
 

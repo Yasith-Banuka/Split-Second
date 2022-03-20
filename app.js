@@ -3,7 +3,7 @@ const Net = require('net');
 const { serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
 const { serverManager } = require('./serverManager/serverManager');
-const { setConfigInfo, getAllInfo, setCoordinator, getClientPort } = require('./data/serverDetails');
+const { setConfigInfo, getAllInfo, setCoordinator, getClientPort, getCoordinator } = require('./data/serverDetails');
 const { setCoordinatingServersConfig, getCoordinatingPorts, getHighestPriorityServer } = require('./data/globalServerDetails');
 
 const util = require('./util/util');

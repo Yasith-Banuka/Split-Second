@@ -1,7 +1,8 @@
-const util = require("../util/util");
+
 const net = require("net");
 const {getServerInfo, getCoordinatingServerIds} = require("../data/globalServerDetails");
 const {getCoordinationPort} = require("../data/serverDetails");
+const { jsonEncode, jsonDecode } = require("../util/util");
 
 module.exports = {
     message: function (serverId, message) {
@@ -11,7 +12,7 @@ module.exports = {
         console.log(receivingServerInfo);
         if(receivingServerInfo.active) {
             const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort["coordinationPort"]}, receivingServerInfo["address"], ()=>{
-                socket.write(util.jsonEncode(message));
+                socket.write(jsonEncode(message));
                 socket.destroy();
             } )
         }
@@ -38,11 +39,11 @@ module.exports = {
         let receivingServerInfo = getServerInfo(serverId);
         console.log(serverId, message);
         const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort}, receivingServerInfo["address"], ()=>{
-            socket.write(util.jsonEncode(message));
+            socket.write(jsonEncode(message));
         });
         return new Promise((resolve, reject) => {
             socket.on('data', (bufObj) => {
-                let json = util.jsonDecode(bufObj);
+                let json = jsonDecode(bufObj);
                 resolve(json);
                 socket.end();
             });
