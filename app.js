@@ -9,6 +9,7 @@ const { setCoordinatingServersConfig, getCoordinatingPorts, getHighestPrioritySe
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
+const { heartbeat } = require('./serverManager/heartbeat');
 
 // Get serverId as the argument
 const serverId = argv[2];
@@ -56,7 +57,7 @@ serverForClients.on('connection', function (socket) {
         let json = util.jsonDecode(bufObj);
         console.log(`Data received from client: ` + JSON.stringify(json) + `\n`);
         clientServer(socket, json);
-        
+
     });
 
 
@@ -72,8 +73,6 @@ serverForClients.on('connection', function (socket) {
     });
 });
 
-
-
 // Create a server for communicating  with other server
 const serverForCoordination = new Net.Server();
 
@@ -82,14 +81,14 @@ serverForCoordination.listen(coordinationPort, function () {
 });
 
 serverForCoordination.on('connection', function (socket) {
-    
+
     console.log('A new connection with a server has been established.');
 
     socket.on('data', function (bufObj) {
         let json = util.jsonDecode(bufObj);
         console.log(`Data received from a server : ` + JSON.stringify(json) + `\n`);
         serverManager(socket, json);
-        
+
     });
 
     socket.on('end', function () {
@@ -100,4 +99,6 @@ serverForCoordination.on('connection', function (socket) {
         console.log(`Error: ${err}`);
     });
 });
+
+//await heartbeat();
 

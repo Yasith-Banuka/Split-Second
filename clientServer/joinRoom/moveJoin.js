@@ -1,4 +1,8 @@
-const { getLocalChatRoom, getMainHallID } = require("../../data/serverChatRooms");
+const { joinClientNewChatRoom } = require("../../chatRoomManager/chatRoomManager");
+const { getLocalChatRoom, getMainHallID, addLocalChatRoom } = require("../../data/serverChatRooms");
+const { addLocalClient } = require("../../data/serverClients");
+const { getServerId } = require("../../data/serverDetails");
+const util = require("../../util/util");
 const { jsonEncode } = require("../../util/util");
 
 module.exports = {
@@ -14,8 +18,10 @@ module.exports = {
             let serverChange = {
                 "type": "serverchange",
                 "approved": "true",
-                "serverid": "s2"
-            };
+                "serverid": getServerId()
+            }
+
+            console.log(serverChange);
 
             socket.write(jsonEncode(serverChange));
 

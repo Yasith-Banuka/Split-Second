@@ -18,6 +18,8 @@ module.exports = {
         };
 
         socket.write(util.jsonEncode(whoReply));
+
+        console.log(roomDetails);
     }
 }
 
