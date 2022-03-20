@@ -9,11 +9,12 @@ module.exports = {
         let serverCoordinationPort = getCoordinationPort();
         let receivingServerInfo = getServerInfo(serverId);
         console.log(receivingServerInfo);
-
-        const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort["coordinationPort"]}, receivingServerInfo["address"], ()=>{
-            socket.write(util.jsonEncode(message));
-            socket.destroy();
-        } )
+        if(receivingServerInfo.active) {
+            const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort["coordinationPort"]}, receivingServerInfo["address"], ()=>{
+                socket.write(util.jsonEncode(message));
+                socket.destroy();
+            } )
+        }
     },
 
     broadcast: function(message) {
