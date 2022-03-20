@@ -1,5 +1,6 @@
-const {uponReceiveNewClient,uponReceiveNewChatroom,uponReceiveClientDeletion,uponReceiveChatroomDeletion} = require('./broadcastCommunication');
+const { uponReceiveNewClient, uponReceiveNewChatroom, uponReceiveClientDeletion, uponReceiveChatroomDeletion } = require('./broadcastCommunication');
 const { handleIdentityRequestMsg, handleRoomRequestMsg } = require('./coordinatorCommunication');
+const { receiveHeartbeat, receiveHeartbeatAck, informFailure, leaderActionForFailedServer, serverActionForFailedServer } = require('./heartbeat');
 const { bullyManager } = require('./leaderElection');
 
 module.exports = {
@@ -8,13 +9,13 @@ module.exports = {
 
             case "clientrequest":
                 handleIdentityRequestMsg(socket, json);
-                break; 
-                
+                break;
+
             case "roomrequest":
                 handleRoomRequestMsg(socket, json);
                 break;
 
-            case "newclient": 
+            case "newclient":
                 uponReceiveNewClient(json["serverid"], json["clientid"]);
                 break;
 
@@ -38,13 +39,24 @@ module.exports = {
                 bullyManager(json);
                 break;
 
+            // hearbeat protocol functionality
+
             case "heartbeat":
-                // code block
+                receiveHeartbeat(json["from"], json["counter"]);
                 break;
-            case "suspectfailed":
-                // code block
+
+            case "heartbeat_ack":
+                receiveHeartbeatAck(json["from"]);
                 break;
-                
+
+            case "heartbeat_fail":
+                leaderActionForFailedServer(json["fail_serverid"]);
+                break;
+
+            case "heartbeat_fail_broadcast":
+                serverActionForFailedServer(json["fail_serverid"]);
+                break;
+
             default:
                 console.log(`\nERROR: Message received from server is wrong.\nPlease check and try again\n` + JSON.stringify(json));
         }

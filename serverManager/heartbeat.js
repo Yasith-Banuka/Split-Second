@@ -24,13 +24,7 @@ includes heartbeat counter details.
 * Use Date.now() to calculate the current timestamp
 
 */
-var heartbeatCounterList = [
-	{
-		serverID: "s2",
-		heartbeatCounter: 1024,
-		Timestamp: 1647282451457
-	}
-];
+var heartbeatCounterList = [];
 
 /* 
 
@@ -38,13 +32,7 @@ includes received heartbeat counter details.
 
 */
 
-var heartbeatReceiveCounterList = [
-	{
-		serverID: "s2",
-		heartbeatCounter: 1024,
-		Timestamp: 1647282451457
-	}
-];
+var heartbeatReceiveCounterList = [];
 
 // add given heartbeatCounterObject to the heartbeatCounterList and heartbeatCounterRecievedList
 function addHearbeatCounterObject(heartbeatCounterObject) {
@@ -173,10 +161,12 @@ function sendHeartbeat(heartbeatCounterObject) {
 
 /*
 
-{
-	“type” : “heartbeat_fail”,
-	“fail_serverid” : s2,
-}
+	inform the leader about the failed server
+
+	{
+		“type” : “heartbeat_fail”,
+		“fail_serverid” : s2,
+	}
 */
 function informFailure(serverid) {
 	leaderid = getCoordinator();
@@ -281,4 +271,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { heartbeat, receiveHeartbeat, leaderActionForFailedServer, serverActionForFailedServer }
+module.exports = { heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }
