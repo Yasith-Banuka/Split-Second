@@ -43,6 +43,7 @@ var bullyManager = (json) => {
 
 var beginElection = () => {
     //send election msgs to all processes with higher priority
+    console.log("coordinator failed. begin election")
     sendElection();
     acceptingAnswers = true;
     inProcess = true;

@@ -45,7 +45,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             timeoutVar = setTimeout(() => {
                 socket.end();
-                throw new Error();
+                resolve({type: "serverfailure"});
             }, timeout);
 
             socket.on('data', (bufObj) => {
@@ -58,7 +58,7 @@ module.exports = {
             socket.on('error', (error) => {
                 socket.end();
                 clearTimeout(timeoutVar);
-                throw new Error();   
+                resolve({type: "serverfailure"});   
             });
 
 
