@@ -12,7 +12,6 @@ function removeClient(clientId){
     delete globalClients[clientId];
 }
 
-
 function updateClients(serverId, clientList) {
     for(let i=0;i<clientList.length;i++) {
         globalClients[clientList[i]] = serverId;

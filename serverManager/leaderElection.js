@@ -180,7 +180,7 @@ function getHigherPriorityServers() {
     let globalServerInfo = getAllServerInfo();
     let serverPriority = getPriority();
     for (var i = 0; i < globalServerInfo.length; i++) {
-        if ((serverPriority.priority < globalServerInfo[i].priority) && globalServerInfo[i].active == true) {
+        if ((serverPriority.priority < globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
     } 
@@ -192,7 +192,7 @@ function getLowerPriorityServers() {
     let globalServerInfo = getAllServerInfo();
     let serverPriority = getPriority();
     for (var i = 0; i < globalServerInfo.length; i++) {
-        if ((serverPriority.priority > globalServerInfo[i].priority) && globalServerInfo[i].active == true) {
+        if ((serverPriority.priority > globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
     } 
