@@ -51,6 +51,6 @@ module.exports = {
 */
 function checkAvailability(identity) {
 
-    return util.checkAlphaNumeric(identity) && (!isClientIdUsed) && getCoordinatorIdentityApproval(identity);
+    return util.checkAlphaNumeric(identity) && (!isClientIdUsed(identity)) && getCoordinatorIdentityApproval(identity);
 };
 

@@ -6,6 +6,7 @@ const {reply} = require('./serverMessage');
 const constants = require('../util/constants')
 
 function getCoordinatorRoomIdApproval(roomId, serverId) {
+
     if (!isCoordinatorAvailable) {
         return false;
     }
