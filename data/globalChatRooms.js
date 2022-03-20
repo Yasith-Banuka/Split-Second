@@ -1,25 +1,42 @@
-var serverChatrooms = {}; // Store the chatroom id // {'roomId': 's1'}
+var gloablChatrooms = {}; // Store the chatroom id // {'roomId': 's1'}
 
 function isChatroomIdUsed(roomId){
-    return serverChatrooms.hasOwnProperty(roomId); 
+    return gloablChatrooms.hasOwnProperty(roomId); 
 }
 
 function addChatroom(serverId, roomId){
-    serverChatrooms[roomId] = serverId;
+    gloablChatrooms[roomId] = serverId;
 }
     
 function removeChatroom(roomId){
-    delete serverChatrooms[roomId];
+    delete gloablChatrooms[roomId];
 }
 
 function getRoomServer(roomId) {
-    return serverChatrooms[roomId];
+    return gloablChatrooms[roomId];
 }
 
 function updateRooms(serverId, roomList) {
     for(let i=0;i<roomList.length;i++) {
-        serverChatrooms[roomList[i]] = serverId;
+        gloablChatrooms[roomList[i]] = serverId;
     }
 }
 
-module.exports = {isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms}
+/*
+
+    return the list of chat rooms for a server
+
+*/
+function getChatRoomOfServer(serverId) {
+    let chatRooms = [];
+
+    for (var roomId in serverChatrooms) {
+        if (getRoomServer(roomId) == serverId) {
+            chatRooms.push(roomId);
+        }
+    }
+
+    return chatRooms;
+}
+
+module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer }

@@ -1,39 +1,76 @@
 const {beginElection} = require("./leaderElection");
-const {getServerId, getCoordinator} = require('../data/serverDetails');
-const {isChatroomIdUsed} = require('../data/globalChatRooms');
-const {isClientIdUsed} = require('../data/globalClients');
+const {isCoordinator, isCoordinatorAvailable, getCoordinator} = require('../data/serverDetails');
+const {isChatroomIdUsed,addChatroom} = require('../data/globalChatRooms');
+const {isClientIdUsed, addClient} = require('../data/globalClients');
 const {reply} = require('./serverMessage');
+const constants = require('../util/constants');
+const { jsonEncode } = require("../util/util");
 
-function getCoordinatorRoomIdApproval(roomId) {
-    if(getServerId()===getCoordinator()) {
-        let roomApprovalMsg = {"type" : "roomconfirm", "roomid" : roomId, "roomApproved" : !isChatroomIdUsed(roomId)}
-        return roomApprovalMsg;
+function getCoordinatorRoomIdApproval(roomId, serverId) {
+
+    if (!isCoordinatorAvailable) {
+        return false;
     }
-    let roomRequestMsg = {"type" : "roomrequest", "roomid" : roomId, "serverid" : getServerId()}
-    reply(getCoordinator(), roomRequestMsg)
+    if(isCoordinator()) {
+        let isRoomApproved = !isChatroomIdUsed(roomId);
+        if(isRoomApproved) {
+            addChatroom(serverId, roomId);
+        }
+        
+        return isRoomApproved;
+    }
+    let roomRequestMsg = {type : "roomrequest", roomid : roomId, serverid : serverId}
+    reply(getCoordinator(), roomRequestMsg, constants.T1)
         .then(json => {
             if(json.type === "roomconfirm" && json.roomid === roomId) {
-                return json;
+                return json.roomapproved;
             }
             return false;
         })
-        .catch(error => beginElection())
+        .catch(error => {
+            beginElection();
+            return false;
+        })
 };
 
-function getCoordinatorIdentityApproval(identity) {
-    if(getServerId() === getCoordinator() ) {
-        let identityApprovalMsg = {"type" : "clientconfirm", "clientid" : identity, "idapproved" : !isClientIdUsed(identity)}
-        return identityApprovalMsg;
+function getCoordinatorIdentityApproval(identity, serverId) {
+    if (!isCoordinatorAvailable) {
+        return false;
     }
-    let identityRequestMsg = {"type" : "clientrequest", "clientid" : identity, "serverid" : getServerId() }
-    reply(getCoordinator() , identityRequestMsg)
+    if(isCoordinator()) {
+        let isClientApproved = !isClientIdUsed(identity);
+        if(isClientApproved) {
+            addClient(serverId, identity);
+        }
+        
+        return isClientApproved;
+    }
+    let identityRequestMsg = {type : "clientrequest", clientid : identity, serverid : serverId }
+    reply(getCoordinator() , identityRequestMsg, constants.T1)
         .then(json => {
-            if(json.clientid === identity) {
-                return json.idApproved;
+            if(json.type === "clientconfirm" && json.clientid === identity) {
+                return json.idapproved;
             }
             return false;
         })
-        .catch(error => beginElection())
+        .catch(error => {
+            beginElection();
+            return false;
+        })
 };
 
-module.exports = {getCoordinatorIdentityApproval, getCoordinatorRoomIdApproval}
+function handleIdentityRequestMsg(socket, message) {
+    let approval = getCoordinatorIdentityApproval(message.clientid, message.serverid);
+    let identityApprovalMsg = {type : "clientconfirm", clientid : message.clientid, idapproved : approval};
+    socket.write(jsonEncode(identityApprovalMsg));
+    socket.destroy();
+}
+
+function handleRoomRequestMsg(socket, message) {
+    let approval = getCoordinatorRoomIdApproval(message.roomid, message.serverid);
+    let roomApprovalMsg = {type : "roomconfirm", roomid : message.roomid, roomapproved : approval}
+    socket.write(jsonEncode(roomApprovalMsg));
+    socket.destroy();
+}
+
+module.exports = {getCoordinatorIdentityApproval, getCoordinatorRoomIdApproval, handleIdentityRequestMsg, handleRoomRequestMsg}

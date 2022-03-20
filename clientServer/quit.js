@@ -1,6 +1,7 @@
 const { removeClientFromChatRoom, joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
 const { getLocalChatRoom, serverChatRooms } = require("../data/serverChatRooms");
 const { getClientForSocket, removeClientFromServer, serverClients } = require("../data/serverClients");
+const { broadcastClientDeletion } = require("../serverManager/broadcastCommunication");
 const util = require("../util/util");
 
 module.exports = {
@@ -60,23 +61,28 @@ module.exports = {
                 clientListForMainHall.push(clientListForChatRoom[i]);
             }
 
-             //delete room
-             // remove chatRoom from serverChatRooms
-             let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
-             serverChatRooms.splice(chatRoomArrayIndex, 1);
- 
-             // send deleteRoom approve message to the client
-             approveMessage = {
-                 "type": "deleteroom",
-                 "roomid": room,
-                 "approved": "true"
-             };
-             socket.write(util.jsonEncode(approveMessage));
-             
-             console.log("room deleted");
- 
-         } 
+            //delete room
+            // remove chatRoom from serverChatRooms
+            let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
+            serverChatRooms.splice(chatRoomArrayIndex, 1);
 
-         socket.destroy();
+            // send deleteRoom approve message to the client
+            approveMessage = {
+                "type": "deleteroom",
+                "roomid": room,
+                "approved": "true"
+            };
+            socket.write(util.jsonEncode(approveMessage));
+
+            console.log("room deleted");
+
+        }
+
+        socket.destroy();
+
+        // broadcast client deletion to the other servers
+        broadcastClientDeletion(client.clientIdentity);
+
+        console.log("client removed")
     }
 }

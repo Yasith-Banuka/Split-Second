@@ -1,7 +1,8 @@
-const util = require("../util/util");
+
 const net = require("net");
 const {getServerInfo, getCoordinatingServerIds} = require("../data/globalServerDetails");
 const {getCoordinationPort} = require("../data/serverDetails");
+const { jsonEncode, jsonDecode } = require("../util/util");
 
 module.exports = {
     message: function (serverId, message) {
@@ -9,11 +10,12 @@ module.exports = {
         let serverCoordinationPort = getCoordinationPort();
         let receivingServerInfo = getServerInfo(serverId);
         console.log(receivingServerInfo);
-
-        const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort["coordinationPort"]}, receivingServerInfo["address"], ()=>{
-            socket.write(util.jsonEncode(message));
-            socket.destroy();
-        } )
+        if(receivingServerInfo.active) {
+            const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort["coordinationPort"]}, receivingServerInfo["address"], ()=>{
+                socket.write(jsonEncode(message));
+                socket.destroy();
+            } )
+        }
     },
 
     broadcast: function(message) {
@@ -31,17 +33,17 @@ module.exports = {
         }
     },
     
-    reply: function(serverId, message) {
+    reply: function(serverId, message, timeout) {
         console.log(serverId);
         let serverCoordinationPort = getCoordinationPort();
         let receivingServerInfo = getServerInfo(serverId);
         console.log(serverId, message);
         const socket = net.createConnection({port:receivingServerInfo["clientPort"], localPort:serverCoordinationPort}, receivingServerInfo["address"], ()=>{
-            socket.write(util.jsonEncode(message));
+            socket.write(jsonEncode(message));
         });
         return new Promise((resolve, reject) => {
             socket.on('data', (bufObj) => {
-                let json = util.jsonDecode(bufObj);
+                let json = jsonDecode(bufObj);
                 resolve(json);
                 socket.end();
             });
@@ -50,6 +52,8 @@ module.exports = {
                 reject(error)
                 socket.end();
             });
+
+            setTimeout(() => reject(), timeout);
         });
     }
 }
