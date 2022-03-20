@@ -15,7 +15,7 @@ module.exports = {
                 break;
 
             case "newclient": 
-                uponReceiveNewClient(json["clientid"]);
+                uponReceiveNewClient(json["serverid"], json["clientid"]);
                 break;
 
             case "endclient":

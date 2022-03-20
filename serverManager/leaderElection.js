@@ -43,13 +43,14 @@ var bullyManager = (json) => {
 
 var beginElection = () => {
     //send election msgs to all processes with higher priority
+    console.log("coordinator failed. begin election")
     sendElection();
     acceptingAnswers = true;
     inProcess = true;
     setCoordinator(null);
     setTimeout(() => {
         acceptingAnswers = false;
-        if(answers.length()>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+        if(answers.length>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
             sendNomination();
             acceptingNominations = true;
         } else {  //else, send coordinator msgs to all processes wih lower priority
@@ -114,7 +115,7 @@ var receiveCoordinator = (serverId) => {
 var sendNominationTimeout = null;
 var currentNomination;
 var sendNomination = () => {
-    if(answers.length()>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+    if(answers.length>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
         currentNomination = "s"+answers.pop();
         let nominationMsg = {type : "bully", subtype : "nomination", serverid : getServerId()}
         message(currentNomination, nominationMsg);
@@ -180,7 +181,7 @@ function getHigherPriorityServers() {
     let globalServerInfo = getAllServerInfo();
     let serverPriority = getPriority();
     for (var i = 0; i < globalServerInfo.length; i++) {
-        if ((serverPriority.priority < globalServerInfo[i].priority) && globalServerInfo[i].active == true) {
+        if ((serverPriority.priority < globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
     } 
@@ -192,7 +193,7 @@ function getLowerPriorityServers() {
     let globalServerInfo = getAllServerInfo();
     let serverPriority = getPriority();
     for (var i = 0; i < globalServerInfo.length; i++) {
-        if ((serverPriority.priority > globalServerInfo[i].priority) && globalServerInfo[i].active == true) {
+        if ((serverPriority.priority > globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
     } 
