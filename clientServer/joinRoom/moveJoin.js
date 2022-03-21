@@ -1,4 +1,8 @@
-const { getLocalChatRoom, getMainHallID } = require("../../data/serverChatRooms");
+const { joinClientNewChatRoom } = require("../../chatRoomManager/chatRoomManager");
+const { getLocalChatRoom, getMainHallID, addLocalChatRoom } = require("../../data/serverChatRooms");
+const { addLocalClient } = require("../../data/serverClients");
+const { getServerId } = require("../../data/serverDetails");
+const util = require("../../util/util");
 const { jsonEncode } = require("../../util/util");
 
 module.exports = {
@@ -8,16 +12,23 @@ module.exports = {
 
         if (typeof getChatRoom != "boolean") {
 
-            localMoveJoin(socket, roomId, former, clientIdentity);
-
             // send serverChange message to the client
             let serverChange = {
                 "type": "serverchange",
                 "approved": "true",
-                "serverid": "s2"
-            };
+                "serverid": getServerId()
+            }
+
 
             socket.write(jsonEncode(serverChange));
+
+            localMoveJoin(socket, roomId, former, clientIdentity);
+
+
+            console.log(serverChange);
+
+            // update client server id
+            // todo: update client's server id
 
             console.log("move join called - client add to the " + roomId);
 

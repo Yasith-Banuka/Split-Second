@@ -5,6 +5,7 @@ const { beginElection } = require("./leaderElection")
 const { getCoordinator } = require("../data/serverDetails");
 const { getServerInfo, markFailedServer } = require("../data/globalServerDetails");
 const { getChatRoomOfServer, removeChatroom } = require("../data/globalChatRooms");
+const { removeAllClientsOfAServer } = require("../data/globalClients");
 
 /* 
 
@@ -23,13 +24,7 @@ includes heartbeat counter details.
 * Use Date.now() to calculate the current timestamp
 
 */
-var heartbeatCounterList = [
-	{
-		serverID: "s2",
-		heartbeatCounter: 1024,
-		Timestamp: 1647282451457
-	}
-];
+var heartbeatCounterList = [];
 
 /* 
 
@@ -37,40 +32,33 @@ includes received heartbeat counter details.
 
 */
 
-var heartbeatReceiveCounterList = [
-	{
-		serverID: "s2",
-		heartbeatCounter: 1024,
-		Timestamp: 1647282451457
-	}
-];
+var heartbeatReceiveCounterList = [];
 
-// add given heartbeatCounterObject to the heartbeatCounterList
+// add given heartbeatCounterObject to the heartbeatCounterList and heartbeatCounterRecievedList
 function addHearbeatCounterObject(heartbeatCounterObject) {
 	heartbeatCounterList.push(heartbeatCounterObject);
+	heartbeatReceiveCounterList.push(heartbeatCounterObject);
 }
 
 /*
 
 	if heartbeatCounterObject exsists
-		remove the object from the heartbeatCounterList
+		remove the object from the heartbeatCounterList and heartbeatCounterRecievedList
 	else	
 		return false
 
 */
 function removeHeartbeatCounterObject(heartbeatCounterObject) {
-	let heartbeatCounterListIndex = heartbeatCounterList.findIndex((x) => x == heartbeatCounterObject);
-	if (heartbeatCounterListIndex == -1) {
-		let arraySize = heartbeatCounterList.length;
-		for (let i = 0; i < arraySize; i++) {
-			if (heartbeatCounterList[i].serverId == heartbeatCounterObject.serverID) {
-				heartbeatCounterListIndex = i;
-			}
-			return false
+	let arraySize = heartbeatCounterList.length;
+	for (let i = 0; i < arraySize; i++) {
+		if (heartbeatCounterList[i].serverId == heartbeatCounterObject.serverID) {
+			heartbeatCounterListIndex = i;
 		}
+		return false
 	}
 
 	heartbeatCounterList.splice(heartbeatCounterListIndex, 1);
+	heartbeatReceiveCounterList.splice(heartbeatCounterListIndex, 1);
 }
 
 /*
@@ -117,9 +105,9 @@ function receiveHeartbeat(identity, receivedCounter) {
 
 	if (receivedCounter > currentCounter) {
 
-		
+
 		heartbeatReceiveCounterList[fromServerIndex].counter = heartbeatReceiveCounterList[fromServerIndex].counter + 1;
-			
+
 		let heartbeatAckMessage = {
 			"type": "heartbeat_ack",
 			"from": getServerId(),
@@ -173,10 +161,12 @@ function sendHeartbeat(heartbeatCounterObject) {
 
 /*
 
-{
-	“type” : “heartbeat_fail”,
-	“fail_serverid” : s2,
-}
+	inform the leader about the failed server
+
+	{
+		“type” : “heartbeat_fail”,
+		“fail_serverid” : s2,
+	}
 */
 function informFailure(serverid) {
 	leaderid = getCoordinator();
@@ -203,13 +193,16 @@ function serverActionForFailedServer(failedServerID) {
 
 	let chatRoomForFailedServer = getChatRoomOfServer(failedServerID);
 
+	// remove chat rooms of the failed server
 	for (var i = 0; i < chatRoomForFailedServer.length; i++) {
 		removeChatroom(chatRoomForFailedServer[i]);
 	}
 
-	//todo: remove its clients from global client list
+	// remove clients of the failed server
+	removeAllClientsOfAServer(failedServerID);
 
-	//todo: remove server from heartbeatcounterlist and heartbeatAckCounterlist
+	// remove the heartbeat counter object of the failed server
+	removeHeartbeatCounterObject(failedServerID);
 }
 
 /*
@@ -278,4 +271,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { heartbeat, receiveHeartbeat, leaderActionForFailedServer, serverActionForFailedServer }
+module.exports = { heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }

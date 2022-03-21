@@ -24,7 +24,6 @@ module.exports = {
     // the length is least 3 characters and no more than 16 characters long.
     checkAlphaNumeric: function (string) {
         let regEx = new RegExp('^[a-z][a-z0-9]{2,16}$', 'i');
-
         return regEx.test(string);
     }
 }

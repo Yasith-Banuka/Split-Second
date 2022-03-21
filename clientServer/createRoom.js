@@ -1,6 +1,6 @@
 const util = require("../util/util");
 const { isChatroomIdUsed } = require("../data/globalChatRooms");
-const { getServerId, getCoordinator } = require("../data/serverDetails");
+const { getServerId } = require("../data/serverDetails");
 const { reply } = require("../serverManager/serverMessage");
 const { beginElection } = require("../serverManager/leaderElection");
 
@@ -8,8 +8,9 @@ const { getCoordinatorRoomIdApproval } = require("../serverManager/coordinatorCo
 const { getClientForSocket, checkClientIdentityExist, serverClients } = require("../data/serverClients");
 const { removeClientFromChatRoom } = require("../chatRoomManager/chatRoomManager");
 const { getLocalChatRoom, addLocalChatRoom } = require("../data/serverChatRooms");
+const { broadcastNewChatroom } = require("../serverManager/broadcastCommunication");
 module.exports = {
-    createRoom: function (socket, roomId) {
+    createRoom: async function (socket, roomId) {
         let client = getClientForSocket(socket);
 
         let approveMessage;
@@ -20,8 +21,8 @@ module.exports = {
             "roomid": roomId
         };
         let previousChatRoom = client.chatRoom;
-
-        if ((!checkClientIsOwner(client)) && checkAvailability(roomId)) {
+        let available = await checkAvailability(roomId);
+        if ((!checkClientIsOwner(client)) && available) {
 
             // remove client from previous chatRoom
             removeClientFromChatRoom(previousChatRoom, client);
@@ -44,6 +45,9 @@ module.exports = {
             socket.write(util.jsonEncode(roomChange));
             util.broadcast(getLocalChatRoom(previousChatRoom).clients, roomChange);
 
+            // broadcast new chatroom to the other servers
+            broadcastNewChatroom(getServerId(), roomId);
+
             console.log("room created");
         } else {
             approveMessage = { "type": "createroom", "roomid": roomId, "approved": "false" };
@@ -60,9 +64,12 @@ module.exports = {
     else 
         return true
 */
-function checkAvailability(roomId) {
+async function checkAvailability(roomId) {
 
-    return util.checkAlphaNumeric(roomId) && (!isChatroomIdUsed) && getCoordinatorRoomIdApproval(roomId, getServerId());
+    if (util.checkAlphaNumeric(roomId) && (!(isChatroomIdUsed(roomId)))) {
+        return await getCoordinatorRoomIdApproval(roomId, getServerId());
+    }
+    return false;
 };
 
 

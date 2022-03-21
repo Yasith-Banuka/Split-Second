@@ -15,6 +15,7 @@ var acceptingNominations = false;
 var acceptingCoordinators = false;
 var acceptingViews = false;
 
+
 var bullyManager = (json) => {
     switch (json.subtype) {
 
@@ -42,13 +43,14 @@ var bullyManager = (json) => {
 
 var beginElection = () => {
     //send election msgs to all processes with higher priority
+    console.log("coordinator failed. begin election")
     sendElection();
     acceptingAnswers = true;
     inProcess = true;
-
+    setCoordinator(null);
     setTimeout(() => {
         acceptingAnswers = false;
-        if(answers.length()>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+        if(answers.length>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
             sendNomination();
             acceptingNominations = true;
         } else {  //else, send coordinator msgs to all processes wih lower priority
@@ -65,6 +67,7 @@ var sendElection = () => {
 
 var receiveElectionTimeout = null;
 var receiveElection = (serverId) => {
+    setCoordinator(null);
     //if the priority of server that sent the msg is lower, send answer msg
     let serverPriority = parseInt(serverId.slice(1));
     if(serverPriority < getPriority()) {
@@ -72,7 +75,6 @@ var receiveElection = (serverId) => {
         receiveElectionTimeout = setTimeout(() => {
             beginElection();
         }, constants.T4);
-
     }
 }
 
@@ -113,9 +115,9 @@ var receiveCoordinator = (serverId) => {
 var sendNominationTimeout = null;
 var currentNomination;
 var sendNomination = () => {
-    if(answers.length()>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+    if(answers.length>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
         currentNomination = "s"+answers.pop();
-        nominationMsg = {type : "bully", subtype : "nomination", serverid : getServerId()}
+        let nominationMsg = {type : "bully", subtype : "nomination", serverid : getServerId()}
         message(currentNomination, nominationMsg);
         sendNominationTimeout = setTimeout(sendNomination, constants.T3)  //repeat every T3 until coordinator msg received
     } else { //else restart election
@@ -179,7 +181,7 @@ function getHigherPriorityServers() {
     let globalServerInfo = getAllServerInfo();
     let serverPriority = getPriority();
     for (var i = 0; i < globalServerInfo.length; i++) {
-        if (serverPriority.priority < globalServerInfo[i].priority) {
+        if ((serverPriority.priority < globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
     } 
@@ -191,7 +193,7 @@ function getLowerPriorityServers() {
     let globalServerInfo = getAllServerInfo();
     let serverPriority = getPriority();
     for (var i = 0; i < globalServerInfo.length; i++) {
-        if (serverPriority.priority > globalServerInfo[i].priority) {
+        if ((serverPriority.priority > globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
     } 

@@ -78,7 +78,11 @@ function isCoordinator() {
     return serverInfo["serverId"]===coordinatorId;
 }
 
-module.exports = { setConfigInfo, getServerId, getClientPort, getCoordinationPort, getPriority, getAllInfo, setCoordinator, setCoordinator, getCoordinator, isCoordinator }
+function isCoordinatorAvailable() {
+    return coordinatorId == null;
+}
+
+module.exports = { setConfigInfo, getServerId, getClientPort, getCoordinationPort, getPriority, getAllInfo, setCoordinator, setCoordinator, getCoordinator, isCoordinator, isCoordinatorAvailable }
 
 
 // console.log(setConfigInfo('config/serverConfig.txt','s1'));

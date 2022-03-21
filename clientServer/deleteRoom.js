@@ -1,6 +1,8 @@
 const { joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { removeChatroom } = require("../data/globalChatRooms");
 const { getLocalChatRoom, getMainHallID, serverChatRooms } = require("../data/serverChatRooms");
 const { serverClients, getClientForSocket } = require("../data/serverClients");
+const { broadcastChatroomDeletion } = require("../serverManager/broadcastCommunication");
 const util = require("../util/util");
 
 // todo: If successfully deleted, s1 informs other servers by sending the message
@@ -51,6 +53,10 @@ module.exports = {
                 "approved": "true"
             };
             socket.write(util.jsonEncode(approveMessage));
+
+            // broadcast deletion of chatroom to the other servers
+            removeChatroom(roomId);
+            broadcastChatroomDeletion(roomId);
 
             console.log("room deleted");
 

@@ -1,21 +1,33 @@
-var globalClients = []; // Store the client id
+var globalClients = {}; // Store the client id : server id
 
 function isClientIdUsed(clientId){
-    return globalClients.includes(clientId)
+    return globalClients.hasOwnProperty(clientId)
 }
-function addClient(clientId){
-    globalClients.push(clientId);
+
+function addClient(serverId, clientId){
+    globalClients[clientId] = serverId;
 }
 
 function removeClient(clientId){
-    const index = globalClients.indexOf(clientId);
-    if (index > -1) {
-        globalClients.splice(index, 1); // 2nd parameter means remove one item only
+    delete globalClients[clientId];
+}
+
+function updateClients(serverId, clientList) {
+    for(let i=0;i<clientList.length;i++) {
+        globalClients[clientList[i]] = serverId;
     }
 }
 
-function updateClients(clientIdList) {
-    globalClients = globalClients.concat(clientIdList);
+function updateClientServer(serverId, clientId) {
+    globalClients[clientId] = serverId;
 }
 
-module.exports = {isClientIdUsed, addClient, removeClient, updateClients}
+function removeAllClientsOfAServer(serverId) {
+    for ( var clientId in globalClients ) {
+        if ( globalClients[clientId] === serverId ) {
+            delete globalClients[clientId];
+        }
+    }
+}
+
+module.exports = {isClientIdUsed, addClient, removeClient, updateClients, updateClientServer, removeAllClientsOfAServer}
