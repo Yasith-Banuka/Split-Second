@@ -11,6 +11,11 @@ const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
 const { heartbeat } = require('./serverManager/heartbeat');
 
+const {Worker} = require("worker_threads");
+
+// create new worker
+const worker = new Worker("./serverManager/heartbeat");
+
 // Get serverId as the argument
 const serverId = argv[2];
 
@@ -100,5 +105,18 @@ serverForCoordination.on('connection', function (socket) {
     });
 });
 
-//await heartbeat();
+
+worker.on("message", result => {
+    //heartbeat();
+    console.log('heartbeating');
+});
+
+worker.on("error", error => {
+    console.log(error);
+});
+
+worker.on("exit", exitCode => {
+    console.log(`Worker exited with code ${exitCode}`);
+})
+
 
