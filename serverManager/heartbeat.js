@@ -230,44 +230,42 @@ function leaderActionForFailedServer(failedServerID) {
 }
 
 async function heartbeat() {
-	while (true) {
+	console.log("heartbeating");
+	let arraySize = heartbeatCounterList.length;
+	for (let i = 0; i < arraySize; i++) {
 
-		let arraySize = heartbeatCounterList.length;
-		for (let i = 0; i < arraySize; i++) {
+		// failure counter - when hit 3 inform leader about the failed serverId
+		let failureCounter = 0;
+		let prevHeartbeatCounter = heartbeatCounterList[i].heartbeatCounter;
 
-			// failure counter - when hit 3 inform leader about the failed serverId
-			let failureCounter = 0;
-			let prevHeartbeatCounter = heartbeatCounterList[i].heartbeatCounter;
+		// send heartbeat to external servers
+		sendHeartbeat(heartbeatCounterList[i]);
 
-			// send heartbeat to external servers
-			sendHeartbeat(heartbeatCounterList[i]);
+		// if a ack do not return in 3s try again for 3 times
 
-			// if a ack do not return in 3s try again for 3 times
-			while (failureCounter < 3) {
-				new Promise(resolve => {
-					setTimeout(() => {
-						if (prevHeartbeatCounter != heartbeatCounterList[i].heartbeatCounter--) {
+		let intervalVar = setInterval(() => {
+			if (prevHeartbeatCounter != heartbeatCounterList[i].heartbeatCounter--) {
 
-							// if the heartBeatAck has not return back send the heatbeat again
-							sendHeartbeat(heartbeatCounterList[i]);
-							failureCounter++;
+				// if the heartBeatAck has not return back send the heatbeat again
+				sendHeartbeat(heartbeatCounterList[i]);
+				failureCounter++;
 
-							console.log(heartbeatCounterList[i].serverID + " heart beat failed. Trying Again");
-						} else {
-							// to break the failureCounter while loop
-							failureCounter = 5;
-						}
-					}, 3000);
-				});
+				console.log(heartbeatCounterList[i].serverID + " heart beat failed. Trying Again");
+			} else {
+				// to break the failureCounter while loop
+				failureCounter = 5;
 			}
-
-			// if failureCounter == 3 inform the leader about the failed Server
-			if (failureCounter == 3) {
-				informFailure(heartbeatCounterList[i].serverID);
+			if(failureCounter>2) {
+				clearInterval(intervalVar);
 			}
+		}, 3000);
 
-			return false
+		// if failureCounter == 3 inform the leader about the failed Server
+		if (failureCounter == 3) {
+			informFailure(heartbeatCounterList[i].serverID);
 		}
+
+		return false
 	}
 }
 
