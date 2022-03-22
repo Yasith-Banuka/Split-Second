@@ -9,7 +9,7 @@ const { setCoordinatingServersConfig, getCoordinatingPorts, getHighestPrioritySe
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
-const { heartbeat } = require('./serverManager/heartbeat');
+const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
 
 // Get serverId as the argument
 const serverId = argv[2];
@@ -29,7 +29,9 @@ setCoordinatingServersConfig(configPath, serverId);
 //set coordinator
 setCoordinator(getHighestPriorityServer());
 
+var heartbeatCheck = false;
 
+initHeartbeat();
 
 // Create a client server
 const serverForClients = new Net.Server();
@@ -48,6 +50,12 @@ serverForClients.listen(port, function () {
 
 // When a client requests a connection with the server, the server creates a new socket dedicated to it.
 serverForClients.on('connection', function (socket) {
+
+    if (heartbeatCheck == false) {
+        setInterval(heartbeat, 2000);
+        heartbeatCheck = 1;
+    }
+
     //socket = new JsonSocket(socket);
     console.log('A new connection with a client has been established.');
 
@@ -102,7 +110,20 @@ serverForCoordination.on('connection', function (socket) {
     });
 });
 
-setInterval(heartbeat, 2000);
+/* serverForCoordination.on('clientError', (err, socket) => {
+    //if (err.code === 'ECONNRESET' || !socket.writable) socket.end('HTTP/2 400 Bad Request\n');
+    console.log('client error\n', err);
+}); */
+
+serverForCoordination.on('error', (err, socket) => {
+    //if (err.code === 'ECONNRESET' || !socket.writable) socket.end('HTTP/2 400 Bad Request\n');
+    console.log('client error\n', err);
+});
+
+/* if (heartbeatCheck == 1) {
+    setInterval(heartbeat, 2000);
+} */
+
 
 
 
