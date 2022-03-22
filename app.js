@@ -29,6 +29,8 @@ setCoordinatingServersConfig(configPath, serverId);
 //set coordinator
 setCoordinator(getHighestPriorityServer());
 
+
+
 // Create a client server
 const serverForClients = new Net.Server();
 
@@ -100,7 +102,7 @@ serverForCoordination.on('connection', function (socket) {
     });
 });
 
-setInterval(heartbeat,2000);
+setInterval(heartbeat, 2000);
 
 
 

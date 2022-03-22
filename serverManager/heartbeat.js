@@ -34,6 +34,28 @@ includes received heartbeat counter details.
 
 var heartbeatReceiveCounterList = [];
 
+/*
+
+	Initalize heartbeatCounter lists
+
+*/
+
+function initHeartbeat() {
+	let globalServerList = getAllServerInfo();
+	let arrayLength = globalServerList.length;
+
+	for (var i = 0; i < arrayLength; i++) {
+		if (globalServersInfo[i]["active"] == true) {
+			let heartbeatCounterObject = {
+				"serverID": globalServerList[i]["serverId"],
+				"heartbeatCounter": 0
+			}
+			heartbeatCounterList.push(heartbeatCounterObject);
+			heartbeatReceiveCounterList.push(heartbeatCounterObject);
+		}
+	}
+}
+
 // add given heartbeatCounterObject to the heartbeatCounterList and heartbeatCounterRecievedList
 function addHearbeatCounterObject(heartbeatCounterObject) {
 	heartbeatCounterList.push(heartbeatCounterObject);
@@ -255,7 +277,7 @@ async function heartbeat() {
 				// to break the failureCounter while loop
 				failureCounter = 5;
 			}
-			if(failureCounter>2) {
+			if (failureCounter > 2) {
 				clearInterval(intervalVar);
 			}
 		}, 3000);
@@ -269,4 +291,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }
+module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }
