@@ -6,7 +6,7 @@ const {reply} = require('./serverMessage');
 const constants = require('../util/constants');
 const { jsonEncode } = require("../util/util");
 
-function getCoordinatorRoomIdApproval(roomId, serverId) {
+async function getCoordinatorRoomIdApproval(roomId, serverId) {
 
     if (!isCoordinatorAvailable) {
         return false;
@@ -20,17 +20,15 @@ function getCoordinatorRoomIdApproval(roomId, serverId) {
         return isRoomApproved;
     }
     let roomRequestMsg = {type : "roomrequest", roomid : roomId, serverid : serverId}
-    reply(getCoordinator(), roomRequestMsg, constants.T1)
-        .then(json => {
-            if(json.type === "roomconfirm" && json.roomid === roomId) {
-                return json.roomapproved;
-            }
-            return false;
-        })
-        .catch(error => {
-            beginElection();
-            return false;
-    })
+    response = await reply(getCoordinator(), roomRequestMsg, constants.T1)
+    if (response.type == "serverfailure") {
+        beginElection();
+        return false;
+    }
+    if(response.type === "roomconfirm" && response.roomid === roomId) {
+        return response.roomapproved;
+    }
+    return false;
 };
 
 async function getCoordinatorIdentityApproval(identity, serverId) {
@@ -46,9 +44,8 @@ async function getCoordinatorIdentityApproval(identity, serverId) {
         return isClientApproved;
     }
     let identityRequestMsg = {type : "clientrequest", clientid : identity, serverid : serverId }
-    try {
-        response = await reply(getCoordinator() , identityRequestMsg, constants.T1)
-    } catch (e) {
+    response = await reply(getCoordinator() , identityRequestMsg, constants.T1)
+    if (response.type == "serverfailure") {
         beginElection();
         return false;
     }
@@ -65,8 +62,8 @@ async function handleIdentityRequestMsg(socket, message) {
     socket.destroy();
 }
 
-function handleRoomRequestMsg(socket, message) {
-    let approval = getCoordinatorRoomIdApproval(message.roomid, message.serverid);
+async function handleRoomRequestMsg(socket, message) {
+    let approval = await getCoordinatorRoomIdApproval(message.roomid, message.serverid);
     let roomApprovalMsg = {type : "roomconfirm", roomid : message.roomid, roomapproved : approval}
     socket.write(jsonEncode(roomApprovalMsg));
     socket.destroy();

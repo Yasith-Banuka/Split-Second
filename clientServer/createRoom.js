@@ -10,7 +10,7 @@ const { removeClientFromChatRoom } = require("../chatRoomManager/chatRoomManager
 const { getLocalChatRoom, addLocalChatRoom } = require("../data/serverChatRooms");
 const { broadcastNewChatroom } = require("../serverManager/broadcastCommunication");
 module.exports = {
-    createRoom: function (socket, roomId) {
+    createRoom: async function (socket, roomId) {
         let client = getClientForSocket(socket);
 
         let approveMessage;
@@ -21,8 +21,8 @@ module.exports = {
             "roomid": roomId
         };
         let previousChatRoom = client.chatRoom;
-
-        if ((!checkClientIsOwner(client)) && checkAvailability(roomId)) {
+        let available = await checkAvailability(roomId);
+        if ((!checkClientIsOwner(client)) && available) {
 
             // remove client from previous chatRoom
             removeClientFromChatRoom(previousChatRoom, client);
@@ -64,9 +64,12 @@ module.exports = {
     else 
         return true
 */
-function checkAvailability(roomId) {
+async function checkAvailability(roomId) {
 
-    return util.checkAlphaNumeric(roomId) && (!isChatroomIdUsed) && getCoordinatorRoomIdApproval(roomId, getServerId());
+    if( util.checkAlphaNumeric(roomId) && (!isChatroomIdUsed(roomId))) {
+        return await getCoordinatorRoomIdApproval(roomId, getServerId());
+    }
+    return false;
 };
 
 
