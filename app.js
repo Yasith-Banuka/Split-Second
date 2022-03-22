@@ -100,5 +100,8 @@ serverForCoordination.on('connection', function (socket) {
     });
 });
 
-//await heartbeat();
+setInterval(heartbeat,2000);
+
+
+
 
