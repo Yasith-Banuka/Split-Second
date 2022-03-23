@@ -1,4 +1,4 @@
-const { multicast } = require('./serverMessage');
+const { multicast, broadcast } = require('./serverMessage');
 const { getCoordinator } = require('../data/serverDetails');
 const { getAllServerInfo } = require("../data/globalServerDetails");
 const { addClient, removeClient } = require('../data/globalClients');
@@ -19,8 +19,7 @@ function uponReceiveNewClient(serverId, clientId) {
 
 function broadcastClientDeletion(clientId) {
     let message = { type: "endclient", clientid: clientId };
-    let multicastServerIds = getServerIdsExcludingLeader();
-    multicast(multicastServerIds, message);
+    broadcast(message);
 }
 
 function uponReceiveClientDeletion(clientId) {
@@ -39,8 +38,7 @@ function uponReceiveNewChatroom(serverId, roomId) {
 
 function broadcastChatroomDeletion(roomId) {
     let message = { type: "endroom", roomid: roomId };
-    let multicastServerIds = getServerIdsExcludingLeader();
-    multicast(multicastServerIds, message);
+    broadcast(message);
 }
 
 function uponReceiveChatroomDeletion(roomId) {
