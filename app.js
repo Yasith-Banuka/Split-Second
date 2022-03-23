@@ -23,11 +23,13 @@ const serverConfig = setConfigInfo(configPath, serverId);
 const port = getClientPort();
 const coordinationPort = getCoordinationPort();
 constants.T4 = 2000*serverConfig.priority;
-sendIamup();
+
 // set coordinating servers config
 setGlobalServersConfig(configPath, serverId);
 // const otherCoordinationPorts = getCoordinatingPorts();
 
+//send iamup
+sendIamup();
 //set coordinator
 setCoordinator(getHighestPriorityServer());
 
