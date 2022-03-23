@@ -1,21 +1,20 @@
 
 const net = require("net");
-const {getServerInfo, getCoordinatingServerIds} = require("../data/globalServerDetails");
-const {getCoordinationPort} = require("../data/serverDetails");
+const { getServerInfo, getAllServerInfo } = require("../data/globalServerDetails");
+const { getCoordinationPort } = require("../data/serverDetails");
 const { jsonEncode, jsonDecode } = require("../util/util");
 
 
 function unicast(serverId, message) {
 
     let receivingServerInfo = getServerInfo(serverId);
-
-    if(receivingServerInfo.active) {
-        const socket = net.connect({port:receivingServerInfo["coordinationPort"]}, receivingServerInfo["address"], ()=>{
+    if (receivingServerInfo["active"]) {
+        const socket = net.connect({ port: receivingServerInfo["coordinationPort"] }, receivingServerInfo["address"], () => {
             socket.write(jsonEncode(message));
             socket.destroy();
-        })
+        });
         socket.on('error', error => {
-            console.log(error);
+            console.log(`Error: ${ex}`);
             socket.destroy();
         });
     }
@@ -23,16 +22,16 @@ function unicast(serverId, message) {
 
 function broadcast(message) {
 
-    let coordinatingServerIds = getCoordinatingServerIds();
-    for (let i=0;i<coordinatingServerIds.length;i++) {
-        unicast(coordinatingServerIds[i], message);
+    let globalServerIds = getAllServerInfo();
+    for (let i = 0; i < globalServerIds.length; i++) {
+        unicast(globalServerIds[i]["serverId"], message);
     }
 }
 
 
 function multicast(serverIds, message) {
 
-    for (let i=0;i<serverIds.length;i++) {
+    for (let i = 0; i < serverIds.length; i++) {
         unicast(serverIds[i], message);
     }
 }
@@ -43,7 +42,7 @@ function reply(serverId, message, timeout) {
     // let serverCoordinationPort = getCoordinationPort();
     let receivingServerInfo = getServerInfo(serverId);
     console.log(serverId, message);
-    const socket = net.createConnection({port:receivingServerInfo["coordinationPort"]}, receivingServerInfo["address"], ()=>{
+    const socket = net.createConnection({ port: receivingServerInfo["coordinationPort"] }, receivingServerInfo["address"], () => {
         socket.write(jsonEncode(message));
     });
     let timeoutVar = null;

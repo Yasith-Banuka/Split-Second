@@ -26,7 +26,7 @@ function setGlobalServersConfig(path, serverId) {
     const data = fs.readFileSync(path, 'utf8');
 
     serversConf = data.split('\r\n');
-    
+
     for (var i = 0; i < serversConf.length; i++) {
 
         serverConf = serversConf[i].split(' ');
@@ -121,4 +121,7 @@ function markActiveServer(serverID) {
     }
 }
 
-module.exports = { setCoordinatingServersConfig: setGlobalServersConfig, getCoordinatingPorts, getServerInfo, getHighestPriorityServer, getAllServerInfo, markFailedServer, markActiveServer }
+function getGlobalServerIds() {
+    return globalServersInfo.map(server => server.serverId);
+}
+module.exports = { setGlobalServersConfig, getCoordinatingPorts, getServerInfo, getHighestPriorityServer, getAllServerInfo, markFailedServer, markActiveServer, getGlobalServerIds }

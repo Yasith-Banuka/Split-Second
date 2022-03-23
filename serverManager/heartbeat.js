@@ -1,9 +1,9 @@
 const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
-const { message, broadcast } = require("./serverMessage");
+const { unicast, broadcast } = require("./serverMessage");
 const { beginElection } = require("./leaderElection")
 const { getCoordinator } = require("../data/serverDetails");
-const { getServerInfo, markFailedServer } = require("../data/globalServerDetails");
+const { getServerInfo, markFailedServer, getAllServerInfo } = require("../data/globalServerDetails");
 const { getChatRoomOfServer, removeChatroom } = require("../data/globalChatRooms");
 const { removeAllClientsOfAServer } = require("../data/globalClients");
 
@@ -14,23 +14,15 @@ includes heartbeat counter details.
 [ 
 
 {
-	“serverID” : “s2”,
+	“serverId” : “s2”,
 	“heartbeatCounter” : 1024,
-	“timestamp” : xxxx
+	“failedCounter” : 0
 },...
 
 ]
 
-* Use Date.now() to calculate the current timestamp
-
 */
-var heartbeatCounterList = [
-	{
-		serverID: "s2",
-		heartbeatCounter: 1024,
-		Timestamp: 1647282451457
-	}
-];
+var heartbeatCounterList = [];
 
 /* 
 
@@ -38,13 +30,35 @@ includes received heartbeat counter details.
 
 */
 
-var heartbeatReceiveCounterList = [
-	{
-		serverID: "s2",
-		heartbeatCounter: 1024,
-		Timestamp: 1647282451457
+var heartbeatReceiveCounterList = [];
+
+/*
+
+	Initalize heartbeatCounter lists
+
+*/
+
+function initHeartbeat() {
+	let globalServerList = getAllServerInfo();
+	let arrayLength = globalServerList.length;
+
+	for (var i = 0; i < arrayLength; i++) {
+		if (globalServerList[i]["active"] == true) {
+			let heartbeatCounterObject = {
+				"serverId": globalServerList[i]["serverId"],
+				"heartbeatCounter": 1,
+				"failedCounter": 0
+			}
+
+			let heartbeatRecieveCounterObject = {
+				"serverId": globalServerList[i]["serverId"],
+				"heartbeatCounter": 0,
+			}
+			heartbeatCounterList.push(heartbeatCounterObject);
+			heartbeatReceiveCounterList.push(heartbeatRecieveCounterObject);
+		}
 	}
-];
+}
 
 // add given heartbeatCounterObject to the heartbeatCounterList and heartbeatCounterRecievedList
 function addHearbeatCounterObject(heartbeatCounterObject) {
@@ -60,13 +74,13 @@ function addHearbeatCounterObject(heartbeatCounterObject) {
 		return false
 
 */
-function removeHeartbeatCounterObject(heartbeatCounterObject) {
+function removeHeartbeatCounterObject(failedServerId) {
 	let arraySize = heartbeatCounterList.length;
 	for (let i = 0; i < arraySize; i++) {
-		if (heartbeatCounterList[i].serverId == heartbeatCounterObject.serverID) {
+		if (heartbeatCounterList[i]["serverId"] == failedServerId) {
 			heartbeatCounterListIndex = i;
+			break;
 		}
-		return false
 	}
 
 	heartbeatCounterList.splice(heartbeatCounterListIndex, 1);
@@ -84,7 +98,7 @@ function removeHeartbeatCounterObject(heartbeatCounterObject) {
 function getHearbeatCounterObjectForServerId(serverId) {
 	let arraySize = heartbeatCounterList.length;
 	for (let i = 0; i < arraySize; i++) {
-		if (heartbeatCounterList[i].serverId == serverId) {
+		if (heartbeatCounterList[i]["serverId"] == serverId) {
 			return heartbeatCounterList[i];
 		}
 		return false
@@ -108,8 +122,8 @@ function receiveHeartbeat(identity, receivedCounter) {
 	let currentCounter;
 	let fromServerIndex;
 	for (var i = 0; i < arrayLength; i++) {
-		if (heartbeatReceiveCounterList[i].serverid == identity) {
-			currentCounter = heartbeatReceiveCounterList[i].counter;
+		if (heartbeatReceiveCounterList[i]["serverId"] == identity) {
+			currentCounter = heartbeatReceiveCounterList[i]["heartbeatCounter"];
 			fromServerIndex = i;
 			break
 		}
@@ -118,29 +132,30 @@ function receiveHeartbeat(identity, receivedCounter) {
 	if (receivedCounter > currentCounter) {
 
 
-		heartbeatReceiveCounterList[fromServerIndex].counter = heartbeatReceiveCounterList[fromServerIndex].counter + 1;
+		heartbeatReceiveCounterList[fromServerIndex]["heartbeatCounter"] = heartbeatReceiveCounterList[fromServerIndex]["heartbeatCounter"] + 1;
 
 		let heartbeatAckMessage = {
 			"type": "heartbeat_ack",
 			"from": getServerId(),
-			"counter": heartbeatCounterObject[heartbeatCounter]++
+			"counter": heartbeatReceiveCounterList[fromServerIndex]["heartbeatCounter"]
 		};
 
 		// sernd the heartbeat message to the particular server
-		message(identity, heartbeatAckMessage);
+		unicast(identity, heartbeatAckMessage);
 	}
 
 }
 
 //increase heartbeat counter after receiving heartbeat ack message
 
-function receiveHeartbeatAck(identity) {
+function receiveHeartbeatAck(identity, counter) {
 
 	let arrayLength = heartbeatCounterList.length;
 
 	for (var i = 0; i < arrayLength; i++) {
-		if (heartbeatCounterList[i].serverid == identity) {
-			heartbeatCounterList[i].counter = heartbeatCounterList[i].counter + 1;
+		if (heartbeatCounterList[i]["serverId"] == identity) {
+			heartbeatCounterList[i]["heartbeatCounter"]++;
+			break;
 		}
 	}
 
@@ -161,11 +176,11 @@ function sendHeartbeat(heartbeatCounterObject) {
 	let heartbeatMessage = {
 		"type": "heartbeat",
 		"from": getServerId(),
-		"counter": heartbeatCounterObject[heartbeatCounter]++
+		"counter": heartbeatCounterObject["heartbeatCounter"]
 	};
 
-	// sernd the heartbeat message to the particular server
-	message(serverId, heartbeatMessage);
+	// sernd the heartbeat unicast to the particular server
+	unicast(heartbeatCounterObject["serverId"], heartbeatMessage);
 }
 
 //inform leader about failure
@@ -173,10 +188,12 @@ function sendHeartbeat(heartbeatCounterObject) {
 
 /*
 
-{
-	“type” : “heartbeat_fail”,
-	“fail_serverid” : s2,
-}
+	inform the leader about the failed server
+
+	{
+		“type” : “heartbeat_fail”,
+		“fail_serverid” : s2,
+	}
 */
 function informFailure(serverid) {
 	leaderid = getCoordinator();
@@ -188,7 +205,13 @@ function informFailure(serverid) {
 			"type": "heartbeat_fail",
 			"fail_serverid": serverid
 		};
-		message(leaderid, failureMsg);
+
+		// check if the current server is the leader
+		if (leaderid == getServerId()) {
+			leaderActionForFailedServer(serverid)
+		} else {
+			unicast(leaderid, failureMsg);
+		}
 	}
 }
 
@@ -240,45 +263,51 @@ function leaderActionForFailedServer(failedServerID) {
 }
 
 async function heartbeat() {
-	while (true) {
+	console.log("heartbeating");
+	let arraySize = heartbeatCounterList.length;
 
-		let arraySize = heartbeatCounterList.length;
-		for (let i = 0; i < arraySize; i++) {
+	for (let i = 0; i < arraySize; i++) {
+		// failure counter - when hit 3 inform leader about the failed serverId
+		var failureCounter = 0;
+		let prevHeartbeatCounter = heartbeatCounterList[i]["heartbeatCounter"];
 
-			// failure counter - when hit 3 inform leader about the failed serverId
-			let failureCounter = 0;
-			let prevHeartbeatCounter = heartbeatCounterList[i].heartbeatCounter;
+		// send heartbeat to external servers
+		sendHeartbeat(heartbeatCounterList[i]);
 
-			// send heartbeat to external servers
-			sendHeartbeat(heartbeatCounterList[i]);
+		// if a ack do not return in 3s try again for 3 times
 
-			// if a ack do not return in 3s try again for 3 times
-			while (failureCounter < 3) {
-				new Promise(resolve => {
-					setTimeout(() => {
-						if (prevHeartbeatCounter != heartbeatCounterList[i].heartbeatCounter--) {
+		let intervalVar = setInterval(() => {
 
-							// if the heartBeatAck has not return back send the heatbeat again
-							sendHeartbeat(heartbeatCounterList[i]);
-							failureCounter++;
+			if (heartbeatCounterList[i] == undefined) {
+				clearInterval(intervalVar);
+			} else {
+				let currentCounter = heartbeatCounterList[i]["heartbeatCounter"] - 1;
+				if (prevHeartbeatCounter >= currentCounter) {
 
-							console.log(heartbeatCounterList[i].serverID + " heart beat failed. Trying Again");
-						} else {
-							// to break the failureCounter while loop
-							failureCounter = 5;
-						}
-					}, 3000);
-				});
+					// if the heartBeatAck has not return back send the heatbeat again
+					sendHeartbeat(heartbeatCounterList[i]);
+					failureCounter++;
+
+					console.log(heartbeatCounterList[i]["serverId"] + " heart beat failed. Trying Again");
+				} else {
+					// to break the failureCounter while loop
+					failureCounter = 5;
+					console.log(heartbeatCounterList[i]["serverId"] + " heart beat success " + heartbeatCounterList[i]["heartbeatCounter"]);
+				}
+
+				// if failureCounter == 3 inform the leader about the failed Server
+				if (failureCounter == 3) {
+					informFailure(heartbeatCounterList[i]["serverId"]);
+				}
+
+				if (failureCounter > 2) {
+					clearInterval(intervalVar);
+				}
 			}
 
-			// if failureCounter == 3 inform the leader about the failed Server
-			if (failureCounter == 3) {
-				informFailure(heartbeatCounterList[i].serverID);
-			}
+		}, 3000);
 
-			return false
-		}
 	}
 }
 
-module.exports = { heartbeat, receiveHeartbeat, leaderActionForFailedServer, serverActionForFailedServer }
+module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }

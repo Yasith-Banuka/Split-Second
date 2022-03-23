@@ -5,11 +5,10 @@ const {getAllServerInfo, markFailedServer, markActiveServer} = require("../data/
 const {getPriority, getServerId, setCoordinator, getAllInfo, getCoordinator} = require("../data/serverDetails")
 const {getLocalClientIds} = require("../data/serverClients")
 const {getLocalChatRooms} = require("../data/serverChatRooms")
-const {updateRooms} = require("../data/globalChatRooms")
-const {updateClients} = require("../data/globalClients");
+const {updateRooms, removeAllChatRoomsOfAServer} = require("../data/globalChatRooms")
+const {updateClients, removeAllClientsOfAServer} = require("../data/globalClients");
 
 const answers = new heap.Heap();
-var inProcess = false;
 var acceptingAnswers = false;
 var acceptingViews = false;
 
@@ -40,13 +39,22 @@ var bullyManager = (json) => {
 }
 
 var beginElection = () => {
-    //send election msgs to all processes with higher priority
+    
     console.log("coordinator failed. begin election")
     markFailedServer(getCoordinator());
-    sendElection();
-    acceptingAnswers = true;
-    inProcess = true;
+    removeAllClientsOfAServer(getCoordinator());
+    removeAllChatRoomsOfAServer(getCoordinator());
     setCoordinator(null);
+    sendElection();
+}
+
+var sendElection = () => {
+    initialize();
+    //send election msgs to all processes with higher priority
+    let electionMsg = {type : "bully", subtype : "election", serverid : getServerId()};
+    multicast(getHigherPriorityServers(),electionMsg);
+    acceptingAnswers = true;
+    
     setTimeout(() => {
         acceptingAnswers = false;
         if(answers.length>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
@@ -58,11 +66,6 @@ var beginElection = () => {
     }, constants.T2);
 }
 
-var sendElection = () => {
-    let electionMsg = {type : "bully", subtype : "election", serverid : getServerId()};
-    multicast(getHigherPriorityServers(),electionMsg);
-}
-
 var receiveElectionTimeout = null;
 var receiveElection = (serverId) => {
     markFailedServer(getCoordinator());
@@ -72,7 +75,7 @@ var receiveElection = (serverId) => {
     if(serverPriority > getPriority()) {
         sendAnswer(serverId);
         receiveElectionTimeout = setTimeout(() => {
-            beginElection();
+            sendElection();
         }, constants.T4);
     }
 }
@@ -123,7 +126,7 @@ var sendNomination = () => {
         unicast(currentNomination, nominationMsg);
         sendNominationTimeout = setTimeout(sendNomination, constants.T3)  //repeat every T3 until coordinator msg received
     } else { //else restart election
-        beginElection();
+        sendElection();
     }
     
 }
@@ -138,7 +141,6 @@ var receiveNomination = (serverId) => {
     if(serverPriority > getPriority()) {
         
         sendCoordinator();
-        inProcess = false;
     }
 }
 var viewMsgPriorities = []
@@ -151,13 +153,16 @@ var sendIamup = () => {
         if(viewMsgPriorities.length==0) {
             setCoordinator(getServerId());
         } else {
-            if(Math.min(viewMsgPriorities)>getServerId()) {
+            let minView = Math.min(...viewMsgPriorities);
+            if(minView>getServerId()) {
                 sendCoordinator();
             } else {
-                setCoordinator("s" + Math.min(viewMsgPriorities));
+                setCoordinator("s" + minView);
             }
         }
+        
     },constants.T2);
+
 }
 
 var receiveIamup = (serverId) => {
@@ -172,7 +177,7 @@ var sendView = (serverId) => {
 
 var receiveView = (viewMsg) => {
     if(acceptingViews) {
-        viewMsgPriorities.push(viewMsg.serverpriority);
+        viewMsgPriorities.push(parseInt(viewMsg.serverpriority));
         updateClients("s"+viewMsg.serverpriority, viewMsg.clientlist);
         updateRooms("s"+viewMsg.serverpriority, viewMsg.roomlist);
     }
@@ -190,6 +195,16 @@ function getHigherPriorityServers() {
     return results;
 }
 
+function initialize() {
+    answers.clear();
+    acceptingAnswers = false;
+    acceptingViews = false;  
+    viewMsgPriorities = [];
+    if(receiveElectionTimeout!=null) {
+        clearTimeout(receiveElectionTimeout);
+        receiveElectionTimeout = null;
+    }
+}
 function getLowerPriorityServers() {
     let results = [];
     let globalServerInfo = getAllServerInfo();
@@ -207,3 +222,5 @@ module.exports = {bullyManager, beginElection, sendIamup}
 //values for t1, t2
 //at start, set leader
 //start vs recoevered
+//remove clients/rooms when server fails
+//leader fail remove chatrooms - by broadcast same msg as heartbeat
