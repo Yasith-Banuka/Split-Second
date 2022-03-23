@@ -154,7 +154,7 @@ var sendIamup = () => {
             setCoordinator(getServerId());
         } else {
             let minView = Math.min(...viewMsgPriorities);
-            if(minView>getServerId()) {
+            if(minView>getPriority()) {
                 sendCoordinator();
             } else {
                 setCoordinator("s" + minView);
