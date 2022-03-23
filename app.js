@@ -28,10 +28,11 @@ constants.T4 = 2000*serverConfig.priority;
 setGlobalServersConfig(configPath, serverId);
 // const otherCoordinationPorts = getCoordinatingPorts();
 
-//send iamup
-sendIamup();
 //set coordinator
 setCoordinator(getHighestPriorityServer());
+//send iamup
+sendIamup();
+
 
 // Create a client server
 const serverForClients = new Net.Server();

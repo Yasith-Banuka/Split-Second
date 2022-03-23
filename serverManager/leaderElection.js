@@ -5,7 +5,7 @@ const {getAllServerInfo, markFailedServer, markActiveServer} = require("../data/
 const {getPriority, getServerId, setCoordinator, getAllInfo, getCoordinator} = require("../data/serverDetails")
 const {getLocalClientIds} = require("../data/serverClients")
 const {getLocalChatRooms} = require("../data/serverChatRooms")
-const {updateRooms} = require("../data/globalChatRooms")
+const {updateRooms, removeAllChatRoomsOfAServer} = require("../data/globalChatRooms")
 const {updateClients, removeAllClientsOfAServer} = require("../data/globalClients");
 
 const answers = new heap.Heap();
@@ -49,6 +49,7 @@ var beginElection = () => {
 }
 
 var sendElection = () => {
+    initialize();
     //send election msgs to all processes with higher priority
     let electionMsg = {type : "bully", subtype : "election", serverid : getServerId()};
     multicast(getHigherPriorityServers(),electionMsg);
@@ -152,13 +153,16 @@ var sendIamup = () => {
         if(viewMsgPriorities.length==0) {
             setCoordinator(getServerId());
         } else {
-            if(Math.min(viewMsgPriorities)>getServerId()) {
+            let minView = Math.min(...viewMsgPriorities);
+            if(minView>getServerId()) {
                 sendCoordinator();
             } else {
-                setCoordinator("s" + Math.min(viewMsgPriorities));
+                setCoordinator("s" + minView);
             }
         }
+        
     },constants.T2);
+
 }
 
 var receiveIamup = (serverId) => {
@@ -173,7 +177,7 @@ var sendView = (serverId) => {
 
 var receiveView = (viewMsg) => {
     if(acceptingViews) {
-        viewMsgPriorities.push(viewMsg.serverpriority);
+        viewMsgPriorities.push(parseInt(viewMsg.serverpriority));
         updateClients("s"+viewMsg.serverpriority, viewMsg.clientlist);
         updateRooms("s"+viewMsg.serverpriority, viewMsg.roomlist);
     }
@@ -191,6 +195,16 @@ function getHigherPriorityServers() {
     return results;
 }
 
+function initialize() {
+    answers.clear();
+    acceptingAnswers = false;
+    acceptingViews = false;  
+    viewMsgPriorities = [];
+    if(receiveElectionTimeout!=null) {
+        clearTimeout(receiveElectionTimeout);
+        receiveElectionTimeout = null;
+    }
+}
 function getLowerPriorityServers() {
     let results = [];
     let globalServerInfo = getAllServerInfo();

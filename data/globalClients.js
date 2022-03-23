@@ -16,6 +16,7 @@ function updateClients(serverId, clientList) {
     for(let i=0;i<clientList.length;i++) {
         globalClients[clientList[i]] = serverId;
     }
+    
 }
 
 function updateClientServer(serverId, clientId) {
@@ -28,6 +29,7 @@ function removeAllClientsOfAServer(serverId) {
             delete globalClients[clientId];
         }
     }
+
 }
 
 module.exports = {isClientIdUsed, addClient, removeClient, updateClients, updateClientServer, removeAllClientsOfAServer}

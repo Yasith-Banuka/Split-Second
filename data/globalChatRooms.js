@@ -45,5 +45,6 @@ function removeAllChatRoomsOfAServer(serverId) {
             delete gloablChatrooms[roomId];
         }
     }
+    
 }
 module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }
