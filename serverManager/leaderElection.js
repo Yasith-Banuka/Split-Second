@@ -167,7 +167,6 @@ var sendIamup = () => {
 
 var receiveIamup = (serverId) => {
     markActiveServer(serverId);
-    addChatroom(serverId, "MainHall-" + serverId);
     sendView(serverId);
 }
 
