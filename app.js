@@ -26,7 +26,7 @@ const configPath = argv[3];
 const serverConfig = setConfigInfo(configPath, serverId);
 const port = getClientPort();
 const coordinationPort = getCoordinationPort();
-constants.T4 = 2000 * serverConfig.priority;
+constants.T4 = 2000*serverConfig.priority;
 
 // set coordinating servers config
 setGlobalServersConfig(configPath, serverId);
@@ -35,7 +35,8 @@ setGlobalServersConfig(configPath, serverId);
 //set coordinator
 setCoordinator(getHighestPriorityServer());
 //send iamup
-//sendIamup();
+sendIamup();
+
 
 var heartbeatCheck = false;
 

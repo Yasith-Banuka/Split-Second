@@ -14,7 +14,7 @@ function unicast(serverId, message) {
             socket.destroy();
         });
         socket.on('error', error => {
-            console.log(`Error: ${error}`);
+            console.log(`Error: ${ex}`);
             socket.destroy();
         });
     }
@@ -49,7 +49,7 @@ function reply(serverId, message, timeout) {
     return new Promise((resolve) => {
         timeoutVar = setTimeout(() => {
             socket.end();
-            resolve({ type: "serverfailure" });
+            resolve({type: "serverfailure"});
         }, timeout);
 
         socket.on('data', (bufObj) => {
@@ -61,7 +61,7 @@ function reply(serverId, message, timeout) {
         socket.on('error', () => {
             socket.end();
             clearTimeout(timeoutVar);
-            resolve({ type: "serverfailure" });
+            resolve({type: "serverfailure"});   
         });
     });
 }
