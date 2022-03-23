@@ -1,4 +1,5 @@
 const { removeClientFromChatRoom, joinClientNewChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { removeClient } = require("../data/globalClients");
 const { getLocalChatRoom, serverChatRooms } = require("../data/serverChatRooms");
 const { getClientForSocket, removeClientFromServer, serverClients } = require("../data/serverClients");
 const { broadcastClientDeletion } = require("../serverManager/broadcastCommunication");
@@ -25,6 +26,7 @@ module.exports = {
 
         removeClientFromChatRoom(room, client);
         removeClientFromServer(client);
+        removeClient(client.clientIdentity)
 
         util.broadcast(clientList, quitReply);
 

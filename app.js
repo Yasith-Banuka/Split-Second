@@ -16,6 +16,7 @@ const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication
 
 const constants = require('./util/constants');
 const { sendIamup } = require('./serverManager/leaderElection');
+const { quit } = require('./clientServer/quit');
 
 
 // Get serverId as the argument
@@ -87,6 +88,7 @@ serverForClients.on('connection', function (socket) {
 
     // When the client requests to end the TCP connection with the server, the server ends the connection.
     socket.on('end', function () {
+        quit(socket);
         console.log('Closing the connection');
     });
 
