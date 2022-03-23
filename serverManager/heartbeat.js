@@ -74,13 +74,13 @@ function addHearbeatCounterObject(heartbeatCounterObject) {
 		return false
 
 */
-function removeHeartbeatCounterObject(heartbeatCounterObject) {
+function removeHeartbeatCounterObject(failedServerId) {
 	let arraySize = heartbeatCounterList.length;
 	for (let i = 0; i < arraySize; i++) {
-		if (heartbeatCounterList[i]["serverId"] == heartbeatCounterObject["serverId"]) {
+		if (heartbeatCounterList[i]["serverId"] == failedServerId) {
 			heartbeatCounterListIndex = i;
+			break;
 		}
-		return false
 	}
 
 	heartbeatCounterList.splice(heartbeatCounterListIndex, 1);
@@ -205,7 +205,13 @@ function informFailure(serverid) {
 			"type": "heartbeat_fail",
 			"fail_serverid": serverid
 		};
-		unicast(leaderid, failureMsg);
+
+		// check if the current server is the leader
+		if (leaderid == getServerId()) {
+			leaderActionForFailedServer(serverid)
+		} else {
+			unicast(leaderid, failureMsg);
+		}
 	}
 }
 
@@ -259,6 +265,7 @@ function leaderActionForFailedServer(failedServerID) {
 async function heartbeat() {
 	console.log("heartbeating");
 	let arraySize = heartbeatCounterList.length;
+
 	for (let i = 0; i < arraySize; i++) {
 		// failure counter - when hit 3 inform leader about the failed serverId
 		var failureCounter = 0;
@@ -270,28 +277,34 @@ async function heartbeat() {
 		// if a ack do not return in 3s try again for 3 times
 
 		let intervalVar = setInterval(() => {
-			let currentCounter = heartbeatCounterList[i]["heartbeatCounter"] - 1;
-			if (prevHeartbeatCounter >= currentCounter) {
 
-				// if the heartBeatAck has not return back send the heatbeat again
-				sendHeartbeat(heartbeatCounterList[i]);
-				failureCounter++;
-
-				console.log(heartbeatCounterList[i]["serverId"] + " heart beat failed. Trying Again");
-			} else {
-				// to break the failureCounter while loop
-				failureCounter = 5;
-				console.log(heartbeatCounterList[i]["serverId"] + " heart beat success " + heartbeatCounterList[i]["heartbeatCounter"]);
-			}
-
-			// if failureCounter == 3 inform the leader about the failed Server
-			if (failureCounter == 3) {
-				informFailure(heartbeatCounterList[i]["serverId"]);
-			}
-
-			if (failureCounter > 2) {
+			if (heartbeatCounterList[i] == undefined) {
 				clearInterval(intervalVar);
+			} else {
+				let currentCounter = heartbeatCounterList[i]["heartbeatCounter"] - 1;
+				if (prevHeartbeatCounter >= currentCounter) {
+
+					// if the heartBeatAck has not return back send the heatbeat again
+					sendHeartbeat(heartbeatCounterList[i]);
+					failureCounter++;
+
+					console.log(heartbeatCounterList[i]["serverId"] + " heart beat failed. Trying Again");
+				} else {
+					// to break the failureCounter while loop
+					failureCounter = 5;
+					console.log(heartbeatCounterList[i]["serverId"] + " heart beat success " + heartbeatCounterList[i]["heartbeatCounter"]);
+				}
+
+				// if failureCounter == 3 inform the leader about the failed Server
+				if (failureCounter == 3) {
+					informFailure(heartbeatCounterList[i]["serverId"]);
+				}
+
+				if (failureCounter > 2) {
+					clearInterval(intervalVar);
+				}
 			}
+
 		}, 3000);
 
 	}

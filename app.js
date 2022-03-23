@@ -53,7 +53,7 @@ serverForClients.on('connection', function (socket) {
 
     if (heartbeatCheck == false) {
         setInterval(heartbeat, 2000);
-        heartbeatCheck = 1;
+        heartbeatCheck = true;
     }
 
     //socket = new JsonSocket(socket);
@@ -91,6 +91,11 @@ serverForCoordination.listen(coordinationPort, function () {
 });
 
 serverForCoordination.on('connection', function (socket) {
+
+    if (heartbeatCheck == false) {
+        setInterval(heartbeat, 2000);
+        heartbeatCheck = true;
+    }
 
     console.log('A new connection with a server has been established.');
 
