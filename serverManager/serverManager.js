@@ -46,7 +46,7 @@ module.exports = {
                 break;
 
             case "heartbeat_ack":
-                receiveHeartbeatAck(json["from"]);
+                receiveHeartbeatAck(json["from"], json["counter"]);
                 break;
 
             case "heartbeat_fail":
