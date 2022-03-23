@@ -5,7 +5,7 @@ const {getAllServerInfo, markFailedServer, markActiveServer} = require("../data/
 const {getPriority, getServerId, setCoordinator, getAllInfo, getCoordinator} = require("../data/serverDetails")
 const {getLocalClientIds} = require("../data/serverClients")
 const {getLocalChatRooms} = require("../data/serverChatRooms")
-const {updateRooms, removeAllChatRoomsOfAServer} = require("../data/globalChatRooms")
+const {updateRooms, removeAllChatRoomsOfAServer, addChatroom} = require("../data/globalChatRooms")
 const {updateClients, removeAllClientsOfAServer} = require("../data/globalClients");
 
 const answers = new heap.Heap();
@@ -167,6 +167,7 @@ var sendIamup = () => {
 
 var receiveIamup = (serverId) => {
     markActiveServer(serverId);
+    addChatroom(serverId, "MainHall-" + serverId);
     sendView(serverId);
 }
 
