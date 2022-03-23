@@ -197,19 +197,15 @@ function sendHeartbeat(heartbeatCounterObject) {
 */
 function informFailure(serverid) {
 	leaderid = getCoordinator();
-	let failureMsg = {
-		"type": "heartbeat_fail",
-		"fail_serverid": serverid
-	};
-
-	console.log(leaderid);
-
 	if (serverid == leaderid) {
-		// remove the heartbeat counter object of the failed server
-		removeHeartbeatCounterObject(serverid);
 		beginElection();
 	}
 	else {
+		let failureMsg = {
+			"type": "heartbeat_fail",
+			"fail_serverid": serverid
+		};
+
 		// check if the current server is the leader
 		if (leaderid == getServerId()) {
 			leaderActionForFailedServer(serverid)
@@ -240,8 +236,6 @@ function serverActionForFailedServer(failedServerID) {
 
 	// remove the heartbeat counter object of the failed server
 	removeHeartbeatCounterObject(failedServerID);
-
-	console.log(`${failedServerID} is removed from the server lists`)
 }
 
 /*
@@ -274,7 +268,7 @@ async function heartbeat() {
 
 	for (let i = 0; i < arraySize; i++) {
 		// failure counter - when hit 3 inform leader about the failed serverId
-		let failureCounter = 0;
+		var failureCounter = 0;
 		let prevHeartbeatCounter = heartbeatCounterList[i]["heartbeatCounter"];
 
 		// send heartbeat to external servers
@@ -290,12 +284,10 @@ async function heartbeat() {
 				let currentCounter = heartbeatCounterList[i]["heartbeatCounter"] - 1;
 				if (prevHeartbeatCounter >= currentCounter) {
 
-					failureCounter = failureCounter + 1;
-
 					// if the heartBeatAck has not return back send the heatbeat again
 					sendHeartbeat(heartbeatCounterList[i]);
+					failureCounter++;
 
-					console.log(failureCounter);
 					console.log(heartbeatCounterList[i]["serverId"] + " heart beat failed. Trying Again");
 				} else {
 					// to break the failureCounter while loop
