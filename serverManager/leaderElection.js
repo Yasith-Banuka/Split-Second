@@ -5,7 +5,7 @@ const {getAllServerInfo, markFailedServer, markActiveServer} = require("../data/
 const {getPriority, getServerId, setCoordinator, getAllInfo, getCoordinator} = require("../data/serverDetails")
 const {getLocalClientIds} = require("../data/serverClients")
 const {getLocalChatRooms} = require("../data/serverChatRooms")
-const {updateRooms, removeAllChatRoomsOfAServer} = require("../data/globalChatRooms")
+const {updateRooms, removeAllChatRoomsOfAServer, addChatroom} = require("../data/globalChatRooms")
 const {updateClients, removeAllClientsOfAServer} = require("../data/globalClients");
 const {addHearbeatCounterObject} = require("./heartbeat")
 
@@ -155,7 +155,7 @@ var sendIamup = () => {
             setCoordinator(getServerId());
         } else {
             let minView = Math.min(...viewMsgPriorities);
-            if(minView>getServerId()) {
+            if(minView>getPriority()) {
                 sendCoordinator();
             } else {
                 setCoordinator("s" + minView);
