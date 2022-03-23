@@ -35,7 +35,7 @@ setGlobalServersConfig(configPath, serverId);
 //set coordinator
 setCoordinator(getHighestPriorityServer());
 //send iamup
-//sendIamup();
+sendIamup();
 
 var heartbeatCheck = false;
 
