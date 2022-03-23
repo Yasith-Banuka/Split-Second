@@ -1,4 +1,13 @@
+const { getGlobalServerIds } = require("./globalServerDetails");
+
 var gloablChatrooms = {}; // Store the chatroom id // {'roomId': 's1'}
+
+function addMainHalls() {
+    allIds = getGlobalServerIds()
+    for (let i = 0; i < allIds.length; i++) {
+        gloablChatrooms["MainHall-" + allIds[i]] = allIds[i];
+    }
+}
 
 function isChatroomIdUsed(roomId) {
     return gloablChatrooms.hasOwnProperty(roomId);
@@ -47,4 +56,4 @@ function removeAllChatRoomsOfAServer(serverId) {
     }
     
 }
-module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }
+module.exports = { gloablChatrooms, addMainHalls, isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }
