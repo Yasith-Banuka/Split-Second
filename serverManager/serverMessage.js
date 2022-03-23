@@ -1,6 +1,6 @@
 
 const net = require("net");
-const {getServerInfo, getCoordinatingServerIds} = require("../data/globalServerDetails");
+const {getServerInfo, getCoordinatingServerIds, getGlobalServerIds} = require("../data/globalServerDetails");
 const {getCoordinationPort} = require("../data/serverDetails");
 const { jsonEncode, jsonDecode } = require("../util/util");
 
@@ -23,7 +23,7 @@ function unicast(serverId, message) {
 
 function broadcast(message) {
 
-    let coordinatingServerIds = getCoordinatingServerIds();
+    let coordinatingServerIds = getGlobalServerIds();
     for (let i=0;i<coordinatingServerIds.length;i++) {
         unicast(coordinatingServerIds[i], message);
     }

@@ -30,7 +30,7 @@ function updateRooms(serverId, roomList) {
 function getChatRoomOfServer(serverId) {
     let chatRooms = [];
 
-    for (var roomId in serverChatrooms) {
+    for (var roomId in gloablChatrooms) {
         if (getRoomServer(roomId) == serverId) {
             chatRooms.push(roomId);
         }
@@ -39,4 +39,11 @@ function getChatRoomOfServer(serverId) {
     return chatRooms;
 }
 
-module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer }
+function removeAllChatRoomsOfAServer(serverId) {
+    for ( var roomId in gloablChatrooms ) {
+        if ( gloablChatrooms[roomId] === serverId ) {
+            delete gloablChatrooms[roomId];
+        }
+    }
+}
+module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }
