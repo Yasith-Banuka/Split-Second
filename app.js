@@ -4,12 +4,17 @@ const { serverChatRooms } = require('./chatRoomManager/chatRoomManager');
 const { clientServer } = require('./clientServer/clientServerMain');
 const { serverManager } = require('./serverManager/serverManager');
 const { setConfigInfo, getAllInfo, setCoordinator, getClientPort, getCoordinationPort, getCoordinator } = require('./data/serverDetails');
-const { setCoordinatingServersConfig, getCoordinatingPorts, getHighestPriorityServer } = require('./data/globalServerDetails');
+const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer } = require('./data/globalServerDetails');
 
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
+
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
+
+const constants = require('./util/constants');
+const { sendIamup } = require('./serverManager/leaderElection');
+
 
 // Get serverId as the argument
 const serverId = argv[2];
@@ -21,13 +26,17 @@ const configPath = argv[3];
 const serverConfig = setConfigInfo(configPath, serverId);
 const port = getClientPort();
 const coordinationPort = getCoordinationPort();
+constants.T4 = 2000*serverConfig.priority;
 
 // set coordinating servers config
-setCoordinatingServersConfig(configPath, serverId);
+setGlobalServersConfig(configPath, serverId);
 // const otherCoordinationPorts = getCoordinatingPorts();
 
 //set coordinator
 setCoordinator(getHighestPriorityServer());
+//send iamup
+sendIamup();
+
 
 var heartbeatCheck = false;
 

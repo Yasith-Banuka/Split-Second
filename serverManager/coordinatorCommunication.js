@@ -25,6 +25,7 @@ async function getCoordinatorRoomIdApproval(roomId, serverId) {
         beginElection();
         return false;
     }
+
     if (response.type === "roomconfirm" && response.roomid === roomId) {
         return response.roomapproved;
     }

@@ -39,4 +39,12 @@ function getChatRoomOfServer(serverId) {
     return chatRooms;
 }
 
-module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer }
+function removeAllChatRoomsOfAServer(serverId) {
+    for ( var roomId in gloablChatrooms ) {
+        if ( gloablChatrooms[roomId] === serverId ) {
+            delete gloablChatrooms[roomId];
+        }
+    }
+    
+}
+module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }

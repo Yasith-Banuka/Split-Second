@@ -13,8 +13,9 @@ function unicast(serverId, message) {
             socket.write(jsonEncode(message));
             socket.destroy();
         });
-        socket.on('error', function (ex) {
+        socket.on('error', error => {
             console.log(`Error: ${ex}`);
+            socket.destroy();
         });
     }
 }
@@ -44,33 +45,24 @@ function reply(serverId, message, timeout) {
     const socket = net.createConnection({ port: receivingServerInfo["coordinationPort"] }, receivingServerInfo["address"], () => {
         socket.write(jsonEncode(message));
     });
-    return new Promise((resolve, reject) => {
+    let timeoutVar = null;
+    return new Promise((resolve) => {
+        timeoutVar = setTimeout(() => {
+            socket.end();
+            resolve({type: "serverfailure"});
+        }, timeout);
+
         socket.on('data', (bufObj) => {
             let json = jsonDecode(bufObj);
             resolve(json);
             socket.end();
         });
-        let timeoutVar = null;
-        return new Promise((resolve, reject) => {
-            timeoutVar = setTimeout(() => {
-                socket.end();
-                resolve({ type: "serverfailure" });
-            }, timeout);
 
-            socket.on('data', (bufObj) => {
-                let json = jsonDecode(bufObj);
-                resolve(json);
-                clearTimeout(timeoutVar);
-                socket.end();
-            });
-
-            socket.on('error', (error) => {
-                socket.end();
-                clearTimeout(timeoutVar);
-                resolve({ type: "serverfailure" });
-            });
+        socket.on('error', () => {
+            socket.end();
+            clearTimeout(timeoutVar);
+            resolve({type: "serverfailure"});   
         });
-        setTimeout(() => reject(), timeout);
     });
 }
 
