@@ -9,8 +9,10 @@ const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer }
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
+const { addMainHalls, addChatroom } = require('./data/globalChatRooms');
 
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
+const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication');
 
 const constants = require('./util/constants');
 const { sendIamup } = require('./serverManager/leaderElection');
@@ -55,6 +57,10 @@ serverForClients.listen(port, function () {
         owner: null,
         clients: []
     });
+    addChatroom(serverId, "MainHall-" + serverId);
+    broadcastNewChatroom(serverId, "MainHall-" + serverId)
+    addMainHalls();
+
 });
 
 // When a client requests a connection with the server, the server creates a new socket dedicated to it.
