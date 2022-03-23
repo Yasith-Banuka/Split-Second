@@ -66,7 +66,7 @@ module.exports = {
 */
 async function checkAvailability(roomId) {
 
-    if( util.checkAlphaNumeric(roomId) && (!isChatroomIdUsed(roomId))) {
+    if (util.checkAlphaNumeric(roomId) && (!(isChatroomIdUsed(roomId)))) {
         return await getCoordinatorRoomIdApproval(roomId, getServerId());
     }
     return false;

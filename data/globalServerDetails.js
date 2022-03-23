@@ -26,7 +26,7 @@ function setGlobalServersConfig(path, serverId) {
     const data = fs.readFileSync(path, 'utf8');
 
     serversConf = data.split('\r\n');
-    
+
     for (var i = 0; i < serversConf.length; i++) {
 
         serverConf = serversConf[i].split(' ');

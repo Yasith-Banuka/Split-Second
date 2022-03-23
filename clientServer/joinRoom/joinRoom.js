@@ -1,4 +1,5 @@
 const { removeClientFromChatRoom, joinClientNewChatRoom } = require("../../chatRoomManager/chatRoomManager");
+const { isChatroomIdUsed } = require("../../data/globalChatRooms");
 const { isClientIdUsed } = require("../../data/globalClients");
 const { getLocalChatRoom } = require("../../data/serverChatRooms");
 const { getClientForSocket } = require("../../data/serverClients");
@@ -17,7 +18,7 @@ module.exports = {
             removeClientFromChatRoom(clientPrevChatRoomId, client);
 
             // handle seperately - when the chat room in a different server
-            if (isClientIdUsed(roomId)) {
+            if (getLocalChatRoom(roomId) == false) {
 
                 joinRoomChangeServer(socket, roomId, client);
 
