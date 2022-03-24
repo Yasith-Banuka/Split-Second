@@ -15,6 +15,13 @@ module.exports = {
 
         if (checkRoomIsAuthentic(client, roomId)) {
 
+            approveMessage = {
+                "type": "roomchange",
+                "identity": client.clientIdentity,
+                "former": clientPrevChatRoomId,
+                "roomid": roomId
+            };
+
             removeClientFromChatRoom(clientPrevChatRoomId, client);
 
             // handle seperately - when the chat room in a different server
@@ -25,23 +32,12 @@ module.exports = {
             } else {
 
                 // when chat room in the same server
-
-                approveMessage = {
-                    "type": "roomchange",
-                    "identity": client.clientIdentity,
-                    "former": clientPrevChatRoomId,
-                    "roomid": roomId
-                };
-
-
                 client.chatRoom = roomId;
 
                 joinClientNewChatRoom(roomId, client);
 
                 // send neccessary messages
                 util.broadcast(getLocalChatRoom(roomId).clients, approveMessage);
-
-
             }
 
             // send neccessary messages - this is common for the both cases
