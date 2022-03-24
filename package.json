@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Yasith-Banuka/Split-Second#readme",
   "dependencies": {
+    "heap-js": "^2.1.6",
     "json-socket": "^0.3.0"
   }
 }

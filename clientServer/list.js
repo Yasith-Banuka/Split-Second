@@ -1,19 +1,23 @@
-const { serverChatRooms } = require("../chatRoomManager/chatRoomManager");
+const { serverChatRooms } = require("../data/serverChatRooms");
 const util = require("../util/util");
 
 module.exports = {
     sendlist: function (socket) {
-        let sendListReply;
-        let rooms=[];
+
+        let listReply;
+        let rooms = [];
         let arrayLength = serverChatRooms.length;
+
         for (var i = 0; i < arrayLength; i++) {
-            rooms.push(serverChatRooms.chatRoomIdentity);
+            rooms.push(serverChatRooms[i].chatRoomIdentity);
         }
-        sendListReply = {
-            "type" : "roomlist",
-            "rooms" : rooms
-            };
-        socket.write(util.jsonEncode(sendListReply));
+
+        listReply = {
+            "type": "roomlist",
+            "rooms": rooms
+        };
+
+        socket.write(util.jsonEncode(listReply));
     }
 }
 

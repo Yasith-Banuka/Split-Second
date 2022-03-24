@@ -1,8 +1,16 @@
-const { getChatRoom, serverClients, removeClientFromChatRoom, serverChatRooms, getClientForSocket, checkClientIdentityExist } = require("../chatRoomManager/chatRoomManager");
 const util = require("../util/util");
+const { isChatroomIdUsed } = require("../data/globalChatRooms");
+const { getServerId } = require("../data/serverDetails");
+const { reply } = require("../serverManager/serverMessage");
+const { beginElection } = require("../serverManager/leaderElection");
 
+const { getCoordinatorRoomIdApproval } = require("../serverManager/coordinatorCommunication");
+const { getClientForSocket, checkClientIdentityExist, serverClients } = require("../data/serverClients");
+const { removeClientFromChatRoom } = require("../chatRoomManager/chatRoomManager");
+const { getLocalChatRoom, addLocalChatRoom } = require("../data/serverChatRooms");
+const { broadcastNewChatroom } = require("../serverManager/broadcastCommunication");
 module.exports = {
-    createRoom: function (socket, roomId) {
+    createRoom: async function (socket, roomId) {
         let client = getClientForSocket(socket);
 
         let approveMessage;
@@ -13,8 +21,8 @@ module.exports = {
             "roomid": roomId
         };
         let previousChatRoom = client.chatRoom;
-
-        if (checkAvailability(roomId) && (!checkClientIsOwner(client))) {
+        let available = await checkAvailability(roomId);
+        if ((!checkClientIsOwner(client)) && available) {
 
             // remove client from previous chatRoom
             removeClientFromChatRoom(previousChatRoom, client);
@@ -30,12 +38,15 @@ module.exports = {
                 owner: client,
                 clients: [client]
             }
-            serverChatRooms.push(newChatRoom);
+            addLocalChatRoom(newChatRoom);
 
             approveMessage = { "type": "createroom", "roomid": roomId, "approved": "true" };
             socket.write(util.jsonEncode(approveMessage));
             socket.write(util.jsonEncode(roomChange));
-            util.broadcast(getChatRoom(previousChatRoom).clients, roomChange);
+            util.broadcast(getLocalChatRoom(previousChatRoom).clients, roomChange);
+
+            // broadcast new chatroom to the other servers
+            broadcastNewChatroom(getServerId(), roomId);
 
             console.log("room created");
         } else {
@@ -53,13 +64,15 @@ module.exports = {
     else 
         return true
 */
-function checkAvailability(roomId) {
-    // because in js (0==false)-> true
-    if (util.checkAlphaNumeric(roomId) && (typeof getChatRoom(roomId) == "boolean")) {
-        return true;
+async function checkAvailability(roomId) {
+
+    if (util.checkAlphaNumeric(roomId) && (!(isChatroomIdUsed(roomId)))) {
+        return await getCoordinatorRoomIdApproval(roomId, getServerId());
     }
     return false;
-}
+};
+
+
 
 /*
 
@@ -71,7 +84,7 @@ function checkAvailability(roomId) {
 */
 function checkClientIsOwner(client) {
     let clientChatRoomId = checkClientIdentityExist(client.clientIdentity).chatRoom;
-    let clientChatRoom = getChatRoom(clientChatRoomId);
+    let clientChatRoom = getLocalChatRoom(clientChatRoomId);
 
     return (clientChatRoom.owner == client);
 
