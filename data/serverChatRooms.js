@@ -61,12 +61,7 @@ function getLocalChatRoom(chatRoomIdentity) {
 
 */
 function getLocalChatRooms() {
-    let arrayLength = serverChatRooms.length;
-    let chatRooms = [];
-    for (var i = 0; i < arrayLength; i++) {
-        chatRooms.push(serverChatRooms.chatRoomIdentity);
-    }
-    return chatRooms;
+    return serverChatRooms.map(chatroom => chatroom.chatRoomIdentity);
 }
 
 module.exports = { serverChatRooms, getMainHallID, addLocalChatRoom, getLocalChatRoom, getLocalChatRooms }
