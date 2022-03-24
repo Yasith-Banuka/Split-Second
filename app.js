@@ -9,7 +9,7 @@ const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer }
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
-const { addMainHalls, addChatroom } = require('./data/globalChatRooms');
+const {addChatroom } = require('./data/globalChatRooms');
 
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
 const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication');
@@ -35,8 +35,7 @@ constants.T4 = 2000 * serverConfig.priority;
 setGlobalServersConfig(configPath, serverId);
 // const otherCoordinationPorts = getCoordinatingPorts();
 
-//set coordinator
-setCoordinator(getHighestPriorityServer());
+
 //send iamup
 sendIamup();
 
@@ -59,7 +58,6 @@ serverForClients.listen(port, function () {
     });
     addChatroom(serverId, "MainHall-" + serverId);
     broadcastNewChatroom(serverId, "MainHall-" + serverId)
-    addMainHalls();
 
 });
 
@@ -67,7 +65,7 @@ serverForClients.listen(port, function () {
 serverForClients.on('connection', function (socket) {
 
     if (heartbeatCheck == false) {
-        setInterval(heartbeat, 2000);
+        //setInterval(heartbeat, 2000);
         heartbeatCheck = true;
     }
 
@@ -95,7 +93,8 @@ serverForClients.on('connection', function (socket) {
 
     // Don't forget to catch error, for your own sake.
     socket.on('error', function (err) {
-        console.log(`Error: ${err}`);
+        quit(socket);
+        console.log('Closing the connection');
     });
 });
 
@@ -109,7 +108,7 @@ serverForCoordination.listen(coordinationPort, function () {
 serverForCoordination.on('connection', function (socket) {
 
     if (heartbeatCheck == false) {
-        setInterval(heartbeat, 2000);
+        //setInterval(heartbeat, 2000);
         heartbeatCheck = true;
     }
 

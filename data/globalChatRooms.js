@@ -56,4 +56,4 @@ function removeAllChatRoomsOfAServer(serverId) {
     }
     
 }
-module.exports = { gloablChatrooms, addMainHalls, isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }
+module.exports = { gloablChatrooms, isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }

@@ -39,6 +39,7 @@ module.exports = {
                 clients: [client]
             }
             addLocalChatRoom(newChatRoom);
+            
 
             approveMessage = { "type": "createroom", "roomid": roomId, "approved": "true" };
             socket.write(util.jsonEncode(approveMessage));
