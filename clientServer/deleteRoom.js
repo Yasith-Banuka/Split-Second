@@ -56,6 +56,7 @@ module.exports = {
 
             // broadcast deletion of chatroom to the other servers
             removeChatroom(roomId);
+
             broadcastChatroomDeletion(roomId);
 
             console.log("room deleted");

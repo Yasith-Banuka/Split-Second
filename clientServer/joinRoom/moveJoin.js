@@ -1,7 +1,9 @@
 const { joinClientNewChatRoom } = require("../../chatRoomManager/chatRoomManager");
+const { updateClients } = require("../../data/globalClients");
 const { getLocalChatRoom, getMainHallID, addLocalChatRoom } = require("../../data/serverChatRooms");
 const { addLocalClient } = require("../../data/serverClients");
 const { getServerId } = require("../../data/serverDetails");
+const { broadcastClientUpdation } = require("../../serverManager/broadcastCommunication");
 const util = require("../../util/util");
 const { jsonEncode } = require("../../util/util");
 
@@ -24,11 +26,13 @@ module.exports = {
 
             localMoveJoin(socket, roomId, former, clientIdentity);
 
-
             console.log(serverChange);
 
             // update client server id
-            // todo: update client's server id
+            updateClients(getServerId(), clientIdentity);
+
+            // broadcast clients move to the new server to other servers
+            broadcastClientUpdation(getServerId(), clientIdentity);
 
             console.log("move join called - client add to the " + roomId);
 

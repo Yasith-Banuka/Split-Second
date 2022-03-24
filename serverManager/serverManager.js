@@ -1,4 +1,4 @@
-const { uponReceiveNewClient, uponReceiveNewChatroom, uponReceiveClientDeletion, uponReceiveChatroomDeletion } = require('./broadcastCommunication');
+const { uponReceiveNewClient, uponReceiveNewChatroom, uponReceiveClientDeletion, uponReceiveChatroomDeletion, uponReceiveClientUpdation } = require('./broadcastCommunication');
 const { handleIdentityRequestMsg, handleRoomRequestMsg } = require('./coordinatorCommunication');
 const { receiveHeartbeat, receiveHeartbeatAck, informFailure, leaderActionForFailedServer, serverActionForFailedServer } = require('./heartbeat');
 const { bullyManager } = require('./leaderElection');
@@ -17,6 +17,10 @@ module.exports = {
 
             case "newclient":
                 uponReceiveNewClient(json["serverid"], json["clientid"]);
+                break;
+
+            case "updateclient":
+                uponReceiveClientUpdation(json["newServerid"], json["clientid"]);
                 break;
 
             case "endclient":
