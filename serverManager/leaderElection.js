@@ -7,6 +7,7 @@ const {getLocalClientIds} = require("../data/serverClients")
 const {getLocalChatRooms} = require("../data/serverChatRooms")
 const {updateRooms, removeAllChatRoomsOfAServer, addChatroom} = require("../data/globalChatRooms")
 const {updateClients, removeAllClientsOfAServer} = require("../data/globalClients");
+const {addHearbeatCounterObject} = require("./heartbeat")
 
 const answers = new heap.Heap();
 var acceptingAnswers = false;
@@ -168,6 +169,7 @@ var sendIamup = () => {
 var receiveIamup = (serverId) => {
     markActiveServer(serverId);
     sendView(serverId);
+    addHearbeatCounterObject(serverId);
 }
 
 var sendView = (serverId) => {
