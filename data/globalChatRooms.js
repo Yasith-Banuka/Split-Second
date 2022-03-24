@@ -1,3 +1,5 @@
+const { getGlobalServerIds } = require("./globalServerDetails");
+
 var gloablChatrooms = {}; // Store the chatroom id // {'roomId': 's1'}
 
 function isChatroomIdUsed(roomId) {
@@ -47,4 +49,4 @@ function removeAllChatRoomsOfAServer(serverId) {
     }
     
 }
-module.exports = { isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }
+module.exports = { gloablChatrooms, isChatroomIdUsed, addChatroom, removeChatroom, getRoomServer, updateRooms, getChatRoomOfServer, removeAllChatRoomsOfAServer }
