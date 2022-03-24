@@ -1,15 +1,17 @@
-const { serverChatRooms } = require("../data/serverChatRooms");
+const { gloablChatrooms } = require("../data/globalChatRooms");
 const util = require("../util/util");
 
 module.exports = {
     sendlist: function (socket) {
-
+        console.log(gloablChatrooms);
         let listReply;
         let rooms = [];
-        let arrayLength = serverChatRooms.length;
 
-        for (var i = 0; i < arrayLength; i++) {
-            rooms.push(serverChatRooms[i].chatRoomIdentity);
+        for (var key in gloablChatrooms) {
+            if (gloablChatrooms.hasOwnProperty(key)){
+                rooms.push(key);
+            }
+            
         }
 
         listReply = {

@@ -9,11 +9,14 @@ const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer }
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
+const {addChatroom } = require('./data/globalChatRooms');
 
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
+const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication');
 
 const constants = require('./util/constants');
 const { sendIamup } = require('./serverManager/leaderElection');
+const { quit } = require('./clientServer/quit');
 
 
 // Get serverId as the argument
@@ -32,10 +35,9 @@ constants.T4 = 2000 * serverConfig.priority;
 setGlobalServersConfig(configPath, serverId);
 // const otherCoordinationPorts = getCoordinatingPorts();
 
-//set coordinator
-setCoordinator(getHighestPriorityServer());
+
 //send iamup
-//sendIamup();
+sendIamup();
 
 var heartbeatCheck = false;
 
@@ -54,13 +56,16 @@ serverForClients.listen(port, function () {
         owner: null,
         clients: []
     });
+    addChatroom(serverId, "MainHall-" + serverId);
+    broadcastNewChatroom(serverId, "MainHall-" + serverId)
+
 });
 
 // When a client requests a connection with the server, the server creates a new socket dedicated to it.
 serverForClients.on('connection', function (socket) {
 
     if (heartbeatCheck == false) {
-        setInterval(heartbeat, 2000);
+        //setInterval(heartbeat, 2000);
         heartbeatCheck = true;
     }
 
@@ -81,13 +86,15 @@ serverForClients.on('connection', function (socket) {
 
     // When the client requests to end the TCP connection with the server, the server ends the connection.
     socket.on('end', function () {
+        quit(socket);
         console.log('Closing the connection');
     });
 
 
     // Don't forget to catch error, for your own sake.
     socket.on('error', function (err) {
-        console.log(`Error: ${err}`);
+        quit(socket);
+        console.log('Closing the connection');
     });
 });
 
@@ -101,7 +108,7 @@ serverForCoordination.listen(coordinationPort, function () {
 serverForCoordination.on('connection', function (socket) {
 
     if (heartbeatCheck == false) {
-        setInterval(heartbeat, 2000);
+        //setInterval(heartbeat, 2000);
         heartbeatCheck = true;
     }
 
