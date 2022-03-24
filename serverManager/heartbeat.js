@@ -64,18 +64,28 @@ function initHeartbeat() {
 // called after Iam up message inside leader election
 function addHearbeatCounterObject(serverId) {
 
-	let heartbeatCounterObject = {
-		"serverId": serverId,
-		"heartbeatCounter": 1,
-		"failedCounter": 0
+	let arraySize = heartbeatCounterList.length;
+	let serverExists = false;
+	for (let i = 0; i < arraySize; i++) {
+		if (heartbeatCounterList[i]["serverId"] == serverId) {
+			serverExists = true;
+			break;
+		}
 	}
+	if (!serverExists){
+		let heartbeatCounterObject = {
+			"serverId": serverId,
+			"heartbeatCounter": 1,
+			"failedCounter": 0
+		}
 
-	let heartbeatReceiveCounterObject = {
-		"serverId": serverId,
-		"heartbeatCounter": 0,
+		let heartbeatReceiveCounterObject = {
+			"serverId": serverId,
+			"heartbeatCounter": 0,
+		}
+		heartbeatCounterList.push(heartbeatCounterObject);
+		heartbeatReceiveCounterList.push(heartbeatReceiveCounterObject);
 	}
-	heartbeatCounterList.push(heartbeatCounterObject);
-	heartbeatReceiveCounterList.push(heartbeatReceiveCounterObject);
 }
 
 /*
