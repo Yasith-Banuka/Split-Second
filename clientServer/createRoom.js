@@ -1,5 +1,5 @@
 const util = require("../util/util");
-const { isChatroomIdUsed } = require("../data/globalChatRooms");
+const { isChatroomIdUsed, addChatroom } = require("../data/globalChatRooms");
 const { getServerId } = require("../data/serverDetails");
 const { reply } = require("../serverManager/serverMessage");
 const { beginElection } = require("../serverManager/leaderElection");
@@ -39,7 +39,7 @@ module.exports = {
                 clients: [client]
             }
             addLocalChatRoom(newChatRoom);
-            
+            addChatroom(getServerId(), roomId);
 
             approveMessage = { "type": "createroom", "roomid": roomId, "approved": "true" };
             socket.write(util.jsonEncode(approveMessage));
