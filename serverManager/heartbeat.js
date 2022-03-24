@@ -61,9 +61,31 @@ function initHeartbeat() {
 }
 
 // add given heartbeatCounterObject to the heartbeatCounterList and heartbeatCounterRecievedList
-function addHearbeatCounterObject(heartbeatCounterObject) {
-	heartbeatCounterList.push(heartbeatCounterObject);
-	heartbeatReceiveCounterList.push(heartbeatCounterObject);
+// called after Iam up message inside leader election
+function addHearbeatCounterObject(serverId) {
+
+	let arraySize = heartbeatCounterList.length;
+	let serverExists = false;
+	for (let i = 0; i < arraySize; i++) {
+		if (heartbeatCounterList[i]["serverId"] == serverId) {
+			serverExists = true;
+			break;
+		}
+	}
+	if (!serverExists){
+		let heartbeatCounterObject = {
+			"serverId": serverId,
+			"heartbeatCounter": 1,
+			"failedCounter": 0
+		}
+
+		let heartbeatReceiveCounterObject = {
+			"serverId": serverId,
+			"heartbeatCounter": 0,
+		}
+		heartbeatCounterList.push(heartbeatCounterObject);
+		heartbeatReceiveCounterList.push(heartbeatReceiveCounterObject);
+	}
 }
 
 /*
@@ -318,4 +340,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }
+module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer, addHearbeatCounterObject }

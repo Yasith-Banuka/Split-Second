@@ -2,6 +2,7 @@ const { getGlobalServerIds } = require("./globalServerDetails");
 
 var gloablChatrooms = {}; // Store the chatroom id // {'roomId': 's1'}
 
+
 function isChatroomIdUsed(roomId) {
     return gloablChatrooms.hasOwnProperty(roomId);
 }
