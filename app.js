@@ -9,7 +9,7 @@ const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer }
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
-const {addChatroom } = require('./data/globalChatRooms');
+const { addChatroom } = require('./data/globalChatRooms');
 
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
 const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication');
@@ -86,7 +86,7 @@ serverForClients.on('connection', function (socket) {
 
     // When the client requests to end the TCP connection with the server, the server ends the connection.
     socket.on('end', function () {
-        quit(socket);
+        //quit(socket);
         console.log('Closing the connection');
     });
 

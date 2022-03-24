@@ -27,7 +27,13 @@ async function getCoordinatorRoomIdApproval(roomId, serverId) {
     }
 
     if (response.type === "roomconfirm" && response.roomid === roomId) {
-        return response.roomapproved;
+
+        if (response.type === "roomconfirm" && response.roomid === roomId) {
+            if (response.roomapproved) {
+                addChatroom(serverId, roomId);
+            }
+            return response.roomapproved;
+        }
     }
     return false;
 };
@@ -51,7 +57,11 @@ async function getCoordinatorIdentityApproval(identity, serverId) {
         return false;
     }
     if (response.type === "clientconfirm" && response.clientid === identity) {
+        if (response.idapproved) {
+            addClient(serverId, identity)
+        }
         return response.idapproved;
+
     }
     return false;
 }
