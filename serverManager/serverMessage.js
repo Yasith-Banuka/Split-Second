@@ -43,10 +43,8 @@ function multicast(serverIds, message) {
 
 
 function reply(serverId, message, timeout) {
-    console.log(serverId);
     // let serverCoordinationPort = getCoordinationPort();
     let receivingServerInfo = getServerInfo(serverId);
-    console.log(serverId, message);
     const socket = net.createConnection({ port: receivingServerInfo["coordinationPort"] }, receivingServerInfo["address"], () => {
         socket.write(jsonEncode(message));
         console.log("Sending message to server ", serverId, " : ", message);
