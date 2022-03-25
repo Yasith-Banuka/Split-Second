@@ -1,11 +1,11 @@
 const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
 const { unicast, broadcast } = require("./serverMessage");
-const { beginElection } = require("./leaderElection")
 const { getCoordinator } = require("../data/serverDetails");
 const { getServerInfo, markFailedServer, getAllServerInfo } = require("../data/globalServerDetails");
 const { getChatRoomOfServer, removeChatroom } = require("../data/globalChatRooms");
 const { removeAllClientsOfAServer } = require("../data/globalClients");
+const { beginElection } = require("./leaderElection");
 
 /* 
 
@@ -85,6 +85,7 @@ function addHearbeatCounterObject(serverId) {
 		}
 		heartbeatCounterList.push(heartbeatCounterObject);
 		heartbeatReceiveCounterList.push(heartbeatReceiveCounterObject);
+		console.log(serverId, " added to heartbeat");
 	}
 }
 
@@ -145,14 +146,20 @@ function receiveHeartbeat(identity, receivedCounter) {
 	let arrayLength = heartbeatReceiveCounterList.length;
 	let currentCounter;
 	let fromServerIndex;
+	let availableInCounterList = false;
 	for (var i = 0; i < arrayLength; i++) {
 		if (heartbeatReceiveCounterList[i]["serverId"] == identity) {
 			currentCounter = heartbeatReceiveCounterList[i]["heartbeatCounter"];
 			fromServerIndex = i;
+			availableInCounterList = true;
 			break
 		}
 	}
-
+	if(!availableInCounterList) {
+		addHearbeatCounterObject(identity);
+		receiveHeartbeat(identity, receivedCounter);
+		return
+	}
 	if (receivedCounter > currentCounter) {
 
 
@@ -293,7 +300,7 @@ function leaderActionForFailedServer(failedServerID) {
 }
 
 async function heartbeat() {
-	console.log("heartbeating");
+	//console.log("heartbeating");
 	let arraySize = heartbeatCounterList.length;
 
 	for (let i = 0; i < arraySize; i++) {
@@ -324,7 +331,7 @@ async function heartbeat() {
 				} else {
 					// to break the failureCounter while loop
 					failureCounter = 5;
-					console.log(heartbeatCounterList[i]["serverId"] + " heart beat success " + heartbeatCounterList[i]["heartbeatCounter"]);
+					//console.log(heartbeatCounterList[i]["serverId"] + " heart beat success " + heartbeatCounterList[i]["heartbeatCounter"]);
 				}
 
 				// if failureCounter == 3 inform the leader about the failed Server
@@ -342,4 +349,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer, addHearbeatCounterObject }
+module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }

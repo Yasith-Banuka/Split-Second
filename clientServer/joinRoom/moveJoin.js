@@ -1,5 +1,5 @@
 const { joinClientNewChatRoom } = require("../../chatRoomManager/chatRoomManager");
-const { updateClients } = require("../../data/globalClients");
+const { updateClientServer } = require("../../data/globalClients");
 const { getLocalChatRoom, getMainHallID, addLocalChatRoom } = require("../../data/serverChatRooms");
 const { addLocalClient } = require("../../data/serverClients");
 const { getServerId } = require("../../data/serverDetails");
@@ -29,7 +29,7 @@ module.exports = {
             console.log(serverChange);
 
             // update client server id
-            updateClients(getServerId(), clientIdentity);
+            updateClientServer(getServerId(), clientIdentity);
 
             // broadcast clients move to the new server to other servers
             broadcastClientUpdation(getServerId(), clientIdentity);
