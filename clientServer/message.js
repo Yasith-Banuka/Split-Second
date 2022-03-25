@@ -12,6 +12,15 @@ module.exports = {
             "content": content
         };
 
-        util.broadcast(getLocalChatRoom(client.chatRoom).clients, message);
+        util.broadcast(getClientsExculdingCurrentClient(getLocalChatRoom(client.chatRoom).clients, client), message);
     }
+}
+
+/*
+
+    get the client list removing the current client
+
+*/
+function getClientsExculdingCurrentClient(clients, currentClient) {
+    return clients.filter(item => item !== currentClient)
 }

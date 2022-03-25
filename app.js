@@ -9,7 +9,7 @@ const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer }
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
-const {addChatroom } = require('./data/globalChatRooms');
+const { addChatroom } = require('./data/globalChatRooms');
 
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
 const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication');
@@ -65,7 +65,7 @@ serverForClients.listen(port, function () {
 serverForClients.on('connection', function (socket) {
 
     if (heartbeatCheck == false) {
-        //setInterval(heartbeat, 2000);
+        setInterval(heartbeat, 2000);
         heartbeatCheck = true;
     }
 
@@ -86,7 +86,6 @@ serverForClients.on('connection', function (socket) {
 
     // When the client requests to end the TCP connection with the server, the server ends the connection.
     socket.on('end', function () {
-        quit(socket);
         console.log('Closing the connection');
     });
 
@@ -94,7 +93,7 @@ serverForClients.on('connection', function (socket) {
     // Don't forget to catch error, for your own sake.
     socket.on('error', function (err) {
         quit(socket);
-        console.log('Closing the connection');
+        console.log('Closing the connection - client error');
     });
 });
 
@@ -108,7 +107,7 @@ serverForCoordination.listen(coordinationPort, function () {
 serverForCoordination.on('connection', function (socket) {
 
     if (heartbeatCheck == false) {
-        //setInterval(heartbeat, 2000);
+        setInterval(heartbeat, 2000);
         heartbeatCheck = true;
     }
 
