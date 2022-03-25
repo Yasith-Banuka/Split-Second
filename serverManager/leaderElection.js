@@ -1,12 +1,13 @@
 const heap = require('heap-js');
 const constants = require('../util/constants');
-const {unicast, broadcast, multicast} = require("./serverMessage")
-const {getAllServerInfo, markFailedServer, markActiveServer} = require("../data/globalServerDetails")
-const {getPriority, getServerId, setCoordinator, getCoordinator} = require("../data/serverDetails")
-const {getLocalClientIds} = require("../data/serverClients")
-const {getLocalChatRooms} = require("../data/serverChatRooms")
-const {updateRooms, removeAllChatRoomsOfAServer} = require("../data/globalChatRooms")
-const {updateClients, removeAllClientsOfAServer} = require("../data/globalClients");
+const { unicast, broadcast, multicast } = require("./serverMessage")
+const { getAllServerInfo, markFailedServer, markActiveServer } = require("../data/globalServerDetails")
+const { getPriority, getServerId, setCoordinator, getAllInfo, getCoordinator } = require("../data/serverDetails")
+const { getLocalClientIds } = require("../data/serverClients")
+const { getLocalChatRooms } = require("../data/serverChatRooms")
+const { updateRooms, removeAllChatRoomsOfAServer, addChatroom } = require("../data/globalChatRooms")
+const { updateClients, removeAllClientsOfAServer } = require("../data/globalClients");
+
 
 const answers = new heap.Heap();
 var acceptingAnswers = false;
@@ -18,7 +19,7 @@ var bullyManager = (json) => {
 
         case "iamup":
             receiveIamup(json.serverid);
-            break; 
+            break;
 
         case "view":
             receiveView(json);
@@ -39,7 +40,7 @@ var bullyManager = (json) => {
 }
 
 var beginElection = () => {
-    
+
     console.log("coordinator failed. begin election")
     removeCoordinatorDetails();
     sendElection();
@@ -48,13 +49,13 @@ var beginElection = () => {
 var sendElection = () => {
     initialize();
     //send election msgs to all processes with higher priority
-    let electionMsg = {type : "bully", subtype : "election", serverid : getServerId()};
-    multicast(getHigherPriorityServers(),electionMsg);
+    let electionMsg = { type: "bully", subtype: "election", serverid: getServerId() };
+    multicast(getHigherPriorityServers(), electionMsg);
     acceptingAnswers = true;
-    
+
     setTimeout(() => {
         acceptingAnswers = false;
-        if(answers.length>0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+        if (answers.length > 0) {  //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
             sendNomination();
         } else {  //else, send coordinator msgs to all processes wih lower priority
             sendCoordinator();
@@ -68,45 +69,45 @@ var receiveElection = (serverId) => {
     removeCoordinatorDetails();
     //if the priority of server that sent the msg is lower, send answer msg
     let serverPriority = parseInt(serverId.slice(1));
-    if(serverPriority > getPriority()) {
+    if (serverPriority > getPriority()) {
         sendAnswer(serverId);
         receiveElectionTimeout = setTimeout(sendElection, constants.T4);
     }
 }
 
 var sendAnswer = (serverId) => {
-    let answerMsg = {type : "bully", subtype : "answer", serverid : getServerId()}
+    let answerMsg = { type: "bully", subtype: "answer", serverid: getServerId() }
     unicast(serverId, answerMsg);
 }
 
 var receiveAnswer = (serverId) => {
-    if(acceptingAnswers) {
+    if (acceptingAnswers) {
         answers.push(parseInt(serverId.slice(1)));
     }
-    
+
 }
 
 var sendCoordinator = () => {
     setCoordinator(getServerId());
     //to all servers with lower priority
-    let coordinatorMsg = {type : "bully", subtype : "coordinator", serverid : getServerId()}
+    let coordinatorMsg = { type: "bully", subtype: "coordinator", serverid: getServerId() }
     multicast(getLowerPriorityServers(), coordinatorMsg);
 }
 
 var receiveCoordinator = (serverId) => {
-    if(receiveElectionTimeout!=null) {
+    if (receiveElectionTimeout != null) {
         clearTimeout(receiveElectionTimeout);
         receiveElectionTimeout = null;
     }
-    
+
     // if sender has higher priority, set sender as new coordinator
-    if(serverId===currentNomination) {
+    if (serverId === currentNomination) {
         clearTimeout(sendNominationTimeout);
         setCoordinator(serverId);
         return
     }
     let serverPriority = parseInt(serverId.slice(1));
-    if(serverPriority < getPriority()) {
+    if (serverPriority < getPriority()) {
         setCoordinator(serverId);
     }
 }
@@ -114,48 +115,48 @@ var receiveCoordinator = (serverId) => {
 var sendNominationTimeout = null;
 var currentNomination;
 var sendNomination = () => {
-    if(answers.length>0)  { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
-        currentNomination = "s"+answers.pop();
-        let nominationMsg = {type : "bully", subtype : "nomination", serverid : getServerId()}
+    if (answers.length > 0) { //if answer array not empty, pick highest priority and send nomination msg and wait for coordinator for T3
+        currentNomination = "s" + answers.pop();
+        let nominationMsg = { type: "bully", subtype: "nomination", serverid: getServerId() }
         unicast(currentNomination, nominationMsg);
         sendNominationTimeout = setTimeout(sendNomination, constants.T3)  //repeat every T3 until coordinator msg received
     } else { //else restart election
         sendElection();
     }
-    
+
 }
 
 var receiveNomination = (serverId) => {
-    if(receiveElectionTimeout!=null) {
+    if (receiveElectionTimeout != null) {
         clearTimeout(receiveElectionTimeout);
         receiveElectionTimeout = null;
     }
     //check if priority less than own and send coordinator
     let serverPriority = parseInt(serverId.slice(1));
-    if(serverPriority > getPriority()) {
-        
+    if (serverPriority > getPriority()) {
+
         sendCoordinator();
     }
 }
 var viewMsgPriorities = []
 var sendIamup = () => {
-    let iamupMsg = {type : "bully", subtype : "iamup", serverid : getServerId()}
+    let iamupMsg = { type: "bully", subtype: "iamup", serverid: getServerId() }
     broadcast(iamupMsg);
     acceptingViews = true;
-    setTimeout(()=> {
+    setTimeout(() => {
         acceptingViews = false;
-        if(viewMsgPriorities.length==0) {
+        if (viewMsgPriorities.length == 0) {
             setCoordinator(getServerId());
         } else {
             let minView = Math.min(...viewMsgPriorities);
-            if(minView>getPriority()) {
+            if (minView > getPriority()) {
                 sendCoordinator();
             } else {
                 setCoordinator("s" + minView);
             }
         }
-        
-    },constants.T2);
+
+    }, constants.T2);
 
 }
 
@@ -165,15 +166,15 @@ var receiveIamup = (serverId) => {
 }
 
 var sendView = (serverId) => {
-    let viewMsg = {type : "bully", subtype : "view", serverpriority : getPriority(), clientlist : getLocalClientIds(), roomlist : getLocalChatRooms()}
+    let viewMsg = { type: "bully", subtype: "view", serverpriority: getPriority(), clientlist: getLocalClientIds(), roomlist: getLocalChatRooms() }
     unicast(serverId, viewMsg);
 }
 
 var receiveView = (viewMsg) => {
-    if(acceptingViews) {
+    if (acceptingViews) {
         viewMsgPriorities.push(parseInt(viewMsg.serverpriority));
-        updateClients("s"+viewMsg.serverpriority, viewMsg.clientlist);
-        updateRooms("s"+viewMsg.serverpriority, viewMsg.roomlist);
+        updateClients("s" + viewMsg.serverpriority, viewMsg.clientlist);
+        updateRooms("s" + viewMsg.serverpriority, viewMsg.roomlist);
     }
 }
 
@@ -194,16 +195,16 @@ function getHigherPriorityServers() {
         if ((serverPriority > globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
-    } 
+    }
     return results;
 }
 
 function initialize() {
     answers.clear();
     acceptingAnswers = false;
-    acceptingViews = false;  
+    acceptingViews = false;
     viewMsgPriorities = [];
-    if(receiveElectionTimeout!=null) {
+    if (receiveElectionTimeout != null) {
         clearTimeout(receiveElectionTimeout);
         receiveElectionTimeout = null;
     }
@@ -216,8 +217,14 @@ function getLowerPriorityServers() {
         if ((serverPriority < globalServerInfo[i].priority) && globalServerInfo[i].active) {
             results.push(globalServerInfo[i].serverId);
         }
-    } 
+    }
     return results;
 }
 
-module.exports = {bullyManager, beginElection, sendIamup}
+module.exports = { bullyManager, beginElection, sendIamup }
+//block clients until all servers up
+//values for t1, t2
+//at start, set leader
+//start vs recoevered
+//remove clients/rooms when server fails
+//leader fail remove chatrooms - by broadcast same msg as heartbeat
