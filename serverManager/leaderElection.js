@@ -2,12 +2,11 @@ const heap = require('heap-js');
 const constants = require('../util/constants');
 const {unicast, broadcast, multicast} = require("./serverMessage")
 const {getAllServerInfo, markFailedServer, markActiveServer} = require("../data/globalServerDetails")
-const {getPriority, getServerId, setCoordinator, getAllInfo, getCoordinator} = require("../data/serverDetails")
+const {getPriority, getServerId, setCoordinator, getCoordinator} = require("../data/serverDetails")
 const {getLocalClientIds} = require("../data/serverClients")
 const {getLocalChatRooms} = require("../data/serverChatRooms")
-const {updateRooms, removeAllChatRoomsOfAServer, addChatroom} = require("../data/globalChatRooms")
+const {updateRooms, removeAllChatRoomsOfAServer} = require("../data/globalChatRooms")
 const {updateClients, removeAllClientsOfAServer} = require("../data/globalClients");
-const {addHearbeatCounterObject} = require("./heartbeat")
 
 const answers = new heap.Heap();
 var acceptingAnswers = false;
@@ -42,10 +41,7 @@ var bullyManager = (json) => {
 var beginElection = () => {
     
     console.log("coordinator failed. begin election")
-    markFailedServer(getCoordinator());
-    removeAllClientsOfAServer(getCoordinator());
-    removeAllChatRoomsOfAServer(getCoordinator());
-    setCoordinator(null);
+    removeCoordinatorDetails();
     sendElection();
 }
 
@@ -69,15 +65,12 @@ var sendElection = () => {
 
 var receiveElectionTimeout = null;
 var receiveElection = (serverId) => {
-    markFailedServer(getCoordinator());
-    setCoordinator(null);
+    removeCoordinatorDetails();
     //if the priority of server that sent the msg is lower, send answer msg
     let serverPriority = parseInt(serverId.slice(1));
     if(serverPriority > getPriority()) {
         sendAnswer(serverId);
-        receiveElectionTimeout = setTimeout(() => {
-            sendElection();
-        }, constants.T4);
+        receiveElectionTimeout = setTimeout(sendElection, constants.T4);
     }
 }
 
@@ -169,7 +162,6 @@ var sendIamup = () => {
 var receiveIamup = (serverId) => {
     markActiveServer(serverId);
     sendView(serverId);
-    addHearbeatCounterObject(serverId);
 }
 
 var sendView = (serverId) => {
@@ -185,6 +177,15 @@ var receiveView = (viewMsg) => {
     }
 }
 
+function removeCoordinatorDetails() {
+    if(getCoordinator()!=null) {
+        markFailedServer(getCoordinator());
+        removeAllClientsOfAServer(getCoordinator());
+        removeAllChatRoomsOfAServer(getCoordinator());
+        setCoordinator(null);
+    }
+
+}
 function getHigherPriorityServers() {
     let results = [];
     let globalServerInfo = getAllServerInfo();
@@ -220,9 +221,3 @@ function getLowerPriorityServers() {
 }
 
 module.exports = {bullyManager, beginElection, sendIamup}
-//block clients until all servers up
-//values for t1, t2
-//at start, set leader
-//start vs recoevered
-//remove clients/rooms when server fails
-//leader fail remove chatrooms - by broadcast same msg as heartbeat

@@ -9,7 +9,7 @@ const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer }
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
-const { addChatroom } = require('./data/globalChatRooms');
+const {addChatroom } = require('./data/globalChatRooms');
 
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
 const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication');
@@ -86,6 +86,7 @@ serverForClients.on('connection', function (socket) {
 
     // When the client requests to end the TCP connection with the server, the server ends the connection.
     socket.on('end', function () {
+        //quit(socket);
         console.log('Closing the connection');
     });
 
@@ -93,7 +94,7 @@ serverForClients.on('connection', function (socket) {
     // Don't forget to catch error, for your own sake.
     socket.on('error', function (err) {
         quit(socket);
-        console.log('Closing the connection - client error');
+        console.log('Closing the connection');
     });
 });
 
@@ -111,17 +112,17 @@ serverForCoordination.on('connection', function (socket) {
         heartbeatCheck = true;
     }
 
-    console.log('A new connection with a server has been established.');
-
     socket.on('data', function (bufObj) {
         let json = util.jsonDecode(bufObj);
-        console.log(`Data received from a server : ` + JSON.stringify(json) + `\n`);
+        if(json.type !== "heartbeat" && json.type !== "heartbeat_ack") {
+            console.log(`Data received from a server : ` + JSON.stringify(json) + `\n`);
+        }
+        
         serverManager(socket, json);
 
     });
 
     socket.on('end', function () {
-        console.log('Closing the connection');
     });
 
     socket.on('error', function (err) {
