@@ -96,13 +96,12 @@ serverForClients.on('connection', function (socket) {
     socket.on('error', function(error) {
         console.log(error);
     });
-    
+
     // Don't forget to catch error, for your own sake.
     socket.on('close', function (isErr) {
         if(isErr) {
             setImmediate(quit,socket);
         }
-        console.log(err);
         console.log('Closing the connection');
     });
 });
