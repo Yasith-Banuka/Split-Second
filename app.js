@@ -93,7 +93,10 @@ serverForClients.on('connection', function (socket) {
         console.log('Closing the connection');
     });
 
-
+    socket.on('error', function(error) {
+        console.log(error);
+    });
+    
     // Don't forget to catch error, for your own sake.
     socket.on('close', function (isErr) {
         if(isErr) {
