@@ -259,23 +259,28 @@ function informFailure(serverid) {
 
 */
 function serverActionForFailedServer(failedServerID) {
-	// mark the server as a failed on its global server list
-	markFailedServer(failedServerID);
+	let failedServerInfo = getServerInfo(failedServerID);
 
-	let chatRoomForFailedServer = getChatRoomOfServer(failedServerID);
+	if (failedServerInfo["active"] == true) {
 
-	// remove chat rooms of the failed server
-	for (var i = 0; i < chatRoomForFailedServer.length; i++) {
-		removeChatroom(chatRoomForFailedServer[i]);
+		// mark the server as a failed on its global server list
+		markFailedServer(failedServerID);
+
+		let chatRoomForFailedServer = getChatRoomOfServer(failedServerID);
+
+		// remove chat rooms of the failed server
+		for (var i = 0; i < chatRoomForFailedServer.length; i++) {
+			removeChatroom(chatRoomForFailedServer[i]);
+		}
+
+		// remove clients of the failed server
+		removeAllClientsOfAServer(failedServerID);
+
+		// remove the heartbeat counter object of the failed server
+		removeHeartbeatCounterObject(failedServerID);
+
+		console.log(`${failedServerID} is removed from the server lists`);
 	}
-
-	// remove clients of the failed server
-	removeAllClientsOfAServer(failedServerID);
-
-	// remove the heartbeat counter object of the failed server
-	removeHeartbeatCounterObject(failedServerID);
-
-	console.log(`${failedServerID} is removed from the server lists`)
 }
 
 /*
@@ -285,19 +290,19 @@ function serverActionForFailedServer(failedServerID) {
 */
 function leaderActionForFailedServer(failedServerID) {
 	let failedServerInfo = getServerInfo(failedServerID);
-	console.log(failedServerInfo);
+
+	let broadcastMessage = {
+		"type": "heartbeat_fail_broadcast",
+		"fail_serverid": failedServerID
+	};
+
 	if (failedServerInfo["active"] == true) {
-
-		let broadcastMessage = {
-			"type": "heartbeat_fail_broadcast",
-			"fail_serverid": failedServerID
-		};
-
 		serverActionForFailedServer(failedServerID)
-
-		// broadcast the message to remove the failedServer from there globale server list
-		broadcast(broadcastMessage);
 	}
+
+	// broadcast the message to remove the failedServer from there globale server list
+	broadcast(broadcastMessage);
+
 	// else disregrad the request, because it's already been handled by the leader.
 
 }
