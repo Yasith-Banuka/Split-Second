@@ -306,10 +306,9 @@ function leaderActionForFailedServer(failedServerID) {
 			heartbeatFailureCounters[parseInt(failedServerID.slice(1))-1]=0
 			beginElection();
 			
-		} else {
-			// broadcast the message to remove the failedServer from there globale server list
-			broadcast(broadcastMessage);
-		}
+		// broadcast the message to remove the failedServer from there globale server list
+		broadcast(broadcastMessage);
+		
 
 
 
