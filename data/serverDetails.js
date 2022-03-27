@@ -27,9 +27,14 @@ function setConfigInfo(path, serverId) {
 
     // read servers config from file 
     const data = fs.readFileSync(path, 'utf8');
-
-    serversConf = data.split('\r\n');
-
+    //check the OS type
+    var isWin = process.platform === "win32";
+    if (isWin){
+        serversConf = data.split('\r\n');
+    }
+    else{
+        serversConf = data.split('\n');
+    }
     for (var i = 0; i < serversConf.length; i++) {
 
         serverConf = serversConf[i].split(' ');

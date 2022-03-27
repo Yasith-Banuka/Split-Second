@@ -72,7 +72,7 @@ function addHearbeatCounterObject(serverId) {
 			break;
 		}
 	}
-	if (!serverExists){
+	if (!serverExists) {
 		let heartbeatCounterObject = {
 			"serverId": serverId,
 			"heartbeatCounter": 1,
@@ -140,6 +140,8 @@ function getHearbeatCounterObjectForServerId(serverId) {
 //increase heartbeatReceive counter after receiving heartbeat and send ack message
 
 function receiveHeartbeat(identity, receivedCounter) {
+
+	addHearbeatCounterObject(identity);
 
 	let arrayLength = heartbeatReceiveCounterList.length;
 	let currentCounter;
@@ -333,11 +335,11 @@ async function heartbeat() {
 				}
 
 				// if failureCounter == 3 inform the leader about the failed Server
-				if (failureCounter == 3) {
+				if (failureCounter == 2) {
 					informFailure(heartbeatCounterList[i]["serverId"]);
 				}
 
-				if (failureCounter > 2) {
+				if (failureCounter > 1) {
 					clearInterval(intervalVar);
 				}
 			}
