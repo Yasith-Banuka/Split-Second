@@ -238,12 +238,13 @@ function informFailure(serverid) {
 		"fail_serverid": serverid
 	};
 
-	console.log(leaderid);
+	console.log("leader is : ", leaderid);
 
 	if (serverid == leaderid) {
 		// remove the heartbeat counter object of the failed server
 		removeHeartbeatCounterObject(serverid);
 		beginElection();
+		console.log("heartbeatCounterList : ",heartbeatCounterList, "\n heartbeatReceiveCounterList  : ", heartbeatReceiveCounterList, "\n heartbeatFailureCounters : ", heartbeatFailureCounters)
 	}
 	else {
 		// check if the current server is the leader

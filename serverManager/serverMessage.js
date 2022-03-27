@@ -13,9 +13,9 @@ function unicast(serverId, message) {
     let receivingServerInfo = getServerInfo(serverId);
     if (receivingServerInfo["active"]) {
         const socket = net.createConnection(receivingServerInfo["coordinationPort"] , receivingServerInfo["address"], () => {
-//             if(message.type !== "heartbeat" && message.type !== "heartbeat_ack") {
+             if(message.type !== "heartbeat" && message.type !== "heartbeat_ack") {
                 console.log("Sending message to server ", serverId, " : ", message);
-//             }
+             }
             socket.write(jsonEncode(message));
             socket.destroy();
         });
