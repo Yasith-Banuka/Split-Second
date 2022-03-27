@@ -26,6 +26,8 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
 
 */
 function joinClientNewChatRoom(chatRoomIdentity, client) {
+    
+    console.log("Inside joint chatromm (roomid, client) : " , chatRoomIdentity, client);
     if (chatRoomIdentity == getMainHallID()) {
         serverChatRooms[0].clients.push(client);
     } else {
