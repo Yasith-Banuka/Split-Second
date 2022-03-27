@@ -32,6 +32,7 @@ includes received heartbeat counter details.
 
 var heartbeatReceiveCounterList = [];
 
+var heartbeatFailureCounters;
 /*
 
 	Initalize heartbeatCounter lists
@@ -58,6 +59,7 @@ function initHeartbeat() {
 			heartbeatReceiveCounterList.push(heartbeatRecieveCounterObject);
 		}
 	}
+	heartbeatFailureCounters = new Array(arrayLength).fill(0)
 }
 
 // add given heartbeatCounterObject to the heartbeatCounterList and heartbeatCounterRecievedList
@@ -143,7 +145,7 @@ function getHearbeatCounterObjectForServerId(serverId) {
 //increase heartbeatReceive counter after receiving heartbeat and send ack message
 
 function receiveHeartbeat(identity, receivedCounter) {
-
+	heartbeatFailureCounters[parseInt(identity.slice(1))]=0
 	addHearbeatCounterObject(identity);
 
 	let arrayLength = heartbeatReceiveCounterList.length;
@@ -183,7 +185,7 @@ function receiveHeartbeat(identity, receivedCounter) {
 //increase heartbeat counter after receiving heartbeat ack message
 
 function receiveHeartbeatAck(identity, counter) {
-
+	heartbeatFailureCounters[parseInt(identity.slice(1))]=0
 	let arrayLength = heartbeatCounterList.length;
 
 	for (var i = 0; i < arrayLength; i++) {
@@ -295,15 +297,19 @@ function leaderActionForFailedServer(failedServerID) {
 		"type": "heartbeat_fail_broadcast",
 		"fail_serverid": failedServerID
 	};
-
-	if (failedServerInfo["active"] == true) {
-		serverActionForFailedServer(failedServerID)
+	if(heartbeatFailureCounters[parseInt(failedServerID.slice(1))]>Math.floor(heartbeatFailureCounters.length/2)) {
+		if (failedServerInfo["active"] == true) {
+			serverActionForFailedServer(failedServerID)
+		}
+	
+		// broadcast the message to remove the failedServer from there globale server list
+		broadcast(broadcastMessage);
+	
+		// else disregrad the request, because it's already been handled by the leader.
+	} else {
+		heartbeatFailureCounters[parseInt(failedServerID.slice(1))]+=1;
 	}
 
-	// broadcast the message to remove the failedServer from there globale server list
-	broadcast(broadcastMessage);
-
-	// else disregrad the request, because it's already been handled by the leader.
 
 }
 
