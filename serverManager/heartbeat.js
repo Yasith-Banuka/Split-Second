@@ -282,7 +282,7 @@ function serverActionForFailedServer(failedServerID) {
 */
 function leaderActionForFailedServer(failedServerID) {
 	let failedServerInfo = getServerInfo(failedServerID);
-
+	console.log(failedServerInfo);
 	if (failedServerInfo["active"] == true) {
 
 		let broadcastMessage = {
