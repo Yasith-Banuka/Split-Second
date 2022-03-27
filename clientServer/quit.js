@@ -23,8 +23,12 @@ module.exports = {
             "former": room,
             "roomid": ""
         };
-
-        socket.write(util.jsonEncode(quitReply));
+        
+        try{
+            socket.write(util.jsonEncode(quitReply));
+        }catch(err){
+            console.log("Client abruptly deleted");
+        }
 
         removeClientFromChatRoom(room, client);
         removeClientFromServer(client);
@@ -76,7 +80,10 @@ module.exports = {
                 "roomid": room,
                 "approved": "true"
             };
-            socket.write(util.jsonEncode(approveMessage));
+            
+            try{
+                socket.write(util.jsonEncode(approveMessage));
+            }catch(err){}
 
             // broadcast deletion of chatroom to the other servers
             removeChatroom(room);
