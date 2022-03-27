@@ -6,6 +6,9 @@ const { jsonEncode, jsonDecode } = require("../util/util");
 
 
 function unicast(serverId, message) {
+    if(serverId==null) {
+        return
+    }
 
     let receivingServerInfo = getServerInfo(serverId);
     if (receivingServerInfo["active"]) {
