@@ -4,8 +4,7 @@ const { unicast, broadcast, multicast } = require("./serverMessage")
 const { getAllServerInfo, markFailedServer, markActiveServer } = require("../data/globalServerDetails")
 const { getPriority, getServerId, setCoordinator, getAllInfo, getCoordinator } = require("../data/serverDetails")
 const { getLocalClientIds } = require("../data/serverClients")
-const { getLocalChatRooms } = require("../data/serverChatRooms")
-const { updateRooms, removeAllChatRoomsOfAServer, addChatroom } = require("../data/globalChatRooms")
+const { updateRooms, removeAllChatRoomsOfAServer, addChatroom, getChatRoomOfServer } = require("../data/globalChatRooms")
 const { updateClients, removeAllClientsOfAServer } = require("../data/globalClients");
 
 
@@ -166,7 +165,7 @@ var receiveIamup = (serverId) => {
 }
 
 var sendView = (serverId) => {
-    let viewMsg = { type: "bully", subtype: "view", serverpriority: getPriority(), clientlist: getLocalClientIds(), roomlist: getLocalChatRooms() }
+    let viewMsg = { type: "bully", subtype: "view", serverpriority: getPriority(), clientlist: getLocalClientIds(), roomlist: getChatRoomOfServer(getServerId()) }
     unicast(serverId, viewMsg);
 }
 

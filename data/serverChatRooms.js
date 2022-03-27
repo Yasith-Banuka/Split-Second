@@ -55,13 +55,6 @@ function getLocalChatRoom(chatRoomIdentity) {
     return false;
 }
 
-/*
 
-    return all server chat rooms 
 
-*/
-function getLocalChatRooms() {
-    return serverChatRooms.map(chatroom => chatroom.chatRoomIdentity);
-}
-
-module.exports = { serverChatRooms, getMainHallID, addLocalChatRoom, getLocalChatRoom, getLocalChatRooms }
+module.exports = { serverChatRooms, getMainHallID, addLocalChatRoom, getLocalChatRoom }
