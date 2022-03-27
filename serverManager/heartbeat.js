@@ -367,4 +367,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, derderActionForFailedServer, serverActionForFailedServer }
+module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }
