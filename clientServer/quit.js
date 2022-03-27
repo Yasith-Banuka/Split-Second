@@ -15,7 +15,7 @@ module.exports = {
         let roomDetails = getLocalChatRoom(room);
         let owner = (roomDetails.owner == null) ? "" : roomDetails.owner.clientIdentity;
         let clientList = roomDetails.clients
-
+        
         //send room change msg with null string as new room
         quitReply = {
             "type": "roomchange",
@@ -23,12 +23,9 @@ module.exports = {
             "former": room,
             "roomid": ""
         };
-        
-        try{
-            socket.write(util.jsonEncode(quitReply));
-        }catch(err){
-            console.log("Client abruptly deleted");
-        }
+
+        socket.write(util.jsonEncode(quitReply));
+
 
         removeClientFromChatRoom(room, client);
         removeClientFromServer(client);
@@ -81,9 +78,9 @@ module.exports = {
                 "approved": "true"
             };
             
-            try{
-                socket.write(util.jsonEncode(approveMessage));
-            }catch(err){}
+
+            socket.write(util.jsonEncode(approveMessage));
+  
 
             // broadcast deletion of chatroom to the other servers
             removeChatroom(room);
