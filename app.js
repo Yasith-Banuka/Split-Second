@@ -77,9 +77,12 @@ serverForClients.on('connection', function (socket) {
 
     // The server can also receive data from the client or another server  by reading from its socket.
     socket.on('data', function (bufObj) {
-        let json = util.jsonDecode(bufObj);
-        console.log(`Data received from client: ` + JSON.stringify(json) + `\n`);
-        clientServer(socket, json);
+        try {
+            let json = util.jsonDecode(bufObj);
+            console.log(`Data received from client: ` + JSON.stringify(json) + `\n`);
+            clientServer(socket, json);
+        } catch (error) {}
+        
 
     });
 
@@ -113,12 +116,16 @@ serverForCoordination.on('connection', function (socket) {
     }
 
     socket.on('data', function (bufObj) {
-        let json = util.jsonDecode(bufObj);
-        if(json.type !== "heartbeat" && json.type !== "heartbeat_ack") {
-            console.log(`Data received from a server : ` + JSON.stringify(json) + `\n`);
-        }
+        try{
+            let json = util.jsonDecode(bufObj);
+            if(json.type !== "heartbeat" && json.type !== "heartbeat_ack") {
+                console.log(`Data received from a server : ` + JSON.stringify(json) + `\n`);
+            }
+            
+            serverManager(socket, json);
+        } catch(error) {}
         
-        serverManager(socket, json);
+        
 
     });
 
