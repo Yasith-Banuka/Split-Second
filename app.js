@@ -48,7 +48,7 @@ const serverForClients = new Net.Server();
 
 // Called when server is connected
 serverForClients.listen(port, function () {
-    console.log(`Server listening for client connection requests on ${serverForClients.address().address}:${port}`);
+    console.log(`Server listening for client connection requests on ${serverConfig.address}:${port}`);
 
     // Create the main hall of the server
     addLocalChatRoom({
@@ -95,8 +95,10 @@ serverForClients.on('connection', function (socket) {
 
 
     // Don't forget to catch error, for your own sake.
-    socket.on('error', function (err) {
-        setImmediate(quit,socket);
+    socket.on('close', function (isErr) {
+        if(isErr) {
+            setImmediate(quit,socket);
+        }
         console.log(err);
         console.log('Closing the connection');
     });
@@ -106,7 +108,7 @@ serverForClients.on('connection', function (socket) {
 const serverForCoordination = new Net.Server();
 
 serverForCoordination.listen(coordinationPort, function () {
-    console.log(`Server listening for server connection requests on ${serverForClients.address().address}:${coordinationPort}`);
+    console.log(`Server listening for server connection requests on ${serverConfig.address}:${coordinationPort}`);
 });
 
 serverForCoordination.on('connection', function (socket) {

@@ -78,9 +78,9 @@ module.exports = {
                 "approved": "true"
             };
             
-
-            socket.write(util.jsonEncode(approveMessage));
-  
+            try {
+                socket.write(util.jsonEncode(approveMessage));
+            } catch (err){}
 
             // broadcast deletion of chatroom to the other servers
             removeChatroom(room);
@@ -89,8 +89,10 @@ module.exports = {
             console.log(room, " chatroom deleted");
 
         }
-
-        socket.destroy();
+        
+        try {
+            socket.destroy();
+        } catch (err){}
 
         // broadcast client deletion to the other servers
         broadcastClientDeletion(client.clientIdentity);
