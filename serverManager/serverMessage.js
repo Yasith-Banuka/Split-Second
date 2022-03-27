@@ -9,15 +9,15 @@ function unicast(serverId, message) {
 
     let receivingServerInfo = getServerInfo(serverId);
     if (receivingServerInfo["active"]) {
-        const socket = net.connect({ port: receivingServerInfo["coordinationPort"] }, receivingServerInfo["address"], () => {
-            if(message.type !== "heartbeat" && message.type !== "heartbeat_ack") {
+        const socket = net.createConnection(receivingServerInfo["coordinationPort"] , receivingServerInfo["address"], () => {
+//             if(message.type !== "heartbeat" && message.type !== "heartbeat_ack") {
                 console.log("Sending message to server ", serverId, " : ", message);
-            }
+//             }
             socket.write(jsonEncode(message));
             socket.destroy();
         });
         socket.on('error', error => {
-            //console.log(`Error: ${error}`);
+            console.log(`Error: ${error}`);
             socket.destroy();
         });
     }
@@ -45,7 +45,7 @@ function multicast(serverIds, message) {
 function reply(serverId, message, timeout) {
     // let serverCoordinationPort = getCoordinationPort();
     let receivingServerInfo = getServerInfo(serverId);
-    const socket = net.createConnection({ port: receivingServerInfo["coordinationPort"] }, receivingServerInfo["address"], () => {
+    const socket = net.createConnection(receivingServerInfo["coordinationPort"], receivingServerInfo["address"], () => {
         socket.write(jsonEncode(message));
         console.log("Sending message to server ", serverId, " : ", message);
     });
