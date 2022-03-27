@@ -1,0 +1,8 @@
+node app.js "s1" "config/serverConfig.txt"
+
+java -jar client.jar -h 34.231.158.202 -p 4444 -i identity -d
+java -jar client.jar -h 34.231.158.202 -p 4445 -i identity -d
+java -jar client.jar -h 52.203.187.32 -p 4446 -i identity -d
+java -jar client.jar -h 52.203.187.32 -p 4447 -i identity -d
+java -jar client.jar -h 54.211.137.253 -p 4448 -i identity -d
+java -jar client.jar -h 54.211.137.253 -p 4449 -i identity -d
