@@ -96,7 +96,7 @@ serverForClients.on('connection', function (socket) {
 
     // Don't forget to catch error, for your own sake.
     socket.on('error', function (err) {
-        //quit(socket);
+        setImmediate(quit,socket);
         console.log(err);
         console.log('Closing the connection');
     });
