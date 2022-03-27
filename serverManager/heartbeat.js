@@ -305,17 +305,10 @@ function leaderActionForFailedServer(failedServerID) {
 		if(failedServerID==leader) {
 			heartbeatFailureCounters[parseInt(failedServerID.slice(1))-1]=0
 			beginElection();
-			
+		}	
 		// broadcast the message to remove the failedServer from there globale server list
 		broadcast(broadcastMessage);
-		
 
-
-
-	
-		
-
-	
 		// else disregrad the request, because it's already been handled by the leader.
 	} else {
 		heartbeatFailureCounters[parseInt(failedServerID.slice(1))-1]+=1;
@@ -374,4 +367,4 @@ async function heartbeat() {
 	}
 }
 
-module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, leaderActionForFailedServer, serverActionForFailedServer }
+module.exports = { initHeartbeat, heartbeat, receiveHeartbeat, receiveHeartbeatAck, derderActionForFailedServer, serverActionForFailedServer }
