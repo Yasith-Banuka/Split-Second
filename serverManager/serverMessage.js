@@ -17,7 +17,7 @@ function unicast(serverId, message) {
             socket.destroy();
         });
         socket.on('error', error => {
-            //console.log(`Error: ${error}`);
+            console.log(`Error: ${error}`);
             socket.destroy();
         });
     }
