@@ -3,7 +3,6 @@ const util = require("../util/util");
 
 module.exports = {
     sendlist: function (socket) {
-        console.log(gloablChatrooms);
         let listReply;
         let rooms = [];
 

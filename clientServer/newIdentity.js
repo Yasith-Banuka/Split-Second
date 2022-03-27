@@ -34,12 +34,12 @@ module.exports = {
             // broadcast new client to the other servers
             broadcastNewClient(getServerId(), identity );
 
-            console.log('new client added to the server');
+            console.log(identity, ' added to the server');
         } else {
             newIdentityAck = { "type": "newidentity", "approved": "false" };
             socket.write(util.jsonEncode(newIdentityAck));
 
-            console.log('new client addition failed')
+            console.log(identity, ' addition failed')
         }
     }
 };

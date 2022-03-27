@@ -59,7 +59,7 @@ module.exports = {
 
             broadcastChatroomDeletion(roomId);
 
-            console.log("room deleted");
+            console.log(roomId, " chatroom deleted");
 
         } else {
             approveMessage = {
@@ -69,7 +69,7 @@ module.exports = {
             };
             socket.write(util.jsonEncode(approveMessage));
 
-            console.log("room deleted failed");
+            console.log(roomId, " chatroom deleted failed");
         }
     }
 }

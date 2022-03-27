@@ -47,12 +47,12 @@ module.exports = {
             // broadcast new chatroom to the other servers
             broadcastNewChatroom(getServerId(), roomId);
 
-            console.log("room created");
+            console.log(roomId," chatroom created");
         } else {
             approveMessage = { "type": "createroom", "roomid": roomId, "approved": "false" };
             socket.write(util.jsonEncode(approveMessage));
 
-            console.log("room created failed");
+            console.log(roomId,"chatroom created failed");
         }
     }
 }

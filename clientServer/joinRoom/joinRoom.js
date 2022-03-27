@@ -42,7 +42,7 @@ module.exports = {
 
             // send neccessary messages - this is common for the both cases
             util.broadcast(getLocalChatRoom(clientPrevChatRoomId).clients, approveMessage);
-            console.log("room changed");
+            console.log(client, " changed from ",clientPrevChatRoomId," to ", roomId);
 
         } else {
             approveMessage = {
@@ -53,7 +53,7 @@ module.exports = {
             };
             socket.write(util.jsonEncode(approveMessage));
 
-            console.log("room changed failed");
+            console.log(client, "room change request denied");
         }
     }
 }

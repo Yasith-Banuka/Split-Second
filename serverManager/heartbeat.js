@@ -238,12 +238,12 @@ function informFailure(serverid) {
 		"fail_serverid": serverid
 	};
 
-	console.log("leader is : ", leaderid);
+	//console.log("leader is : ", leaderid);
 
 	if (serverid == leaderid) {
 		// remove the heartbeat counter object of the failed server
 		broadcast(failureMsg);
-		console.log("heartbeatCounterList : ",heartbeatCounterList, "\n heartbeatReceiveCounterList  : ", heartbeatReceiveCounterList, "\n heartbeatFailureCounters : ", heartbeatFailureCounters)
+		//console.log("heartbeatCounterList : ",heartbeatCounterList, "\n heartbeatReceiveCounterList  : ", heartbeatReceiveCounterList, "\n heartbeatFailureCounters : ", heartbeatFailureCounters)
 	}
 	else {
 		// check if the current server is the leader
@@ -344,8 +344,8 @@ async function heartbeat() {
 					// if the heartBeatAck has not return back send the heatbeat again
 					sendHeartbeat(heartbeatCounterList[i]);
 
-					console.log(failureCounter);
-					console.log(heartbeatCounterList[i]["serverId"] + " heart beat failed. Trying Again");
+					//console.log(failureCounter);
+					//console.log(heartbeatCounterList[i]["serverId"] + " heart beat failed. Trying Again");
 				} else {
 					// to break the failureCounter while loop
 					failureCounter = 5;

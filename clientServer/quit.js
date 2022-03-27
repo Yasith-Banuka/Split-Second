@@ -82,7 +82,7 @@ module.exports = {
             removeChatroom(room);
             broadcastChatroomDeletion(room);
 
-            console.log("room deleted");
+            console.log(room, " chatroom deleted");
 
         }
 
@@ -91,6 +91,6 @@ module.exports = {
         // broadcast client deletion to the other servers
         broadcastClientDeletion(client.clientIdentity);
 
-        console.log("client removed")
+        console.log(client.clientIdentity, " removed")
     }
 }
