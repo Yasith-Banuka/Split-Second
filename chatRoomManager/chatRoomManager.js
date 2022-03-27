@@ -9,6 +9,9 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
     let chatRoom = getLocalChatRoom(chatRoomIdentity);
     let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
 
+    console.log(client);
+    console.log(chatRoom);
+
     let clientList = chatRoom.clients;
     let clientArrayIndex = clientList.findIndex((x) => x == client);
     clientList.splice(clientArrayIndex, 1);
