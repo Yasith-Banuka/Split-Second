@@ -242,8 +242,7 @@ function informFailure(serverid) {
 
 	if (serverid == leaderid) {
 		// remove the heartbeat counter object of the failed server
-		removeHeartbeatCounterObject(serverid);
-		beginElection();
+		broadcast(failureMsg);
 		console.log("heartbeatCounterList : ",heartbeatCounterList, "\n heartbeatReceiveCounterList  : ", heartbeatReceiveCounterList, "\n heartbeatFailureCounters : ", heartbeatFailureCounters)
 	}
 	else {
@@ -299,12 +298,22 @@ function leaderActionForFailedServer(failedServerID) {
 		"fail_serverid": failedServerID
 	};
 	if(heartbeatFailureCounters[parseInt(failedServerID.slice(1))-1]>Math.floor(heartbeatFailureCounters.length/2)) {
+		if(failedServerID==getCoordinator()) {
+			heartbeatFailureCounters[parseInt(failedServerID.slice(1))-1]=0
+			beginElection();
+			
+		} else {
+			// broadcast the message to remove the failedServer from there globale server list
+			broadcast(broadcastMessage);
+		}
+
+
 		if (failedServerInfo["active"] == true) {
 			serverActionForFailedServer(failedServerID)
 		}
 	
-		// broadcast the message to remove the failedServer from there globale server list
-		broadcast(broadcastMessage);
+		
+
 	
 		// else disregrad the request, because it's already been handled by the leader.
 	} else {
