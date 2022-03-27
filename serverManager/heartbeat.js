@@ -2,7 +2,7 @@ const { getServerId } = require("../data/serverDetails");
 const util = require("../util/util");
 const { unicast, broadcast } = require("./serverMessage");
 const { getCoordinator } = require("../data/serverDetails");
-const { getServerInfo, markFailedServer, getAllServerInfo } = require("../data/globalServerDetails");
+const { getServerInfo, markFailedServer, getAllServerInfo, markActiveServer } = require("../data/globalServerDetails");
 const { getChatRoomOfServer, removeChatroom } = require("../data/globalChatRooms");
 const { removeAllClientsOfAServer } = require("../data/globalClients");
 const { beginElection } = require("./leaderElection");
@@ -85,6 +85,9 @@ function addHearbeatCounterObject(serverId) {
 		}
 		heartbeatCounterList.push(heartbeatCounterObject);
 		heartbeatReceiveCounterList.push(heartbeatReceiveCounterObject);
+
+		markActiveServer(serverId);
+
 		console.log(serverId, " added to heartbeat");
 	}
 }
@@ -344,7 +347,7 @@ async function heartbeat() {
 				}
 			}
 
-		}, 60000);
+		}, 8000);
 
 	}
 }
