@@ -34,7 +34,11 @@ function setGlobalServersConfig(path, serverId) {
     }
 
     for (var i = 0; i < serversConf.length; i++) {
-
+        
+        if(serversConf[i]==""){
+            continue;
+        }
+        
         serverConf = serversConf[i].split(' ');
 
         if (serverConf[0] != serverId) {
