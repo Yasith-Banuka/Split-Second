@@ -344,7 +344,7 @@ async function heartbeat() {
 				}
 			}
 
-		}, 60000);
+		}, 8000);
 
 	}
 }
