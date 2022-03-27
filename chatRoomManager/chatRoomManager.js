@@ -9,9 +9,6 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
     let chatRoom = getLocalChatRoom(chatRoomIdentity);
     let chatRoomArrayIndex = serverChatRooms.findIndex((x) => x == chatRoom);
 
-    console.log(client);
-    console.log(chatRoom);
-
     let clientList = chatRoom.clients;
     let clientArrayIndex = clientList.findIndex((x) => x == client);
     clientList.splice(clientArrayIndex, 1);
@@ -27,7 +24,6 @@ function removeClientFromChatRoom(chatRoomIdentity, client) {
 */
 function joinClientNewChatRoom(chatRoomIdentity, client) {
     
-    console.log("Inside joint chatromm (roomid, client) : " , chatRoomIdentity, client);
     if (chatRoomIdentity == getMainHallID()) {
         serverChatRooms[0].clients.push(client);
     } else {
