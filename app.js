@@ -9,7 +9,7 @@ const { setGlobalServersConfig, getCoordinatingPorts, getHighestPriorityServer }
 const util = require('./util/util');
 const { argv } = require('process');
 const { addLocalChatRoom } = require('./data/serverChatRooms');
-const {addChatroom } = require('./data/globalChatRooms');
+const { addChatroom } = require('./data/globalChatRooms');
 
 const { heartbeat, initHeartbeat } = require('./serverManager/heartbeat');
 const { broadcastNewChatroom } = require('./serverManager/broadcastCommunication');
@@ -81,8 +81,8 @@ serverForClients.on('connection', function (socket) {
             let json = util.jsonDecode(bufObj);
             console.log(`Data received from client: ` + JSON.stringify(json) + `\n`);
             clientServer(socket, json);
-        } catch (error) {}
-        
+        } catch (error) { }
+
 
     });
 
@@ -97,7 +97,7 @@ serverForClients.on('connection', function (socket) {
     // Don't forget to catch error, for your own sake.
     socket.on('error', function (err) {
         console.log('error socket : ', socket);
-        quit(socket);
+        //quit(socket);
         console.log('Closing the connection');
     });
 });
@@ -117,16 +117,16 @@ serverForCoordination.on('connection', function (socket) {
     }
 
     socket.on('data', function (bufObj) {
-        try{
+        try {
             let json = util.jsonDecode(bufObj);
-            if(json.type !== "heartbeat" && json.type !== "heartbeat_ack") {
+            if (json.type !== "heartbeat" && json.type !== "heartbeat_ack") {
                 console.log(`Data received from a server : ` + JSON.stringify(json) + `\n`);
             }
-            
+
             serverManager(socket, json);
-        } catch(error) {}
-        
-        
+        } catch (error) { }
+
+
 
     });
 
