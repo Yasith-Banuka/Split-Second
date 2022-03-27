@@ -155,7 +155,7 @@ function receiveHeartbeat(identity, receivedCounter) {
 			break
 		}
 	}
-	if(!availableInCounterList) {
+	if (!availableInCounterList) {
 		addHearbeatCounterObject(identity);
 		receiveHeartbeat(identity, receivedCounter);
 		return
@@ -344,7 +344,7 @@ async function heartbeat() {
 				}
 			}
 
-		}, 3000);
+		}, 60000);
 
 	}
 }
