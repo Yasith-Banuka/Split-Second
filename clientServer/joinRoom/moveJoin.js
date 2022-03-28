@@ -26,7 +26,7 @@ module.exports = {
 
             localMoveJoin(socket, roomId, former, clientIdentity);
 
-            console.log(serverChange);
+            //console.log(serverChange);
 
             // update client server id
             updateClientServer(getServerId(), clientIdentity);

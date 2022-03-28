@@ -42,7 +42,7 @@ module.exports = {
 
             // send neccessary messages - this is common for the both cases
             util.broadcast(getLocalChatRoom(clientPrevChatRoomId).clients, approveMessage);
-            console.log(getLocalChatRoom(clientPrevChatRoomId));
+            //console.log(getLocalChatRoom(clientPrevChatRoomId));
             console.log(client, " changed from ",clientPrevChatRoomId," to ", roomId);
 
         } else {

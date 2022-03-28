@@ -7,7 +7,7 @@ module.exports = {
     joinRoomChangeServer: function (socket, roomId, client) {
         let changeServerInfo = getServerInfo(getRoomServer(roomId));
 
-        console.log(changeServerInfo);
+        //console.log(changeServerInfo);
 
         let routeMessage = {
             "type": "route",
@@ -16,13 +16,13 @@ module.exports = {
             "port": changeServerInfo["clientPort"].toString()
         }
 
-        console.log(routeMessage);
+        //console.log(routeMessage);
 
         socket.write(jsonEncode(routeMessage));
 
         removeClientFromServer(client);
 
-        console.log("joinRoomChangeServer called");
+        console.log(client.clientIdentity," server changed");
 
     }
 }

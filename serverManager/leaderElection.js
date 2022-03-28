@@ -40,7 +40,7 @@ var bullyManager = (json) => {
 
 var beginElection = () => {
 
-    console.log("coordinator failed. begin election")
+    console.log("\n coordinator failed. begin election \n")
     removeCoordinatorDetails();
     sendElection();
 }

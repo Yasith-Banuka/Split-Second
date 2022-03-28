@@ -20,7 +20,7 @@ function unicast(serverId, message) {
             socket.destroy();
         });
         socket.on('error', error => {
-            console.log(`Error: ${error}`);
+            console.log(`Error while trying to connect to server `, serverId);
             socket.destroy();
         });
     }

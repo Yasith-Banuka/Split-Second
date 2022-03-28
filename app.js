@@ -94,7 +94,7 @@ serverForClients.on('connection', function (socket) {
     });
 
     socket.on('error', function(error) {
-        console.log(error);
+        console.log('client connection error');
     });
 
     // Don't forget to catch error, for your own sake.
@@ -138,7 +138,7 @@ serverForCoordination.on('connection', function (socket) {
     });
 
     socket.on('error', function (err) {
-        console.log(`Error: ${err}`);
+        console.log(`server connection error`);
     });
 });
 
@@ -149,7 +149,7 @@ serverForCoordination.on('connection', function (socket) {
 
 serverForCoordination.on('error', (err, socket) => {
     //if (err.code === 'ECONNRESET' || !socket.writable) socket.end('HTTP/2 400 Bad Request\n');
-    console.log('client error\n', err);
+    console.log('server error');
 });
 
 /* if (heartbeatCheck == 1) {
