@@ -35,10 +35,6 @@ module.exports = {
                 uponReceiveChatroomDeletion(json["roomid"]);
                 break;
 
-            case "joinroom":
-                // code block
-                break;
-
             case "bully":
                 bullyManager(json);
                 break;
