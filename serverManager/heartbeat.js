@@ -350,7 +350,7 @@ async function heartbeat() {
 					informFailure(heartbeatCounterList[i]["serverId"]);
 				}
 
-				if (failureCounter > 2) {
+				if (failureCounter > 1) {
 					clearInterval(intervalVar);
 				}
 			}
