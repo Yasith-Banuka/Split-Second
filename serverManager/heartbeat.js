@@ -160,11 +160,6 @@ function receiveHeartbeat(identity, receivedCounter) {
 			break
 		}
 	}
-	if (!availableInCounterList) {
-		addHearbeatCounterObject(identity);
-		receiveHeartbeat(identity, receivedCounter);
-		return
-	}
 	if (receivedCounter > currentCounter) {
 
 
