@@ -151,12 +151,10 @@ function receiveHeartbeat(identity, receivedCounter) {
 	let arrayLength = heartbeatReceiveCounterList.length;
 	let currentCounter;
 	let fromServerIndex;
-	let availableInCounterList = false;
 	for (var i = 0; i < arrayLength; i++) {
 		if (heartbeatReceiveCounterList[i]["serverId"] == identity) {
 			currentCounter = heartbeatReceiveCounterList[i]["heartbeatCounter"];
 			fromServerIndex = i;
-			availableInCounterList = true;
 			break
 		}
 	}
