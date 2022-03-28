@@ -297,7 +297,7 @@ function leaderActionForFailedServer(failedServerID) {
 		"type": "heartbeat_fail_broadcast",
 		"fail_serverid": failedServerID
 	};
-	if(heartbeatFailureCounters[parseInt(failedServerID.slice(1))-1]>Math.floor(heartbeatFailureCounters.length/2)) {
+	if(heartbeatFailureCounters[parseInt(failedServerID.slice(1))-1]>Math.floor(heartbeatCounterList.length/2)) {
 		let leader = getCoordinator();
 		if (failedServerInfo["active"] == true) {
 			serverActionForFailedServer(failedServerID)
